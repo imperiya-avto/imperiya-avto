@@ -311,6 +311,20 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .sell-selected-btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
 .selection-count{color:var(--muted);font-size:13px}
 
+/* Кнопка "Продать всё" */
+.sell-all-btn {
+    background: linear-gradient(180deg, #ff8a00, #c8323f);
+    box-shadow: 0 8px 20px rgba(255, 138, 0, 0.3);
+    border: 1px solid #ffb347;
+}
+.sell-all-btn:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 8px 25px rgba(255, 138, 0, 0.5);
+}
+.sell-all-btn:active {
+    transform: scale(0.96);
+}
+
 /* --- CARS GRID --- */
 .cars{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; overflow-anchor:none; }
 .empty{ color:#6f6f80; text-align:center; padding:18px; min-height:90px; display:flex;align-items:center;justify-content:center; background:linear-gradient(180deg, #14141a, #101015); border:1px dashed var(--stroke-2); border-radius:var(--radius-sm); font-size:13px; }
@@ -890,6 +904,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  <div class="garage-select-tools">
   <button class="select-mode-btn" id="selectModeButton" onclick="toggleSelectMode()">Выбрать</button>
   <button class="sell-selected-btn" id="sellSelectedButton" onclick="openBulkSellModal()" disabled>Продать выбранные (0)</button>
+  <button class="sell-all-btn" id="sellAllButton" onclick="openSellAllModal()">Продать всё</button>
   <span class="selection-count" id="selectionHint">Выбери несколько машин в гараже</span>
  </div>
  <div class="cars" id="garageCars"></div>
@@ -1231,15 +1246,44 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 <footer>Империя Авто © 2026</footer>
 
 <script>
-// ================= СИСТЕМА АККАУНТОВ =================
-let currentUser = null; // Логин текущего пользователя
+// ================= СИСТЕМА АККАУНТОВ (ИСПРАВЛЕННАЯ) =================
+let currentUser = null;
 let isRegisterMode = false;
 
 function getUsersDB() {
-  try { return JSON.parse(localStorage.getItem("autoEmpire_users")) || {}; } catch(e) { return {}; }
+  try {
+    let db = JSON.parse(localStorage.getItem("autoEmpire_users")) || {};
+    if (Object.keys(db).length === 0) {
+      const backup = sessionStorage.getItem("autoEmpire_users_backup");
+      if (backup) {
+        db = JSON.parse(backup);
+        localStorage.setItem("autoEmpire_users", backup);
+      }
+    }
+    return db;
+  } catch(e) {
+    console.error("Ошибка чтения БД:", e);
+    return {};
+  }
 }
+
 function saveUsersDB(db) {
-  localStorage.setItem("autoEmpire_users", JSON.stringify(db));
+  try {
+    const str = JSON.stringify(db);
+    if (str.length > 4.5 * 1024 * 1024) {
+      console.warn("БД близка к переполнению! Размер:", str.length);
+      for (const login in db) {
+        if (db[login].profile && db[login].profile.avatar && db[login].profile.avatar.length > 10000) {
+          db[login].profile.avatar = "";
+        }
+      }
+    }
+    localStorage.setItem("autoEmpire_users", JSON.stringify(db));
+    sessionStorage.setItem("autoEmpire_users_backup", JSON.stringify(db));
+  } catch(e) {
+    console.error("Ошибка сохранения БД:", e);
+    alert("Ошибка сохранения! Возможно, переполнено хранилище. Попробуйте очистить кэш браузера.");
+  }
 }
 
 function toggleAuthMode() {
@@ -1252,7 +1296,6 @@ function toggleAuthMode() {
 }
 
 function generateId(count) {
-  // Генерация ID на основе количества игроков (10-00-00, 20-00-00 и т.д.)
   const num = count * 10;
   const str = String(num).padStart(6, '0');
   return str.slice(0, 2) + "-" + str.slice(2, 4) + "-" + str.slice(4, 6);
@@ -1269,11 +1312,9 @@ function handleAuth() {
   if (isRegisterMode) {
     if (db[login]) { err.textContent = "Этот логин уже занят!"; return; }
     
-    // Считаем количество уже зарегистрированных
     const count = Object.keys(db).length + 1;
     const playerId = generateId(count);
     
-    // Создаем нового юзера
     db[login] = {
       password: pass,
       playerId: playerId,
@@ -1287,8 +1328,8 @@ function handleAuth() {
         lastFuelTime: Date.now(),
         lastTime: Date.now() 
       },
-      friends: [], // Массив ID друзей
-      friendRequests: [] // Массив входящих заявок (ID)
+      friends: [],
+      friendRequests: []
     };
     saveUsersDB(db);
     loginUser(login);
@@ -1296,7 +1337,6 @@ function handleAuth() {
     if (!db[login]) { err.textContent = "Пользователь не найден!"; return; }
     if (db[login].password !== pass) { err.textContent = "Неверный пароль!"; return; }
     
-    // Инициализация массивов для старых аккаунтов
     if (!db[login].friends) db[login].friends = [];
     if (!db[login].friendRequests) db[login].friendRequests = [];
     saveUsersDB(db);
@@ -1309,12 +1349,10 @@ function loginUser(login) {
   currentUser = login;
   localStorage.setItem("autoEmpire_activeUser", login);
   
-  // Скрываем экран входа
   document.getElementById("authScreen").style.display = "none";
   document.getElementById("userProfileWidget").style.display = "flex";
   document.getElementById("fuelWidget").style.display = "flex";
   
-  // Загружаем данные игры
   loadGameData();
   updateProfileUI();
   updateFuelUI();
@@ -1322,10 +1360,8 @@ function loginUser(login) {
   update();
   save();
   
-  // Проверяем заявки в друзья при входе
   checkFriendRequests();
   
-  // Показываем туториал только если это новый аккаунт (без машин)
   const db = getUsersDB();
   if (db[currentUser] && db[currentUser].gameData.cars.length <= 1 && !localStorage.getItem("tutorialCompleted_" + currentUser)) {
     tutorialIndex = 0;
@@ -1336,7 +1372,7 @@ function loginUser(login) {
 
 function logout() {
   if (!confirm("Вы уверены, что хотите выйти?")) return;
-  save(); // Сохраняем перед выходом
+  save();
   localStorage.removeItem("autoEmpire_activeUser");
   currentUser = null;
   document.getElementById("authScreen").style.display = "flex";
@@ -1345,15 +1381,13 @@ function logout() {
   closeProfile();
   closeFriends();
   
-  // Очищаем поля
   document.getElementById("authLogin").value = "";
   document.getElementById("authPassword").value = "";
   document.getElementById("authError").textContent = "";
   isRegisterMode = false;
-  toggleAuthMode(); // Сброс к режиму входа
+  toggleAuthMode();
 }
 
-// Проверка на автологин при загрузке
 window.addEventListener("load", () => {
   const active = localStorage.getItem("autoEmpire_activeUser");
   if (active && getUsersDB()[active]) {
@@ -1369,7 +1403,6 @@ function updateProfileUI() {
   if (!currentUser || !db[currentUser]) return;
   const p = db[currentUser].profile;
   
-  // Обновляем виджет в хедере
   document.getElementById("miniName").textContent = p.name || currentUser;
   const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231e1e26' width='100' height='100'/><text x='50' y='50' font-size='50' text-anchor='middle' dominant-baseline='central' fill='%23ffd21a'>👤</text></svg>";
   document.getElementById("miniAvatar").src = p.avatar || defaultAvatar;
@@ -1387,8 +1420,6 @@ function openProfile() {
   document.getElementById("profileIdDisplay").textContent = db[currentUser].playerId;
   
   document.getElementById("profileModal").hidden = false;
-  
-  // Проверяем заявки при открытии профиля
   checkFriendRequests();
 }
 
@@ -1403,7 +1434,6 @@ function handleAvatarUpload(event) {
   reader.onload = (e) => {
     const img = new Image();
     img.onload = () => {
-      // Сжимаем картинку через canvas, чтобы не забивать localStorage
       const canvas = document.createElement("canvas");
       const MAX_SIZE = 150;
       let width = img.width;
@@ -1437,7 +1467,6 @@ function saveProfile() {
   db[currentUser].profile.name = newName || currentUser;
   db[currentUser].profile.bio = newBio;
   
-  // Сохраняем аватарку только если это данные (а не стандартная svg-заглушка)
   if (newAvatar.startsWith("data:image")) {
      db[currentUser].profile.avatar = newAvatar;
   }
@@ -1449,7 +1478,7 @@ function saveProfile() {
 }
 
 // ================= СИСТЕМА ДРУЗЕЙ =================
-let currentFriendsTab = 'friends'; // 'friends' или 'requests'
+let currentFriendsTab = 'friends';
 
 function openFriends() {
   if (!currentUser) return;
@@ -1466,10 +1495,7 @@ function switchFriendsTab(tab) {
   currentFriendsTab = tab;
   document.getElementById("tabFriendsBtn").classList.toggle("active", tab === 'friends');
   document.getElementById("tabRequestsBtn").classList.toggle("active", tab === 'requests');
-  
-  // Показываем/скрываем поиск в зависимости от вкладки
   document.getElementById("friendSearchBox").style.display = tab === 'friends' ? 'flex' : 'none';
-  
   renderFriendsList();
 }
 
@@ -1482,7 +1508,6 @@ function renderFriendsList() {
   content.innerHTML = "";
   
   if (currentFriendsTab === 'friends') {
-    // Рендер друзей
     if (!user.friends || user.friends.length === 0) {
       content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:20px;">У вас пока нет друзей.<br>Найдите друга по ID и отправьте заявку!</div>';
     } else {
@@ -1509,7 +1534,6 @@ function renderFriendsList() {
       });
     }
   } else {
-    // Рендер входящих заявок
     if (!user.friendRequests || user.friendRequests.length === 0) {
       content.innerHTML = '<div style="text-align:center; color:var(--muted); padding:20px;">Нет входящих заявок.</div>';
     } else {
@@ -1587,13 +1611,11 @@ function sendFriendRequest() {
     return;
   }
   
-  // Проверяем, не в друзьях ли уже
   if (myData.friends && myData.friends.includes(targetId)) {
     alert("Этот игрок уже у вас в друзьях!");
     return;
   }
   
-  // Проверяем, не отправлена ли уже заявка
   let targetLogin = null;
   for (const login in db) {
     if (db[login].playerId === targetId) { targetLogin = login; break; }
@@ -1606,7 +1628,6 @@ function sendFriendRequest() {
     return;
   }
   
-  // Отправляем заявку
   if (!db[targetLogin].friendRequests) db[targetLogin].friendRequests = [];
   db[targetLogin].friendRequests.push(myData.playerId);
   saveUsersDB(db);
@@ -1619,14 +1640,11 @@ function acceptFriendRequest(senderId) {
   const db = getUsersDB();
   const myData = db[currentUser];
   
-  // Удаляем из заявок
   myData.friendRequests = myData.friendRequests.filter(id => id !== senderId);
   
-  // Добавляем в друзья себе
   if (!myData.friends) myData.friends = [];
   if (!myData.friends.includes(senderId)) myData.friends.push(senderId);
   
-  // Находим отправителя и добавляем себя ему в друзья
   for (const login in db) {
     if (db[login].playerId === senderId) {
       if (!db[login].friends) db[login].friends = [];
@@ -1645,7 +1663,6 @@ function rejectFriendRequest(senderId) {
   const db = getUsersDB();
   const myData = db[currentUser];
   
-  // Удаляем из заявок
   myData.friendRequests = myData.friendRequests.filter(id => id !== senderId);
   saveUsersDB(db);
   
@@ -1659,10 +1676,8 @@ function removeFriend(friendId) {
   const db = getUsersDB();
   const myData = db[currentUser];
   
-  // Удаляем у себя
   myData.friends = myData.friends.filter(id => id !== friendId);
   
-  // Удаляем себя у друга
   for (const login in db) {
     if (db[login].playerId === friendId) {
       if (db[login].friends) {
@@ -1683,7 +1698,6 @@ function checkFriendRequests() {
   const requests = db[currentUser].friendRequests || [];
   updateRequestsBadge();
   
-  // Показываем всплывающее уведомление о последней заявке
   if (requests.length > 0) {
     const lastRequestId = requests[requests.length - 1];
     const sender = findUserById(lastRequestId);
@@ -1701,7 +1715,6 @@ function renderTops() {
   if (!currentUser) return;
   const db = getUsersDB();
   
-  // Собираем всех юзеров
   const players = [];
   for (const login in db) {
     players.push({
@@ -1713,26 +1726,23 @@ function renderTops() {
     });
   }
   
-  // Сортируем по балансу
   players.sort((a, b) => b.balance - a.balance);
   
   const topContainer = document.getElementById("topContainer");
   topContainer.innerHTML = "";
   
-  // Ищем свое место
   const myIndex = players.findIndex(p => p.login === currentUser);
   const myPlaceEl = document.getElementById("myTopPlace");
   
   if (myIndex !== -1) {
     if (myIndex < 200) {
-      myPlaceEl.style.display = "none"; // Если я в топ-200, отдельный блок не нужен
+      myPlaceEl.style.display = "none";
     } else {
       myPlaceEl.style.display = "block";
       myPlaceEl.textContent = `Вы находитесь на ${myIndex + 1} месте в топе.`;
     }
   }
   
-  // Рендерим ТОП-200 (или меньше, если игроков мало)
   const topLimit = Math.min(players.length, 200);
   for (let i = 0; i < topLimit; i++) {
     const p = players[i];
@@ -1754,7 +1764,6 @@ function renderTops() {
       <div class="top-balance">${Math.floor(p.balance).toLocaleString('ru-RU')} ₽</div>
     `;
     
-    // Если кликнуть на другого игрока, можно показать его профиль (пока заглушка)
     row.onclick = () => {
       if (p.login !== currentUser) {
         alert(`Профиль игрока ${p.name}\nID: ${p.playerId}\nБаланс: ${Math.floor(p.balance).toLocaleString('ru-RU')} ₽`);
@@ -1776,17 +1785,17 @@ function updateFuel() {
   const gd = db[currentUser].gameData;
   const now = Date.now();
   
-  // Восстановление топлива: 1 ед. в час (3600000 мс)
+  if (typeof gd.fuel === 'undefined') gd.fuel = 20;
+  if (typeof gd.lastFuelTime === 'undefined') gd.lastFuelTime = now;
+  
   if (gd.fuel < 20) {
-    const timePassed = now - (gd.lastFuelTime || now);
+    const timePassed = now - gd.lastFuelTime;
     const hoursPassed = Math.floor(timePassed / 3600000);
     
     if (hoursPassed > 0) {
       gd.fuel = Math.min(20, gd.fuel + hoursPassed);
-      // Сдвигаем время последнего обновления на количество прошедших часов
-      gd.lastFuelTime = (gd.lastFuelTime || now) + (hoursPassed * 3600000);
+      gd.lastFuelTime += hoursPassed * 3600000;
       
-      // Если топливо восстановилось до максимума, сбрасываем таймер
       if (gd.fuel >= 20) {
         gd.lastFuelTime = now;
       }
@@ -1795,7 +1804,6 @@ function updateFuel() {
       updateFuelUI();
     }
   } else {
-    // Если топливо полное, всегда обновляем время
     gd.lastFuelTime = now;
   }
 }
@@ -1807,11 +1815,13 @@ function updateFuelUI() {
   
   const gd = db[currentUser].gameData;
   const fuelCountEl = document.getElementById("fuelCount");
-  fuelCountEl.textContent = gd.fuel;
-  if (gd.fuel <= 3) {
-    fuelCountEl.classList.add("low");
-  } else {
-    fuelCountEl.classList.remove("low");
+  if (fuelCountEl) {
+    fuelCountEl.textContent = gd.fuel;
+    if (gd.fuel <= 3) {
+      fuelCountEl.classList.add("low");
+    } else {
+      fuelCountEl.classList.remove("low");
+    }
   }
 }
 
@@ -1827,7 +1837,6 @@ function spendFuel() {
   }
   
   gd.fuel -= 1;
-  // Если топливо было полным, запускаем таймер восстановления с текущего момента
   if (gd.fuel === 19) {
     gd.lastFuelTime = Date.now();
   }
@@ -1886,13 +1895,13 @@ function triggerBalanceAnimation(amount, isPositive) {
 
 // ================= КАТАЛОГ МАШИН =================
 const RARITY_BASE = {
- "Обычная":      {priceMin: 15000,    priceMax: 90000,     incomeMin: 6,    incomeMax: 20},
- "Необычная":    {priceMin: 120000,   priceMax: 500000,    incomeMin: 30,   incomeMax: 110},
- "Редкая":       {priceMin: 900000,   priceMax: 6000000,   incomeMin: 180,  incomeMax: 800},
- "Эпическая":    {priceMin: 12000000, priceMax: 40000000,  incomeMin: 1100, incomeMax: 2800},
- "Легендарная":  {priceMin: 70000000, priceMax: 220000000, incomeMin: 3500, incomeMax: 9000},
- "Мифическая":   {priceMin: 350000000,priceMax: 900000000, incomeMin: 12000,incomeMax: 28000},
- "Божественная": {priceMin: 1500000000,priceMax: 5000000000,incomeMin: 40000,incomeMax: 90000}
+ "Обычная":      {priceMin: 15000,    priceMax: 90000,     incomeMin: 1.5,  incomeMax: 4.5},
+ "Необычная":    {priceMin: 120000,   priceMax: 500000,    incomeMin: 6,    incomeMax: 18},
+ "Редкая":       {priceMin: 900000,   priceMax: 6000000,   incomeMin: 25,   incomeMax: 80},
+ "Эпическая":    {priceMin: 12000000, priceMax: 40000000,  incomeMin: 120,  incomeMax: 350},
+ "Легендарная":  {priceMin: 70000000, priceMax: 220000000, incomeMin: 500,  incomeMax: 1500},
+ "Мифическая":   {priceMin: 350000000,priceMax: 900000000, incomeMin: 2000, incomeMax: 6000},
+ "Божественная": {priceMin: 1500000000,priceMax: 5000000000,incomeMin: 8000, incomeMax: 25000}
 };
 function lerp(min,max,t){ return Math.round(min + (max-min)*t); }
 
@@ -2128,7 +2137,6 @@ let selectedCars=[];
 let expandedCars = new Set();
 let sortedCarRefs = [];
 
-// Глобальные переменные
 let balance=0;
 let income=0;
 let garageSlots=5;
@@ -2146,6 +2154,12 @@ function loadGameData() {
   garageSlots = Math.min(40, Math.max(5, Number(saved.garageSlots) || 5));
   cars = (saved.cars || []).filter(car => catalog.some(c => c.id === car.id)).slice(0, 40);
   garageSlots = Math.max(garageSlots, cars.length);
+
+  if (typeof saved.fuel === 'undefined') {
+    db[currentUser].gameData.fuel = 20;
+    db[currentUser].gameData.lastFuelTime = Date.now();
+    saveUsersDB(db);
+  }
 
   const elapsed = Math.max(0, (Date.now() - (saved.lastTime || Date.now())) / 1000);
   income += elapsed * getRate();
@@ -2174,20 +2188,36 @@ function save(){
   db[currentUser].gameData.cars = cars;
   db[currentUser].gameData.garageSlots = garageSlots;
   db[currentUser].gameData.lastTime = Date.now();
+  const gd = db[currentUser].gameData;
+  if (typeof gd.fuel === 'undefined') gd.fuel = 20;
+  if (typeof gd.lastFuelTime === 'undefined') gd.lastFuelTime = Date.now();
+  
   saveUsersDB(db);
 }
 
 function update(){
- document.getElementById("balance").textContent=Math.floor(balance).toLocaleString("ru-RU");
- document.getElementById("income").textContent=Math.floor(income).toLocaleString("ru-RU");
- document.getElementById("rate").textContent=getRate().toLocaleString("ru-RU");
- document.getElementById("slots").textContent=cars.length;
- document.getElementById("maxSlots").textContent=garageSlots;
- const nextPrice=getNextSlotPrice();
- document.getElementById("nextSlotPrice").textContent= nextPrice===null?"МАКСИМУМ":nextPrice.toLocaleString("ru-RU");
- const slotButton=document.getElementById("buySlotButton");
- slotButton.disabled=garageSlots>=40||(nextPrice!==null&&balance<nextPrice);
- slotButton.textContent=garageSlots>=40?"Гараж заполнен":"Купить ячейку";
+ const balanceEl = document.getElementById("balance");
+ const incomeEl = document.getElementById("income");
+ const rateEl = document.getElementById("rate");
+ const slotsEl = document.getElementById("slots");
+ const maxSlotsEl = document.getElementById("maxSlots");
+ const nextSlotPriceEl = document.getElementById("nextSlotPrice");
+ const slotButton = document.getElementById("buySlotButton");
+
+ if (balanceEl) balanceEl.textContent = Math.floor(balance).toLocaleString("ru-RU");
+ if (incomeEl) incomeEl.textContent = Math.floor(income).toLocaleString("ru-RU");
+ if (rateEl) rateEl.textContent = getRate().toLocaleString("ru-RU");
+ if (slotsEl) slotsEl.textContent = cars.length;
+ if (maxSlotsEl) maxSlotsEl.textContent = garageSlots;
+ 
+ const nextPrice = getNextSlotPrice();
+ if (nextSlotPriceEl) {
+   nextSlotPriceEl.textContent = nextPrice === null ? "МАКСИМУМ" : nextPrice.toLocaleString("ru-RU");
+ }
+ if (slotButton) {
+   slotButton.disabled = garageSlots >= 40 || (nextPrice !== null && balance < nextPrice);
+   slotButton.textContent = garageSlots >= 40 ? "Гараж заполнен" : "Купить ячейку";
+ }
 }
 
 function updateCaseOdds(){
@@ -2203,6 +2233,7 @@ function renderGarage(){
   if (!currentUser) return;
   const savedScrollY=window.scrollY;
   const container=document.getElementById("garageCars");
+  if(!container) return;
   container.style.overflowAnchor="none";
   container.innerHTML="";
   expandedCars = new Set([...expandedCars].filter(i=>i>=0&&i<cars.length));
@@ -2274,14 +2305,14 @@ function renderGarage(){
      <div class="car-stats">
        <div class="stat-row"><span class="stat-label">✨ Редкость</span> <span class="stat-value rarity" style="color:${color}">${item.rarity}</span></div>
        <div class="stat-row"><span class="stat-label">⚡ Мощность</span> <span class="stat-value">${item.power} л.с.</span></div>
-       <div class="stat-row"><span class="stat-label">💵 Продажа</span> <span class="stat-value" style="color:var(--green)">${Math.floor(item.price*0.30).toLocaleString("ru-RU")} ₽</span></div>
+       <div class="stat-row"><span class="stat-label">💵 Продажа</span> <span class="stat-value" style="color:var(--green)">${Math.floor(item.price*0.15).toLocaleString("ru-RU")} ₽</span></div>
        <div class="stat-row"><span class="stat-label">📈 Доход</span> <span class="stat-value" style="color:var(--yellow)">${item.income.toLocaleString("ru-RU")} ₽/сек</span></div>
      </div>
    `;
 
    const sellBtn=document.createElement("button");
    sellBtn.className="car-sell-inline";
-   sellBtn.textContent="Продать за "+Math.floor(item.price*0.30).toLocaleString("ru-RU")+" ₽";
+   sellBtn.textContent="Продать за "+Math.floor(item.price*0.15).toLocaleString("ru-RU")+" ₽";
    sellBtn.onclick=(e)=>{ e.stopPropagation(); openSellModal(originalIndex); };
    details.append(sellBtn);
 
@@ -2384,7 +2415,7 @@ function openSellModal(index){
   document.getElementById("confirmSellButton").textContent="Продать";
   document.getElementById("sellText").textContent=
    "Ты действительно хочешь продать "+item.name+
-   " за "+Math.floor(item.price*0.30).toLocaleString("ru-RU")+" ₽?";
+   " за "+Math.floor(item.price*0.15).toLocaleString("ru-RU")+" ₽?";
   document.getElementById("sellModal").hidden=false;
 }
 function openBulkSellModal(){
@@ -2392,21 +2423,66 @@ function openBulkSellModal(){
   sellIndices=[...selectedCars].filter(i=>i>=0&&i<cars.length&&!cars[i].locked).sort((a,b)=>a-b);
   if(!sellIndices.length)return;
   const items=sellIndices.map(i=>catalog.find(c=>c.id===cars[i].id)).filter(Boolean);
-  const total=items.reduce((s,it)=>s+Math.floor(it.price*0.30),0);
+  const total=items.reduce((s,it)=>s+Math.floor(it.price*0.15),0);
   document.getElementById("sellModalTitle").textContent="🚘 Продажа автомобилей";
   document.getElementById("confirmSellButton").textContent="Подтвердить продажу";
   document.getElementById("sellText").textContent=
    "Ты уверен, что хочешь продать? Общая сумма: "+total.toLocaleString("ru-RU")+" ₽?";
   document.getElementById("sellModal").hidden=false;
 }
-function closeSellModal(){ document.getElementById("sellModal").hidden=true; sellIndices=[]; }
+
+let sellAllFlag = false;
+function openSellAllModal() {
+  const unlocked = cars.filter(c => !c.locked);
+  if (unlocked.length === 0) {
+    alert("Нет незаблокированных машин для продажи.");
+    return;
+  }
+  let total = 0;
+  unlocked.forEach(car => {
+    const item = catalog.find(c => c.id === car.id);
+    if (item) total += Math.floor(item.price * 0.15);
+  });
+  sellIndices = [];
+  sellAllFlag = true;
+  document.getElementById("sellModalTitle").textContent = "🚘 Продать всё";
+  document.getElementById("confirmSellButton").textContent = "Подтвердить продажу";
+  document.getElementById("sellText").textContent = `Вы уверены, что хотите продать ВСЕ незаблокированные машины (${unlocked.length} шт.) за ${total.toLocaleString("ru-RU")} ₽?`;
+  document.getElementById("sellModal").hidden = false;
+}
+
+function closeSellModal(){ document.getElementById("sellModal").hidden=true; sellIndices=[]; sellAllFlag = false; }
 function confirmSell(){
+  if (sellAllFlag) {
+    const unlocked = cars.filter(c => !c.locked);
+    if (unlocked.length === 0) { closeSellModal(); return; }
+    let total = 0;
+    for (let i = cars.length - 1; i >= 0; i--) {
+      if (!cars[i].locked) {
+        const item = catalog.find(c => c.id === cars[i].id);
+        if (item) {
+          total += Math.floor(item.price * 0.15);
+          cars.splice(i, 1);
+        }
+      }
+    }
+    balance += total;
+    if (total > 0) triggerBalanceAnimation(total, true);
+    selectedCars = [];
+    expandedCars.clear();
+    closeSellModal();
+    if (cars.length === 0) selectMode = false;
+    renderGarage();
+    save();
+    return;
+  }
+  
   if(!sellIndices.length)return;
   const valid=sellIndices.filter(i=>i>=0&&i<cars.length&&!cars[i].locked).sort((a,b)=>b-a);
   let total=0;
   valid.forEach(i=>{
    const item=catalog.find(c=>c.id===cars[i].id);
-   if(item){ total+=Math.floor(item.price*0.30); cars.splice(i,1); }
+   if(item){ total+=Math.floor(item.price*0.15); cars.splice(i,1); }
   });
   balance+=total;
   if(total>0) triggerBalanceAnimation(total, true);
@@ -2425,8 +2501,9 @@ function collectMoney(){
   income=0; 
   
   const incBox = document.getElementById("incomeBox");
-  showMoneyFloat(incBox, amount, true);
-  animateValue(document.getElementById("incomeDisplay"), amount, true);
+  if (incBox) showMoneyFloat(incBox, amount, true);
+  const incDisplay = document.getElementById("incomeDisplay");
+  if (incDisplay) animateValue(incDisplay, amount, true);
   
   triggerBalanceAnimation(amount, true);
 
@@ -2659,9 +2736,10 @@ function openTab(tab,button){
  if(tab !== "casino") closeCasinoGame();
  if(tab !== "races") closeRaceDetail();
  document.querySelectorAll("main section").forEach(s=>{ s.hidden=true; });
- document.getElementById(tab).hidden=false;
+ const section = document.getElementById(tab);
+ if (section) section.hidden = false;
  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
- button.classList.add("active");
+ if (button) button.classList.add("active");
  
  if (tab === "tops") {
    renderTops();
@@ -2798,7 +2876,7 @@ let auctionHighestBidder = "Нет ставок";
 let auctionTradeTimer = null;
 let auctionSpawnTimer = null;
 let auctionTradeTimeLeft = 0;
-let auctionSpawnTimeLeft = 300; // 5 минут
+let auctionSpawnTimeLeft = 300;
 const AUCTION_BOT_NAMES = ["Иван", "Дмитрий", "Алексей", "Максим", "Сергей", "Андрей", "Егор", "Кирилл"];
 
 function initAuction() {
@@ -2890,7 +2968,7 @@ function spawnAuctionCar() {
   toast.classList.add("show");
   setTimeout(() => { toast.classList.remove("show"); }, 5000);
   
-  auctionTradeTimeLeft = 78; // 1.3 мин
+  auctionTradeTimeLeft = 78;
   updateTradeTimerUI();
   
   clearInterval(auctionTradeTimer);
@@ -3036,13 +3114,13 @@ function endAuction() {
 }
 
 // ================= ГОНКИ =================
-const RACE_COST_PERCENT = 0.30; // Стоимость участия = 30% от цены машины соперника
-const RACE_REWARD_PERCENT = 1.0; // Выигрыш = 100% от цены машины соперника
+const RACE_COST_PERCENT = 0.30;
+const RACE_REWARD_PERCENT = 1.0;
 let currentRaceData = null;
 let currentRaceOpp = null;
 let selectedPlayerCar = null;
 let raceInterval = null;
-let raceState = 'idle'; // idle, starting, running, finished
+let raceState = 'idle';
 let playerProgress = 0;
 let botProgress = 0;
 let playerFinished = false;
@@ -3056,7 +3134,6 @@ let playerGoPressed = false;
 
 function initRaces() {
   renderRaceSlots();
-  // Попытаться выбрать лучшую машину по умолчанию
   if (cars.length > 0) {
     let bestCar = null;
     let maxPower = -1;
@@ -3110,7 +3187,6 @@ function renderRaceSlots() {
     `;
     grid.appendChild(slot);
     
-    // Обновить шанс, если выбрана машина
     if (selectedPlayerCar) {
       const chance = Math.min(95, Math.max(5, Math.round((selectedPlayerCar.power / (selectedPlayerCar.power + opp.power)) * 100)));
       const chanceEl = slot.querySelector(`#chance-${opp.id}`);
@@ -3163,6 +3239,7 @@ function closeCarSelect() {
 
 function updateRaceUI() {
   const nameEl = document.getElementById("playerCarName");
+  if (!nameEl) return;
   if (selectedPlayerCar) {
     nameEl.textContent = selectedPlayerCar.name;
     nameEl.style.color = "var(--yellow)";
@@ -3171,7 +3248,6 @@ function updateRaceUI() {
     nameEl.style.color = "var(--red)";
   }
   
-  // Обновить шансы в списке
   if (currentRaceOpp) {
     const chance = Math.min(95, Math.max(5, Math.round((selectedPlayerCar.power / (selectedPlayerCar.power + currentRaceOpp.power)) * 100)));
     document.querySelectorAll(".race-slot").forEach(slot => {
@@ -3252,7 +3328,6 @@ function startRaceSequence() {
     return;
   }
   
-  // Тратим топливо
   if (!spendFuel()) {
     return;
   }
@@ -3284,14 +3359,12 @@ function startRaceSequence() {
     raceState = 'running';
     raceStartTime = Date.now();
     
-    // Запускаем движение (но машина игрока стоит, пока не нажата кнопка)
     startMovement();
   }, greenDelay);
 }
 
 function playerGo() {
   if (raceState === 'starting') {
-    // Фальстарт
     endRace(false, "Фальстарт! Вы нажали до зелёного света. Проигрыш.");
     return;
   }
@@ -3322,13 +3395,11 @@ function startMovement() {
   let botStarted = false;
   let botTimeoutId = null;
 
-  // Бот начинает движение ровно через 500мс после старта
   botTimeoutId = setTimeout(() => {
     botStarted = true;
   }, 500);
   
   raceInterval = setInterval(() => {
-    // Игрок едет ТОЛЬКО если нажал кнопку "Ехать!"
     if (playerGoPressed && playerProgress < 100 && !playerFinished) {
       playerProgress += pSpeed;
       if (playerProgress >= 100) {
@@ -3338,7 +3409,6 @@ function startMovement() {
       document.getElementById("carPlayer").style.left = (8 + (playerProgress / 100) * laneWidth) + "px";
     }
     
-    // Бот едет после задержки
     if (botStarted && botProgress < 100 && !botFinished) {
       botProgress += bSpeed;
       if (botProgress >= 100) {
@@ -3348,7 +3418,6 @@ function startMovement() {
       document.getElementById("carBot").style.left = (8 + (botProgress / 100) * laneWidth) + "px";
     }
     
-    // Обновляем отображение дистанции
     const diff = playerProgress - botProgress;
     const distEl = document.getElementById("raceDistance");
     if (playerProgress > 0 && botProgress > 0 && !playerFinished && !botFinished) {
@@ -3409,7 +3478,6 @@ function endRace(win, message) {
 
 // --- ИНИЦИАЛИЗАЦИЯ ---
 window.onload = () => {
-  // Инициализация общих вещей
   updateCaseOdds();
   ['roulette', 'blackjack', 'dice', 'guess'].forEach(game => {
     updateBetDisplay(game);
@@ -3420,9 +3488,7 @@ window.onload = () => {
       income+=getRate();
       update();
       save();
-      updateFuel(); // Проверка восстановления топлива каждую секунду
-      
-      // Периодическая проверка заявок в друзья (раз в 3 секунды)
+      updateFuel();
       if (Math.random() < 0.33) checkFriendRequests();
     }
   },1000);
