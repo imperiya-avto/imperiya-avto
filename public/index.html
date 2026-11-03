@@ -273,49 +273,15 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 
 /* ===== ОВЕРЛЕЙ "ВЫПАЛА МАШИНА" НА КЕЙСЕ ===== */
 .case-drop-overlay {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 12px;
-  background: rgba(5, 5, 8, 0.82);
-  backdrop-filter: blur(3px);
-  -webkit-backdrop-filter: blur(3px);
-  border-radius: 16px;
-  z-index: 20;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.25s ease;
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 12px;
+  background: rgba(5, 5, 8, 0.82); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); border-radius: 16px; z-index: 20;
+  opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
 }
 .case-drop-overlay.show { opacity: 1; animation: dropPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-@keyframes dropPop {
-  0% { transform: scale(0.7); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
-}
-.case-drop-overlay .drop-icon {
-  font-size: 34px;
-  line-height: 1;
-  margin-bottom: 8px;
-  filter: drop-shadow(0 0 12px currentColor);
-}
-.case-drop-overlay .drop-rarity {
-  font-size: 12px;
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  margin-bottom: 6px;
-  text-shadow: 0 0 14px currentColor;
-}
-.case-drop-overlay .drop-name {
-  font-size: 18px;
-  font-weight: 900;
-  color: #fff;
-  line-height: 1.25;
-  text-shadow: 0 2px 10px rgba(0,0,0,0.95), 0 0 20px currentColor;
-}
+@keyframes dropPop { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.case-drop-overlay .drop-icon { font-size: 34px; line-height: 1; margin-bottom: 8px; filter: drop-shadow(0 0 12px currentColor); }
+.case-drop-overlay .drop-rarity { font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px; text-shadow: 0 0 14px currentColor; }
+.case-drop-overlay .drop-name { font-size: 18px; font-weight: 900; color: #fff; line-height: 1.25; text-shadow: 0 2px 10px rgba(0,0,0,0.95), 0 0 20px currentColor; }
 
 .quantity-title{color:var(--muted);margin:12px 0 8px;font-size:13px;letter-spacing:.4px}
 .quantity-buttons{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
@@ -338,28 +304,15 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 
 /* ===== КОМПАКТНАЯ КНОПКА "ПРОДАТЬ ВЫПАВШЕЕ" ===== */
 .sell-dropped-btn {
-  display: none;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin: 16px auto 6px;
-  padding: 10px 22px;
+  display: none; align-items: center; justify-content: center; gap: 8px;
+  margin: 16px auto 6px; padding: 10px 22px;
   background: linear-gradient(180deg, #2ee27a, #1fa35a);
-  color: #0b2a17;
-  border: 1px solid #7dffb4;
-  border-radius: 999px;
-  font-size: 14px;
-  font-weight: 900;
-  letter-spacing: 0.4px;
-  cursor: pointer;
+  color: #0b2a17; border: 1px solid #7dffb4; border-radius: 999px;
+  font-size: 14px; font-weight: 900; letter-spacing: 0.4px; cursor: pointer;
   box-shadow: 0 6px 18px rgba(46, 226, 122, 0.35), inset 0 1px 0 rgba(255,255,255,0.35);
   transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
 }
-.sell-dropped-btn:hover {
-  transform: translateY(-2px);
-  filter: brightness(1.08);
-  box-shadow: 0 10px 26px rgba(46, 226, 122, 0.5);
-}
+.sell-dropped-btn:hover { transform: translateY(-2px); filter: brightness(1.08); box-shadow: 0 10px 26px rgba(46, 226, 122, 0.5); }
 .sell-dropped-btn:active { transform: scale(0.97); }
 
 .case-price{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:16px; }
@@ -731,7 +684,8 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 </style>
 </head>
 <body>
-  <!-- ЭКРАН АВТОРИЗАЦИИ -->
+
+<!-- ЭКРАН АВТОРИЗАЦИИ -->
 <div id="authScreen">
   <div class="auth-box">
     <h2 id="authTitle">Вход в игру</h2>
@@ -768,6 +722,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
       <button class="btn-save" onclick="saveProfile()">Сохранить</button>
       <button class="btn-logout" onclick="logout()">Выйти</button>
     </div>
+    <!-- Кнопка админки -->
     <div id="adminPanelBtnWrap" style="display:none; margin-top:12px;">
       <button onclick="openAdminPanel()" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--yellow); background:linear-gradient(180deg, rgba(255,210,26,.18), rgba(255,210,26,.04)); color:var(--yellow); font-weight:900; cursor:pointer; text-transform:uppercase; letter-spacing:1px; box-shadow:0 0 18px rgba(255,210,26,.25);">
         ⚙️ Админ-панель
@@ -783,7 +738,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   <p style="color:var(--muted); font-size:13px;">Выдать или забрать деньги у игрока</p>
   
   <div class="profile-field" style="text-align:left;">
-    <label>ID игрока</label>
+    <label>ID игрока (или логин)</label>
     <input type="text" id="adminTargetId" placeholder="Например: 00-00-10">
   </div>
   <div class="profile-field" style="text-align:left;">
@@ -1148,7 +1103,6 @@ async function handleAuth() {
     localStorage.setItem('autoEmpire_activeUser', login);
     currentUser = login;
     applyServerUser(data.user);
-
     startGameLoop();
   } catch (e) {
     err.textContent = 'Сервер недоступен.';
@@ -1159,26 +1113,7 @@ async function handleAuth() {
 // ================= ВЫХОД =================
 function logout() {
   localStorage.removeItem('autoEmpire_activeUser');
-  currentUser = null;
-  myProfileData = null;
-  balance = 0;
-  income = 0;
-  cars = [];
-  garageSlots = 5;
-  selectedCars = [];
-  expandedCars.clear();
-  lastCarsFromCase = [];
-  window._lastFuel = MAX_FUEL;
-  window._lastFuelTime = Date.now();
-  if (saveTimeout) { clearTimeout(saveTimeout); saveTimeout = null; }
-
-  closeProfile();
-  document.getElementById("authScreen").style.display = "flex";
-  document.getElementById("userProfileWidget").style.display = "none";
-  document.getElementById("fuelWidget").style.display = "none";
-  document.getElementById("authLogin").value = "";
-  document.getElementById("authPassword").value = "";
-  document.getElementById("authError").textContent = "";
+  window.location.reload(); // Перезагружаем страницу, чтобы вернуться на экран входа
 }
 
 function applyServerUser(user) {
@@ -1192,7 +1127,6 @@ function applyServerUser(user) {
     window._lastFuel = user.gameData.fuel !== undefined ? user.gameData.fuel : MAX_FUEL;
     window._lastFuelTime = user.gameData.lastFuelTime || Date.now();
   }
-  // Обрезаем до максимума
   if (window._lastFuel > MAX_FUEL) window._lastFuel = MAX_FUEL;
 
   const elapsed = Math.max(0, (Date.now() - (user.gameData.lastTime || Date.now())) / 1000);
@@ -2164,31 +2098,6 @@ async function openMyProfile() {
   } catch (e) { console.error(e); }
 }
 
-async function showPlayerProfile(login) {
-  isViewingOtherProfile = true;
-  try {
-    const res = await fetch(`${API_URL}/user/${login}`);
-    if (!res.ok) return;
-    const user = await res.json();
-
-    const p = user.profile;
-    const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231e1e26' width='100' height='100'/><text x='50' y='50' font-size='50' text-anchor='middle' dominant-baseline='central' fill='%23ffd21a'>👤</text></svg>";
-
-    document.getElementById("profileAvatarPreview").src = p.avatar || defaultAvatar;
-    document.getElementById("profileNameInput").value = p.name || login;
-    document.getElementById("profileBioInput").value = p.bio || "";
-    document.getElementById("profileIdDisplay").textContent = user.playerId;
-
-    document.getElementById("profileNameInput").disabled = true;
-    document.getElementById("profileBioInput").disabled = true;
-    document.getElementById("avatarUploadLabel").style.display = "none";
-    document.getElementById("profileActions").style.display = "none";
-    document.getElementById("adminPanelBtnWrap").style.display = "none";
-
-    document.getElementById("profileModal").hidden = false;
-  } catch (e) { console.error(e); }
-}
-
 function closeProfile() {
   document.getElementById("profileModal").hidden = true;
 }
@@ -2289,14 +2198,8 @@ async function adminAdjust(action) {
       return;
     }
 
-    // === ФИКС: перечитываем актуальные данные с сервера, чтобы локальный balance совпал с БД ===
-    // Находим логин по playerId и перечитываем
-    try {
-      const allRes = await fetch(`${API_URL}/top`);
-      const allPlayers = await allRes.json();
-      const targetPlayer = allPlayers.find(p => p.playerId === targetId);
-      if (targetPlayer && targetPlayer.login === currentUser) {
-        // Если выдали себе — обновляем локальный баланс
+    // Если админ изменил свой же баланс, нужно обновить локальные данные
+    if (targetId === document.getElementById('profileIdDisplay').textContent) {
         const meRes = await fetch(`${API_URL}/user/${currentUser}`);
         const me = await meRes.json();
         balance = me.gameData.balance;
@@ -2308,14 +2211,14 @@ async function adminAdjust(action) {
           window._lastFuelTime = me.gameData.lastFuelTime;
         }
         update();
-      }
-    } catch(e) {}
+        renderGarage();
+    }
 
-    msgEl.textContent = `✅ ${action === 'give' ? 'Выдано' : 'Забрано'} ${amount.toLocaleString('ru-RU')} ₽. Новый баланс игрока: ${data.newBalance.toLocaleString('ru-RU')} ₽`;
+    msgEl.textContent = `✅ ${action === 'give' ? 'Выдано' : 'Забрано'} ${amount.toLocaleString('ru-RU')} ₽. Новый баланс: ${data.newBalance.toLocaleString('ru-RU')} ₽`;
     msgEl.style.color = 'var(--green)';
     document.getElementById('adminAmount').value = '';
   } catch (e) {
-    msgEl.textContent = '❌ Ошибка соединения';
+    msgEl.textContent = '❌ Ошибка соединения с сервером';
     msgEl.style.color = 'var(--red)';
   }
 }
@@ -2361,8 +2264,12 @@ async function renderTops() {
       `;
 
       row.onclick = () => {
-        if (p.login !== currentUser) showPlayerProfile(p.login);
-        else openMyProfile();
+        if (p.login !== currentUser) {
+           // Просмотр чужого профиля (заглушка)
+           alert(`Игрок: ${p.name}\nID: ${p.playerId}\nБаланс: ${Math.floor(p.balance).toLocaleString('ru-RU')} ₽`);
+        } else {
+           openMyProfile();
+        }
       };
       topContainer.appendChild(row);
     }
@@ -2533,13 +2440,11 @@ let playerGoPressed = false;
 
 let raceOpponentsMap = {};
 
-// ===== Обновление ячеек с лучшими машинами =====
 function renderRaceCarsGrid() {
   const grid = document.getElementById('raceCarsGrid');
   if (!grid) return;
   grid.innerHTML = '';
 
-  // Собираем все уникальные машины игрока с их мощностью
   const uniqueCars = [];
   const seen = new Set();
   cars.forEach(c => {
@@ -2550,7 +2455,6 @@ function renderRaceCarsGrid() {
     }
   });
 
-  // Сортируем по мощности (от лучшей к худшей)
   uniqueCars.sort((a, b) => b.power - a.power);
   const topCars = uniqueCars.slice(0, 4);
 
@@ -2562,13 +2466,10 @@ function renderRaceCarsGrid() {
     return;
   }
 
-  // Если выбранной машины нет в топ-4 — сбросим выбор на лучшую
   if (!selectedPlayerCar || !topCars.some(c => c.id === selectedPlayerCar.id)) {
     selectedPlayerCar = topCars[0];
   }
 
-  // Считаем шанс победы = среднее по 5 случайным соперникам (тем, что сейчас в слотах)
-  // Но проще: берём среднее по всем машинам каталога без "low_"
   const opponentsPool = catalog.filter(c => !c.id.startsWith('low_'));
   const avgOppPower = opponentsPool.reduce((s, c) => s + c.power, 0) / opponentsPool.length;
 
@@ -2614,7 +2515,7 @@ function renderRaceSlots() {
     const reward = Math.floor(opp.price * RACE_REWARD_PERCENT);
 
     const racesWithOpp = raceOpponentsMap[opp.id] || 0;
-    const isLocked = racesWithOpp >= 10; // лимит 10 гонок с одним соперником
+    const isLocked = racesWithOpp >= 10;
 
     const slot = document.createElement("div");
     slot.className = "race-slot" + (isLocked ? " locked" : "");
