@@ -660,6 +660,56 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 ::-webkit-scrollbar-thumb{background:#2c2c38;border-radius:6px}
 ::-webkit-scrollbar-thumb:hover{background:#3a3a48}
 
+/* ===== МОДАЛКА ДЛЯ РЕДКОГО НОМЕРА ===== */
+#rareNumberModal .modal-box {
+  border: 2px solid var(--yellow);
+  box-shadow: 0 0 40px rgba(255,210,26,0.3), inset 0 0 20px rgba(255,210,26,0.1);
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+#rareNumberModal .rare-title {
+  font-size: 24px;
+  color: var(--yellow);
+  text-shadow: 0 0 15px rgba(255,210,26,0.5);
+  margin-bottom: 10px;
+  animation: pulseYellow 1.5s infinite alternate;
+}
+#rareNumberModal .rare-subtitle {
+  font-size: 16px;
+  color: #fff;
+  margin-bottom: 20px;
+}
+#rareNumberModal .rare-plate-preview {
+  display: inline-block;
+  background: #fff;
+  color: #000;
+  font-family: 'Arial Black', Impact, sans-serif;
+  font-size: 22px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 2px solid #333;
+  margin-bottom: 25px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+#rareNumberModal .rare-btn-continue {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(180deg, #3ddc84, #28a862);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(61,220,132,0.4);
+  transition: all 0.2s;
+}
+#rareNumberModal .rare-btn-continue:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(61,220,132,0.6);
+}
+
 @media(max-width: 600px) {
   .user-profile-widget { top: 10px; right: 10px; padding: 4px 8px 4px 4px; }
   .user-avatar-mini { width: 32px; height: 32px; }
@@ -855,6 +905,17 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
    <button class="number-sell-btn close" onclick="closeSellNumberModal()">Отмена</button>
   </div>
  </div>
+</div>
+
+<!-- МОДАЛКА ДЛЯ РЕДКОГО НОМЕРА -->
+<div class="modal" id="rareNumberModal" hidden style="z-index: 100010;">
+  <div class="modal-box">
+    <div class="rare-title">🎉 ВАМ ВЫПАЛ ХОРОШИЙ НОМЕР!</div>
+    <div class="rare-subtitle" id="rareNumberTitle">Легендарный номер!</div>
+    <div class="rare-plate-preview" id="rareNumberPreview">А 000 АА | 777</div>
+    <p style="margin-bottom: 20px;">Вы уверены, что хотите продолжить?<br>Не пропустите такую редкость!</p>
+    <button class="rare-btn-continue" onclick="continueAfterRareNumber()">Продолжить</button>
+  </div>
 </div>
 
 <header>
@@ -2551,7 +2612,7 @@ function getRandomPlateRegion() {
   return ALLOWED_REGIONS[Math.floor(Math.random() * ALLOWED_REGIONS.length)];
 }
 
-// Оценка "красоты" номера
+// Оценка "красоты" номера (Улучшенные шансы)
 function evaluatePlate(charsArr, regionStr) {
   const chars = charsArr;
   const digits = chars.filter(c => !isNaN(c));
@@ -2571,14 +2632,21 @@ function evaluatePlate(charsArr, regionStr) {
   // Бонус за крутой регион
   const isCoolRegion = ['777', '799', '197', '99', '97', '177'].includes(regionStr);
 
+  // Увеличенные шансы:
+  // Эксклюзив: 3 одинаковые цифры И 3 одинаковые буквы (А 777 АА)
   if (hasThreeDigits && hasThreeLetters) {
     return { type: 'exclusive', label: '💎 ЭКСКЛЮЗИВНЫЙ НОМЕР!', color: '#ff00cc' };
-  } else if (hasThreeDigits || hasThreeLetters || (isCoolRegion && (hasTwoDigits || hasTwoLetters))) {
-    // Шанс на легендарный увеличен: если 3 одинаковые цифры/буквы ИЛИ крутой регион + 2 одинаковые
+  } 
+  // Легендарный: 3 одинаковые цифры ИЛИ 3 одинаковые буквы ИЛИ (крутой регион + 2 одинаковые цифры/буквы)
+  else if (hasThreeDigits || hasThreeLetters || (isCoolRegion && (hasTwoDigits || hasTwoLetters))) {
     return { type: 'legendary', label: '🔥 ЛЕГЕНДАРНЫЙ НОМЕР!', color: '#ffd21a' };
-  } else if (hasTwoDigits || hasTwoLetters) {
+  } 
+  // Редкий: 2 одинаковые цифры ИЛИ 2 одинаковые буквы
+  else if (hasTwoDigits || hasTwoLetters) {
     return { type: 'rare', label: '✨ РЕДКИЙ НОМЕР', color: '#00e5ff' };
-  } else {
+  } 
+  // Обычный
+  else {
     return { type: 'common', label: '📄 ОБЫЧНЫЙ НОМЕР', color: '#3ddc84' };
   }
 }
@@ -2633,6 +2701,36 @@ function initNumbersTab() {
   currentUnconfirmedPlate = null;
   
   renderMyNumbers();
+}
+
+// Функция для показа модалки редкого номера
+function showRareNumberModal(plateData, callback) {
+  const modal = document.getElementById('rareNumberModal');
+  const title = document.getElementById('rareNumberTitle');
+  const preview = document.getElementById('rareNumberPreview');
+
+  if (plateData.type === 'exclusive') {
+    title.textContent = '💎 ЭКСКЛЮЗИВНЫЙ НОМЕР!';
+    title.style.color = '#ff00cc';
+  } else {
+    title.textContent = '🔥 ЛЕГЕНДАРНЫЙ НОМЕР!';
+    title.style.color = '#ffd21a';
+  }
+
+  preview.textContent = `${plateData.chars} | ${plateData.region}`;
+  
+  modal.hidden = false;
+  
+  // Сохраняем колбэк
+  window._rareNumberCallback = callback;
+}
+
+function continueAfterRareNumber() {
+  document.getElementById('rareNumberModal').hidden = true;
+  if (window._rareNumberCallback) {
+    window._rareNumberCallback();
+    window._rareNumberCallback = null;
+  }
 }
 
 async function spinChars() {
@@ -2711,6 +2809,13 @@ async function spinChars() {
       isSpinningChars = false;
       btn.disabled = false;
       btn.textContent = 'ЦИФРЫ 500К';
+
+      // Если выпал редкий номер - показываем модалку!
+      if (result.type === 'exclusive' || result.type === 'legendary') {
+        showRareNumberModal(currentUnconfirmedPlate, () => {
+           // Ничего делать не надо, просто даем посмотреть
+        });
+      }
     }
   }, 50); 
 }
@@ -2784,6 +2889,13 @@ async function spinRegion() {
       isSpinningRegion = false;
       btn.disabled = false;
       btn.textContent = 'РЕГИОН 300К';
+
+      // Если выпал редкий номер - показываем модалку!
+      if (result.type === 'exclusive' || result.type === 'legendary') {
+        showRareNumberModal(currentUnconfirmedPlate, () => {
+           // Ничего делать не надо, просто даем посмотреть
+        });
+      }
     }
   }, 50);
 }
@@ -2874,7 +2986,7 @@ function renderMyNumbers() {
 
 function getNextNumberSlotPrice() {
   if (numbersSlots >= 40) return 0;
-  // Цена растет: 1млн за 11-ю, 2млн за 12-ю и т.д.
+  // Цена растет: 1млн за 11-ю, 1.5млн за 12-ю и т.д.
   const purchased = numbersSlots - 10;
   return Math.round(1000000 * Math.pow(1.5, purchased));
 }
