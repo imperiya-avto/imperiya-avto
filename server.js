@@ -6,8 +6,12 @@ const { MongoClient } = require('mongodb');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Строка подключения к базе данных (мы получим её на шаге 2)
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+// ================= НАСТРОЙКИ =================
+// ЗАМЕНИТЕ ЭТО НА ВАШ ЛОГИН, ПОД КОТОРЫМ ВЫ ЗАХОДИТЕ В ИГРУ!
+const ADMIN_LOGIN = 'YOUR_ADMIN_LOGIN'; 
+
+// Строка подключения к базе данных (если вы меняли пароль в MongoDB, замените его здесь)
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://q1weshgg5_db_user:RFWAVljQWN6vqJ3@cluster0.kndazx5.mongodb.net/?retryWrites=true&w=majority';
 const DB_NAME = 'imperiya_avto';
 
 app.use(cors());
@@ -109,4 +113,40 @@ app.post('/api/profile', async (req, res) => {
   const { login, profile } = req.body;
   await db.collection('users').updateOne({ login }, { $set: { profile } });
   res.json({ success: true });
+});
+
+// ================= АДМИН ПАНЕЛЬ (ВЫДАЧА ДЕНЕГ) =================
+app.post('/api/admin/give', async (req, res) => {
+  try {
+    const { adminLogin, targetId, amount } = req.body;
+    
+    // Проверка, что запрос делает именно админ
+    if (adminLogin !== ADMIN_LOGIN) {
+      return res.status(403).json({ error: 'У вас нет прав администратора!' });
+    }
+
+    const numAmount = Number(amount);
+    if (isNaN(numAmount) || numAmount <= 0) {
+      return res.status(400).json({ error: 'Неверная сумма!' });
+    }
+
+    // Ищем игрока по ID в базе данных
+    const user = await db.collection('users').findOne({ playerId: targetId });
+    if (!user) {
+      return res.status(404).json({ error: 'Игрок с таким ID не найден!' });
+    }
+
+    // Начисляем деньги
+    const newBalance = (user.gameData.balance || 0) + numAmount;
+    await db.collection('users').updateOne(
+      { playerId: targetId },
+      { $set: { 'gameData.balance': newBalance } }
+    );
+
+    console.log(`Админ выдал ${numAmount} игроку ${targetId}. Новый баланс: ${newBalance}`);
+    res.json({ success: true, newBalance });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Ошибка сервера' });
+  }
 });
