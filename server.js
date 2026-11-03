@@ -6,9 +6,8 @@ const { MongoClient } = require('mongodb');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ================= НАСТРОЙКИ =================
-const ADMIN_LOGIN = 'Q1wesh'; // Ваш логин (владелец)
-const MAX_FUEL = 10; // Лимит топлива
+const ADMIN_LOGIN = 'Q1wesh'; 
+const MAX_FUEL = 10; 
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://q1weshgg5_db_user:RFWAVljQWN6vqJ3@cluster0.kndazx5.mongodb.net/?retryWrites=true&w=majority';
 const DB_NAME = 'imperiya_avto';
@@ -49,7 +48,7 @@ app.post('/api/register', async (req, res) => {
     playerId,
     profile: { name: login, bio: '', avatar: '' },
     gameData: {
-      balance: 400000,
+      balance: 350000,
       income: 0,
       cars: [{ id: 'rusty_7' }],
       garageSlots: 5,
@@ -91,7 +90,6 @@ app.get('/api/top', async (req, res) => {
     playerId: p.playerId,
     name: p.profile?.name || p.login,
     avatar: p.profile?.avatar || '',
-    bio: p.profile?.bio || '',
     balance: p.gameData?.balance || 0
   })));
 });
@@ -108,38 +106,29 @@ app.post('/api/profile', async (req, res) => {
   res.json({ success: true });
 });
 
-// ================= АДМИН ПАНЕЛЬ (ВЫДАТЬ/ЗАБРАТЬ) =================
 app.post('/api/admin/adjust', async (req, res) => {
   try {
     const { adminLogin, targetId, amount } = req.body;
-
-    // Проверка прав: только Q1wesh
-    if (adminLogin !== ADMIN_LOGIN) {
-      return res.status(403).json({ error: 'У вас нет прав администратора!' });
-    }
+    if (adminLogin !== ADMIN_LOGIN) return res.status(403).json({ error: 'Нет прав администратора!' });
 
     const numAmount = Number(amount);
-    if (isNaN(numAmount) || numAmount === 0) {
-      return res.status(400).json({ error: 'Неверная сумма!' });
-    }
+    if (isNaN(numAmount) || numAmount === 0) return res.status(400).json({ error: 'Неверная сумма!' });
 
-    // Ищем игрока по playerId
-    const user = await db.collection('users').findOne({ playerId: targetId });
-    if (!user) {
-      return res.status(404).json({ error: 'Игрок с таким ID не найден!' });
-    }
+    let user = await db.collection('users').findOne({ playerId: targetId });
+    if (!user) user = await db.collection('users').findOne({ login: targetId });
+    if (!user) return res.status(404).json({ error: 'Игрок с таким ID не найден!' });
 
     const currentBalance = user.gameData.balance || 0;
-    const newBalance = Math.max(0, currentBalance + numAmount); // не уходим в минус
+    const newBalance = Math.max(0, currentBalance + numAmount);
 
     await db.collection('users').updateOne(
-      { playerId: targetId },
+      { _id: user._id },
       { $set: { 'gameData.balance': newBalance } }
     );
 
     res.json({ success: true, newBalance, action: numAmount >= 0 ? 'give' : 'take' });
   } catch (e) {
     console.error("Ошибка в админке:", e);
-    res.status(500).json({ error: 'Ошибка сервера' });
+    res.status(500).json({ error: 'Ошибка сервера: ' + e.message });
   }
 });
