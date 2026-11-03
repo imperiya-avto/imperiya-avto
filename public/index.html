@@ -211,7 +211,7 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .cars{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; overflow-anchor:none; }
 .empty{ color:#6f6f80; text-align:center; padding:18px; min-height:90px; display:flex;align-items:center;justify-content:center; background:linear-gradient(180deg, #14141a, #101015); border:1px dashed var(--stroke-2); border-radius:var(--radius-sm); font-size:13px; }
 
-.car{ position:relative; background:linear-gradient(180deg, #1d1d25 0%, #15151b 100%); border-radius:14px; padding:12px; border:2px solid var(--rarity-color, #3a3a48); cursor:pointer; display:flex; flex-direction:column; transition:transform .15s ease, box-shadow .15s ease, filter .15s ease; transform:translateZ(0); overflow:hidden; }
+.car{ position:relative; background:linear-gradient(180deg, #1d1d25 0%, #15151b 100%); border-radius:14px; padding:12px; border:2px solid var(--rarity-color, #3a3a48); cursor:pointer; display:flex; flex-direction:column; transition:transform .15s ease, box-shadow .15s ease, filter .15s ease; transform:translateZ(0); overflow:hidden; will-change: transform; }
 .car:before{ content:"";position:absolute;inset:0; background:radial-gradient(140px 90px at 50% 0%, color-mix(in srgb, var(--rarity-color, #444) 22%, transparent), transparent 70%); pointer-events:none; opacity:.7; }
 .car:hover{transform:translateY(-3px);filter:brightness(1.06)}
 .car:active{transform:scale(.99);filter:brightness(.98)}
@@ -434,43 +434,6 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .guess-input { width: 100px; background: #0a0a0c; border: 2px solid var(--stroke-2); color: var(--yellow); border-radius: 10px; padding: 12px; font-size: 20px; font-weight: 900; text-align: center; outline: none; }
 .guess-input:focus { border-color: var(--yellow); box-shadow: 0 0 20px rgba(255,210,26,.3); }
 
-.auction-header-box { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 20px; padding: 15px 20px; background: linear-gradient(180deg, rgba(255,210,26,.08), rgba(255,210,26,.02)); border: 1px solid rgba(255,210,26,.22); border-radius: 14px; }
-.auction-timer-wrap { display: flex; align-items: center; gap: 15px; }
-.auction-timer-label { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
-.auction-timer { font-size: 28px; font-weight: 900; color: var(--yellow); text-shadow: 0 0 15px rgba(255,210,26,.6); font-variant-numeric: tabular-nums; }
-.auction-timer.urgent { color: var(--red); text-shadow: 0 0 20px rgba(255,77,94,.8); animation: pulseRed 1s infinite; }
-.auction-card { display: flex; gap: 20px; background: linear-gradient(180deg, #1c1c24 0%, #111116 100%); border: 2px solid var(--stroke-2); border-radius: 20px; padding: 20px; position: relative; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,.6); animation: windowAppear 0.5s ease; flex-wrap: wrap; }
-.auction-card.spawn-legendary { border-color: #ffd52a; box-shadow: 0 0 20px rgba(255,213,42,.2), 0 15px 40px rgba(0,0,0,.6); }
-.auction-card.spawn-mythic { border-color: #ff394f; box-shadow: 0 0 20px rgba(255,57,79,.2), 0 15px 40px rgba(0,0,0,.6); }
-.auction-card.spawn-divine { border-color: #ff9f43; box-shadow: 0 0 20px rgba(255,159,67,.25), 0 15px 40px rgba(0,0,0,.6); animation: windowAppear 0.5s ease, divineGlow 3s infinite alternate; }
-@keyframes divineGlow { 0% { box-shadow: 0 0 20px rgba(255,159,67,.25), 0 15px 40px rgba(0,0,0,.6); } 100% { box-shadow: 0 0 40px rgba(255,159,67,.6), 0 15px 40px rgba(0,0,0,.6); } }
-.auction-car-img-wrap { flex: 0 0 200px; height: 150px; background: linear-gradient(180deg, #f4f4f6, #dedee4); border-radius: 12px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
-.auction-car-img-wrap img { width: 100%; height: 100%; object-fit: contain; }
-.auction-car-info { flex: 1; display: flex; flex-direction: column; justify-content: space-between; min-width: 250px; }
-.auction-car-title { font-size: 24px; font-weight: 900; color: #fff; margin: 0 0 5px; }
-.auction-car-rarity { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-.auction-car-stats { display: flex; gap: 20px; font-size: 14px; color: var(--muted); margin-bottom: 15px; flex-wrap: wrap; }
-.auction-car-stats b { color: var(--text); }
-.auction-bid-panel { background: rgba(0,0,0,0.3); border: 1px solid var(--stroke); border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 10px; }
-.auction-current-price { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
-.auction-current-price span { font-size: 22px; font-weight: 900; color: var(--yellow); text-shadow: 0 0 15px rgba(255,210,26,.4); }
-.auction-highest-bidder { font-size: 13px; color: var(--green); font-weight: 700; text-align: right; }
-.auction-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
-.auction-bid-input { flex: 1; min-width: 120px; background: #0a0a0c; border: 2px solid var(--stroke-2); color: var(--yellow); border-radius: 10px; padding: 12px 14px; font-size: 16px; font-weight: 900; text-align: center; outline: none; transition: border-color 0.2s; }
-.auction-bid-input:focus { border-color: var(--yellow); box-shadow: 0 0 20px rgba(255,210,26,.3); }
-.auction-btn { background: linear-gradient(180deg, #ffd21a, #ffb800); color: #15130a; border: 0; border-radius: 10px; padding: 12px 24px; font-size: 16px; font-weight: 900; letter-spacing: .5px; cursor: pointer; box-shadow: 0 8px 20px rgba(255,210,26,.3); transition: all 0.2s ease; white-space: nowrap; }
-.auction-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 12px 25px rgba(255,210,26,.4); }
-.auction-btn:active { transform: scale(0.97); }
-.auction-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
-.auction-empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 16px; background: rgba(0,0,0,0.2); border: 2px dashed var(--stroke-2); border-radius: 16px; }
-.auction-empty span { font-size: 40px; display: block; margin-bottom: 15px; }
-.auction-toast { position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #1c1c24, #0e0e12); border: 2px solid var(--yellow); border-radius: 16px; padding: 16px 20px; box-shadow: 0 10px 40px rgba(255,210,26,.4); z-index: 9999; display: flex; align-items: center; gap: 15px; transform: translateX(120%); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); max-width: 400px; }
-.auction-toast.show { transform: translateX(0); }
-.auction-toast-icon { font-size: 32px; filter: drop-shadow(0 0 10px rgba(255,210,26,.8)); }
-.auction-toast-content h4 { margin: 0 0 5px; color: var(--yellow); font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-.auction-toast-content p { margin: 0; color: #fff; font-size: 14px; font-weight: 600; }
-.auction-toast-content p span { color: var(--yellow-soft); font-weight: 900; }
-
 /* ===== ГОНКИ: ЯЧЕЙКИ С ЛУЧШИМИ МАШИНАМИ ===== */
 .race-cars-grid {
   display: grid;
@@ -490,23 +453,25 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
   align-items: center;
   text-align: center;
   cursor: pointer;
-  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.2s ease;
   overflow: hidden;
 }
-.race-car-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(255,210,26,.55);
-}
+/* Анимированная светящаяся обводка для выбранной машины */
 .race-car-card.selected {
   border-color: var(--yellow);
   background: linear-gradient(180deg, rgba(255,210,26,.18), rgba(255,210,26,.04));
-  box-shadow: 0 0 0 1px var(--yellow), 0 0 20px rgba(255,210,26,.4);
+  animation: raceSelectedGlow 2s infinite alternate;
 }
+@keyframes raceSelectedGlow {
+  0% { box-shadow: 0 0 5px rgba(255,210,26,.5), inset 0 0 10px rgba(255,210,26,.1); }
+  100% { box-shadow: 0 0 25px rgba(255,210,26,1), inset 0 0 15px rgba(255,210,26,.3); }
+}
+
 .race-car-card .race-car-img {
   width: 100%;
   height: 60px;
   object-fit: contain;
-  background: linear-gradient(180deg, #f4f4f6, #dedee4);
+  background: #14141a; /* Убирает белый фон при загрузке */
   border-radius: 8px;
   margin-bottom: 6px;
 }
@@ -527,15 +492,12 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
   font-size: 11px;
   color: var(--yellow-soft);
   font-weight: 700;
-  margin-bottom: 4px;
 }
+/* Убрали % победы с карточек */
 .race-car-card .race-car-chance {
-  font-size: 12px;
-  font-weight: 900;
-  color: var(--green);
-  text-shadow: 0 0 10px rgba(61,220,132,.4);
+  display: none;
 }
-.race-car-card .race-car-chance.low { color: var(--red); text-shadow: 0 0 10px rgba(255,77,94,.4); }
+
 .race-cars-empty {
   grid-column: 1 / -1;
   text-align: center;
@@ -722,7 +684,6 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
       <button class="btn-save" onclick="saveProfile()">Сохранить</button>
       <button class="btn-logout" onclick="logout()">Выйти</button>
     </div>
-    <!-- Кнопка админки -->
     <div id="adminPanelBtnWrap" style="display:none; margin-top:12px;">
       <button onclick="openAdminPanel()" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--yellow); background:linear-gradient(180deg, rgba(255,210,26,.18), rgba(255,210,26,.04)); color:var(--yellow); font-weight:900; cursor:pointer; text-transform:uppercase; letter-spacing:1px; box-shadow:0 0 18px rgba(255,210,26,.25);">
         ⚙️ Админ-панель
@@ -823,7 +784,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 <nav>
  <button class="active" onclick="openTab('garage',this)">Мой гараж</button>
  <button onclick="openTab('cars',this)">Кейс машин</button>
- <button onclick="openTab('numbers',this)">Номера</button> <!-- НОВАЯ КНОПКА -->
+ <button onclick="openTab('numbers',this)">Номера</button> 
  <button onclick="openTab('casino',this)">Казино</button>
  <button onclick="openTab('races',this)">Гонки</button>
  <button onclick="openTab('tops',this)">🏆 Топы</button>
@@ -912,7 +873,6 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  </div>
 </section>
 
-<!-- НОВАЯ ВКЛАДКА НОМЕРА -->
 <section id="numbers" class="panel" hidden>
  <h2>🔢 Номера</h2>
  <div style="text-align:center; padding:40px 20px; background:rgba(0,0,0,0.2); border:2px dashed var(--stroke-2); border-radius:16px;">
@@ -1623,6 +1583,7 @@ function renderGarage(){
 
    const img=document.createElement("img");
    img.src="images/"+item.id+".png";
+   img.loading = "lazy"; /* Фикс белой вспышки */
    img.onerror=()=>{img.style.display="none"};
 
    const icon=document.createElement("div");
@@ -1687,7 +1648,34 @@ function toggleCarDetails(index, cardEl){
 function toggleSelectMode(){
   selectMode=!selectMode;
   selectedCars=[];
-  renderGarage();
+
+  // Вместо полной перерисовки (которая вызывает белые вспышки), просто меняем классы
+  const container = document.getElementById('garageCars');
+  Array.from(container.children).forEach((card, idx) => {
+    if (card.classList.contains('empty')) return;
+    const carIndex = Number(card.dataset.carIndex);
+    const car = cars[carIndex];
+    if (!car) return;
+
+    if (selectMode) {
+      if (!car.locked) {
+        card.classList.add('selectable');
+        // Добавляем маркер
+        if (!card.querySelector('.car-select-mark')) {
+          const mark = document.createElement('div');
+          mark.className = 'car-select-mark';
+          mark.textContent = '';
+          card.appendChild(mark);
+        }
+      }
+    } else {
+      card.classList.remove('selectable', 'selected');
+      const mark = card.querySelector('.car-select-mark');
+      if (mark) mark.remove();
+    }
+  });
+
+  updateGarageSelectionUI();
 }
 
 function toggleCarSelection(index){
@@ -2654,27 +2642,51 @@ function renderRaceCarsGrid() {
     selectedPlayerCar = topCars[0];
   }
 
-  const opponentsPool = catalog.filter(c => !c.id.startsWith('low_'));
-  const avgOppPower = opponentsPool.reduce((s, c) => s + c.power, 0) / opponentsPool.length;
-
   topCars.forEach(car => {
-    const chance = Math.min(95, Math.max(5, Math.round((car.power / (car.power + avgOppPower)) * 100)));
     const card = document.createElement('div');
     card.className = 'race-car-card' + (selectedPlayerCar && selectedPlayerCar.id === car.id ? ' selected' : '');
     const color = getRarityColor(car.rarity);
     card.style.borderColor = color;
+    
     card.onclick = () => {
+      // Убираем класс selected у всех карточек
+      grid.querySelectorAll('.race-car-card').forEach(el => el.classList.remove('selected'));
+      // Добавляем класс selected текущей
+      card.classList.add('selected');
+      
+      // Меняем выбранную машину
       selectedPlayerCar = car;
-      renderRaceCarsGrid();
+      // Пересчитываем проценты на карточках соперников БЕЗ перерисовки всего экрана
+      updateOpponentsChances();
     };
+
     card.innerHTML = `
-      <img class="race-car-img" src="images/${car.id}.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <img class="race-car-img" src="images/${car.id}.png" loading="lazy" decoding="async" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
       <div class="race-car-icon" style="display:none;">🚘</div>
       <div class="race-car-name">${car.name}</div>
       <div class="race-car-power">⚡ ${car.power} л.с.</div>
-      <div class="race-car-chance ${chance < 40 ? 'low' : ''}">${chance}% победы</div>
     `;
     grid.appendChild(card);
+  });
+}
+
+// Функция для мгновенного обновления шансов у соперников
+function updateOpponentsChances() {
+  document.querySelectorAll('.race-slot').forEach(slot => {
+    const oppId = slot.getAttribute('data-opp-id');
+    if (!oppId) return;
+    
+    const opp = catalog.find(c => c.id === oppId);
+    if (!opp) return;
+
+    const chanceEl = slot.querySelector('.race-slot-chance');
+    if (chanceEl && selectedPlayerCar) {
+      const chance = Math.min(95, Math.max(5, Math.round((selectedPlayerCar.power / (selectedPlayerCar.power + opp.power)) * 100)));
+      chanceEl.textContent = `${chance}% поб.`;
+      if (chance > 60) chanceEl.style.color = "var(--green)";
+      else if (chance < 40) chanceEl.style.color = "var(--red)";
+      else chanceEl.style.color = "var(--yellow)";
+    }
   });
 }
 
@@ -2703,6 +2715,7 @@ function renderRaceSlots() {
 
     const slot = document.createElement("div");
     slot.className = "race-slot" + (isLocked ? " locked" : "");
+    slot.setAttribute('data-opp-id', opp.id);
     slot.style.opacity = isLocked ? "0.5" : "1";
     slot.style.cursor = isLocked ? "not-allowed" : "pointer";
 
@@ -2731,17 +2744,10 @@ function renderRaceSlots() {
       </div>
     `;
     grid.appendChild(slot);
-
-    if (selectedPlayerCar) {
-      const chance = Math.min(95, Math.max(5, Math.round((selectedPlayerCar.power / (selectedPlayerCar.power + opp.power)) * 100)));
-      const chanceEl = slot.querySelector(`#chance-${opp.id}`);
-      if (chanceEl) {
-        chanceEl.textContent = `${chance}% поб.`;
-        if (chance > 60) chanceEl.style.color = "var(--green)";
-        else if (chance < 40) chanceEl.style.color = "var(--red)";
-      }
-    }
   });
+
+  // Инициализируем проценты сразу после создания
+  updateOpponentsChances();
 }
 
 function openCarSelect() {
@@ -2762,6 +2768,8 @@ function openCarSelect() {
         closeCarSelect();
         updateRaceUI();
         renderRaceCarsGrid();
+        // Обновляем проценты на экране, если мы вернулись назад
+        updateOpponentsChances();
       };
       el.innerHTML = `
         <img src="images/${item.id}.png" onerror="this.style.display='none'">
