@@ -156,9 +156,14 @@ body{
 header{ padding: 16px 24px; background: linear-gradient(180deg, #0e0e12 0%, #0b0b0f 100%); border-bottom: 1px solid var(--stroke); position: relative; overflow: hidden; display: flex; justify-content: flex-start; align-items: center; min-height: 80px; }
 header:before{ content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(600px 160px at 10% 0%, rgba(255,210,26,.15), transparent 70%); pointer-events: none; }
 .header-content { position: relative; z-index: 2; display: flex; flex-direction: row; align-items: center; gap: 20px; width: 100%; }
-.logo-wrapper { position: relative; display: flex; align-items: center; justify-content: center; }
-.header-logo { max-width: 120px; height: auto; display: block; cursor: pointer; animation: logoFloat 3.5s ease-in-out infinite, logoGlow 2.5s ease-in-out infinite alternate; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease; }
-.header-logo:hover { transform: scale(1.08) rotate(-3deg); filter: drop-shadow(0 0 20px rgba(255, 210, 26, 0.8)); }
+.logo-wrapper { position: relative; display: flex; align-items: center; justify-content: center; padding: 0 10px; }
+.header-logo { 
+  max-width: 130px; height: auto; display: block; cursor: pointer; 
+  animation: logoFloat 3.5s ease-in-out infinite, logoGlow 2.5s ease-in-out infinite alternate; 
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease; 
+  filter: drop-shadow(0 0 10px rgba(255, 210, 26, 0.5));
+}
+.header-logo:hover { transform: scale(1.08) rotate(-3deg); filter: drop-shadow(0 0 25px rgba(255, 210, 26, 0.9)); }
 @keyframes logoFloat { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-6px) scale(1.02); } }
 @keyframes logoGlow { 0% { filter: drop-shadow(0 0 8px rgba(255, 210, 26, 0.4)); } 100% { filter: drop-shadow(0 0 25px rgba(255, 210, 26, 0.9)); } }
 .header-fallback-text { margin: 0; font-size: clamp(18px, 2.5vw, 26px); font-weight: 900; letter-spacing: 1.5px; background: linear-gradient(180deg, #fff7c2 0%, #ffd21a 45%, #ffb800 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 24px rgba(255,210,26,.25); animation: logoGlow 2.5s ease-in-out infinite alternate; }
@@ -686,7 +691,37 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
       <button class="btn-save" onclick="saveProfile()">Сохранить</button>
       <button class="btn-logout" onclick="logout()">Выйти</button>
     </div>
+    <div id="adminPanelBtnWrap" style="display:none; margin-top:12px;">
+      <button onclick="openAdminPanel()" style="width:100%; padding:12px; border-radius:10px; border:1px solid var(--yellow); background:linear-gradient(180deg, rgba(255,210,26,.18), rgba(255,210,26,.04)); color:var(--yellow); font-weight:900; cursor:pointer; text-transform:uppercase; letter-spacing:1px; box-shadow:0 0 18px rgba(255,210,26,.25);">
+        ⚙️ Админ-панель
+      </button>
+    </div>
   </div>
+</div>
+
+<!-- Модалка админки -->
+<div class="modal" id="adminModal" hidden>
+ <div class="modal-box">
+  <h2 style="color:var(--yellow);">⚙️ Админ-панель</h2>
+  <p style="color:var(--muted); font-size:13px;">Выдать или забрать деньги у игрока</p>
+  
+  <div class="profile-field" style="text-align:left;">
+    <label>ID игрока</label>
+    <input type="text" id="adminTargetId" placeholder="Например: 00-00-10">
+  </div>
+  <div class="profile-field" style="text-align:left;">
+    <label>Сумма (₽)</label>
+    <input type="number" id="adminAmount" placeholder="Например: 1000000" min="1">
+  </div>
+
+  <div style="display:flex; gap:10px; margin-top:15px;">
+    <button class="confirm-btn" style="flex:1; background:linear-gradient(180deg,#3ddc84,#28a862); color:#fff; border:0; border-radius:10px; padding:12px; font-weight:900; cursor:pointer;" onclick="adminAdjust('give')">Выдать</button>
+    <button class="confirm-btn" style="flex:1; background:linear-gradient(180deg,#ff4d5e,#c8323f); color:#fff; border:0; border-radius:10px; padding:12px; font-weight:900; cursor:pointer;" onclick="adminAdjust('take')">Забрать</button>
+  </div>
+  <button class="cancel-btn" style="width:100%; margin-top:10px; background:linear-gradient(180deg,#3a3a48,#2a2a34); border:0; border-radius:10px; padding:12px; font-weight:800; color:#fff; cursor:pointer;" onclick="closeAdminPanel()">Закрыть</button>
+  
+  <div id="adminMsg" style="margin-top:15px; min-height:20px; font-weight:700;"></div>
+ </div>
 </div>
 
 <!-- Модалка продажи -->
@@ -731,8 +766,8 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 <header>
   <div class="header-content">
     <div class="logo-wrapper">
-      <img id="mainLogo" src="images/logo_image.png" alt="Империя Авто" class="header-logo" style="display:none;">
-      <h1 class="header-fallback-text" style="display:block;">🚗 ИМПЕРИЯ АВТО</h1>
+      <img id="mainLogo" src="images/logo_image.png" alt="Империя Авто" class="header-logo" onerror="this.style.display='none'; document.querySelector('.header-fallback-text').style.display='block';">
+      <h1 class="header-fallback-text" style="display:none;">🚗 ИМПЕРИЯ АВТО</h1>
     </div>
     <p>Создай свою автомобильную империю!</p>
   </div>
@@ -1000,6 +1035,8 @@ let garageSlots = 5;
 let cars = [];
 let myProfileData = null;
 
+const ADMIN_LOGIN_ID = 'Q1wesh'; // Только этот логин видит кнопку админки
+
 // ================= АВТОРИЗАЦИЯ =================
 function toggleAuthMode() {
   isRegisterMode = !isRegisterMode;
@@ -1034,7 +1071,6 @@ async function handleAuth() {
     currentUser = login;
     applyServerUser(data.user);
 
-    // Запускаем тик дохода и сохранения
     startGameLoop();
   } catch (e) {
     err.textContent = 'Сервер недоступен.';
@@ -1114,14 +1150,13 @@ function startGameLoop() {
   }, 1000);
 }
 
-// ================= ТОПЛИВО (С ТАЙМЕРОМ) =================
+// ================= ТОПЛИВО =================
 function updateFuelUI() {
   const fuelCountEl = document.getElementById('fuelCount');
   if (!fuelCountEl) return;
 
   if (typeof window._lastFuel === 'undefined') window._lastFuel = 20;
 
-  // Восстановление (1 ед. в час)
   if (window._lastFuel < 20) {
     const now = Date.now();
     const passed = now - (window._lastFuelTime || now);
@@ -1136,7 +1171,6 @@ function updateFuelUI() {
   if (window._lastFuel <= 3) fuelCountEl.classList.add("low");
   else fuelCountEl.classList.remove("low");
 
-  // Таймер до следующей единицы
   const timerEl = document.getElementById('fuelTimer');
   if (timerEl) {
     if (window._lastFuel >= 20) {
@@ -1871,7 +1905,6 @@ function animateRoulette(roulette){
  });
 }
 
-// ===== Показ выпавшей машины ПРЯМО НА КЕЙСЕ =====
 function showCaseDrop(car){
   const visual = document.getElementById('caseVisual');
   if (!visual) return;
@@ -1930,7 +1963,6 @@ async function buyCase(){
  area.hidden=false;
  list.innerHTML="";
 
- // Сброс кнопки "Продать выпавшее"
  const sellDroppedBtn = document.getElementById('sellDroppedBtn');
  if (sellDroppedBtn) sellDroppedBtn.style.display = 'none';
  lastCarsFromCase = [];
@@ -1959,7 +1991,6 @@ async function buyCase(){
    result.textContent="🎉 "+winner.name+" — "+winner.rarity;
    row.append(header,result);
    list.append(row);
-   // Показываем надпись на кейсе (перезаписывается, показывается последняя)
    showCaseDrop(winner);
   });
   finishOpening(quantity);
@@ -1968,7 +1999,6 @@ async function buyCase(){
 
  const roulettes = winners.map((w, i) => createRoulette(i, w));
 
- // Показываем каждую выпавшую машину на кейсе по мере окончания прокрутки
  const animations = roulettes.map((r, idx) => animateRoulette(r).then(() => {
    const winner = winners[idx];
    cars.push({ id: winner.id });
@@ -2009,7 +2039,6 @@ function sellDroppedCars() {
     total += Math.floor(car.price * 0.15);
   });
 
-  // Удаляем эти машины из гаража
   for (let i = cars.length - 1; i >= 0; i--) {
     if (lastCarsFromCase.some(c => c.id === cars[i].id)) {
       cars.splice(i, 1);
@@ -2026,7 +2055,7 @@ function sellDroppedCars() {
   update();
 }
 
-// ================= ПРОФИЛЬ (СВОЙ И ЧУЖОЙ) =================
+// ================= ПРОФИЛЬ =================
 async function openMyProfile() {
   if (!currentUser) return;
   isViewingOtherProfile = false;
@@ -2048,6 +2077,9 @@ async function openMyProfile() {
     document.getElementById("profileBioInput").disabled = false;
     document.getElementById("avatarUploadLabel").style.display = "inline-block";
     document.getElementById("profileActions").style.display = "flex";
+    
+    // Показываем кнопку админки ТОЛЬКО для логина Q1wesh
+    document.getElementById("adminPanelBtnWrap").style.display = (currentUser === ADMIN_LOGIN_ID) ? "block" : "none";
 
     document.getElementById("profileModal").hidden = false;
   } catch (e) { console.error(e); }
@@ -2072,6 +2104,7 @@ async function showPlayerProfile(login) {
     document.getElementById("profileBioInput").disabled = true;
     document.getElementById("avatarUploadLabel").style.display = "none";
     document.getElementById("profileActions").style.display = "none";
+    document.getElementById("adminPanelBtnWrap").style.display = "none";
 
     document.getElementById("profileModal").hidden = false;
   } catch (e) { console.error(e); }
@@ -2132,6 +2165,63 @@ async function saveProfile() {
     closeProfile();
     alert("Профиль сохранен!");
   } catch (e) { console.error(e); }
+}
+
+// ================= АДМИН ПАНЕЛЬ =================
+function openAdminPanel() {
+  document.getElementById('adminModal').hidden = false;
+  document.getElementById('adminMsg').textContent = '';
+  document.getElementById('adminTargetId').value = '';
+  document.getElementById('adminAmount').value = '';
+}
+
+function closeAdminPanel() {
+  document.getElementById('adminModal').hidden = true;
+}
+
+async function adminAdjust(action) {
+  const adminLogin = currentUser;
+  if (adminLogin !== ADMIN_LOGIN_ID) {
+    document.getElementById('adminMsg').textContent = '⛔ Нет доступа';
+    document.getElementById('adminMsg').style.color = 'var(--red)';
+    return;
+  }
+
+  const targetId = document.getElementById('adminTargetId').value.trim();
+  const amount = Number(document.getElementById('adminAmount').value);
+  const msgEl = document.getElementById('adminMsg');
+
+  if (!targetId) { msgEl.textContent = '❌ Введите ID игрока'; msgEl.style.color = 'var(--red)'; return; }
+  if (!amount || amount <= 0) { msgEl.textContent = '❌ Введите положительную сумму'; msgEl.style.color = 'var(--red)'; return; }
+
+  const finalAmount = action === 'give' ? amount : -amount;
+
+  try {
+    const res = await fetch(`${API_URL}/admin/adjust`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ adminLogin, targetId, amount: finalAmount })
+    });
+    const data = await res.json();
+
+    if (!res.ok) {
+      msgEl.textContent = '❌ ' + (data.error || 'Ошибка');
+      msgEl.style.color = 'var(--red)';
+      return;
+    }
+
+    msgEl.textContent = `✅ ${action === 'give' ? 'Выдано' : 'Забрано'} ${amount.toLocaleString('ru-RU')} ₽. Новый баланс игрока: ${data.newBalance.toLocaleString('ru-RU')} ₽`;
+    msgEl.style.color = 'var(--green)';
+    document.getElementById('adminAmount').value = '';
+    
+    if (targetId === myProfileData?.playerId) {
+      balance = data.newBalance;
+      update();
+    }
+  } catch (e) {
+    msgEl.textContent = '❌ Ошибка соединения';
+    msgEl.style.color = 'var(--red)';
+  }
 }
 
 // ================= ТОПЫ =================
@@ -2202,7 +2292,7 @@ function openTab(tab,button){
  }
 }
 
-// ================= АНИМАЦИИ ДЕНЕГ =================
+// ================= АНИМАЦИИ =================
 function showMoneyFloat(container, amount, isPositive) {
   if (!container) return;
   const el = document.createElement("div");
@@ -2345,7 +2435,7 @@ let playerPower = 0;
 let botPower = 0;
 let playerGoPressed = false;
 
-let raceOpponentsMap = {}; // Храним количество гонок с каждым соперником
+let raceOpponentsMap = {};
 
 function initRaces() {
   renderRaceSlots();
