@@ -6,16 +6,18 @@ const { MongoClient } = require('mongodb');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Строка подключения к базе данных
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
 const DB_NAME = 'imperiya_avto';
-const MAX_FUEL = 10;
 
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
+// Раздаем папку public
 app.use(express.static(path.join(__dirname, 'public')));
 
 let db;
 
+// Подключение к MongoDB
 MongoClient.connect(MONGODB_URI)
   .then(client => {
     console.log('✅ Подключено к MongoDB');
@@ -27,6 +29,7 @@ MongoClient.connect(MONGODB_URI)
     process.exit(1);
   });
 
+// Регистрация
 app.post('/api/register', async (req, res) => {
   const { login, password } = req.body;
   if (!login || !password) return res.status(400).json({ error: 'Заполните поля!' });
@@ -50,7 +53,7 @@ app.post('/api/register', async (req, res) => {
       income: 0,
       cars: [{ id: 'rusty_7' }],
       garageSlots: 5,
-      fuel: MAX_FUEL,
+      fuel: 10, // <--- Сразу ставим 10
       lastFuelTime: Date.now(),
       lastTime: Date.now()
     },
@@ -62,6 +65,7 @@ app.post('/api/register', async (req, res) => {
   res.json({ success: true, user: newUser });
 });
 
+// Вход
 app.post('/api/login', async (req, res) => {
   const { login, password } = req.body;
   const user = await db.collection('users').findOne({ login });
@@ -70,15 +74,18 @@ app.post('/api/login', async (req, res) => {
   res.json({ success: true, user });
 });
 
+// Сохранение
 app.post('/api/save', async (req, res) => {
   const { login, gameData } = req.body;
-  if (gameData && typeof gameData.fuel === 'number' && gameData.fuel > MAX_FUEL) {
-    gameData.fuel = MAX_FUEL;
+  // Принудительно обрезаем топливо до 10 при сохранении
+  if (gameData && typeof gameData.fuel === 'number' && gameData.fuel > 10) {
+    gameData.fuel = 10;
   }
   await db.collection('users').updateOne({ login }, { $set: { gameData } });
   res.json({ success: true });
 });
 
+// Топ
 app.get('/api/top', async (req, res) => {
   const players = await db.collection('users')
     .find({}, { projection: { login: 1, playerId: 1, profile: 1, 'gameData.balance': 1 } })
@@ -95,22 +102,24 @@ app.get('/api/top', async (req, res) => {
   })));
 });
 
+// Получить пользователя
 app.get('/api/user/:login', async (req, res) => {
   const user = await db.collection('users').findOne({ login: req.params.login });
   if (!user) return res.status(404).json({ error: 'Не найден' });
   res.json(user);
 });
 
+// Профиль
 app.post('/api/profile', async (req, res) => {
   const { login, profile } = req.body;
   await db.collection('users').updateOne({ login }, { $set: { profile } });
   res.json({ success: true });
 });
 
-// ================= АДМИН ПАНЕЛЬ =================
+// --- API ДЛЯ АДМИН ПАНЕЛИ ---
 app.post('/api/admin/money', async (req, res) => {
-  const { adminLogin, targetPlayerId, amount, action } = req.body;
-
+  const { adminLogin, targetPlayerId, amount, action } = req.body; 
+  
   console.log(`[ADMIN] Запрос от ${adminLogin}: ${action} ${amount} для ID: ${targetPlayerId}`);
 
   if (adminLogin !== 'Q1wesh') {
@@ -119,7 +128,6 @@ app.post('/api/admin/money', async (req, res) => {
 
   try {
     let targetUser = await db.collection('users').findOne({ playerId: targetPlayerId });
-
     if (!targetUser) {
       targetUser = await db.collection('users').findOne({ login: targetPlayerId });
     }
@@ -133,14 +141,14 @@ app.post('/api/admin/money', async (req, res) => {
     const numericAmount = Number(amount);
 
     if (isNaN(numericAmount) || numericAmount <= 0) {
-      return res.status(400).json({ error: 'Неверная сумма!' });
+       return res.status(400).json({ error: 'Неверная сумма!' });
     }
 
     if (action === 'add') {
       newBalance += numericAmount;
     } else if (action === 'take') {
       newBalance -= numericAmount;
-      if (newBalance < 0) newBalance = 0;
+      if (newBalance < 0) newBalance = 0; 
     }
 
     await db.collection('users').updateOne(
