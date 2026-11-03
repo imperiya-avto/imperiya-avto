@@ -51,7 +51,7 @@ body{
   perspective: 1000px;
   margin-bottom: 20px;
   position: relative;
-  padding: 20px; /* Место для свечения */
+  padding: 20px;
 }
 
 /* Анимированное свечение вокруг номера */
@@ -80,10 +80,11 @@ body{
   100% { filter: blur(25px); opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
 }
 
-/* Цвета свечения в зависимости от редкости */
-.neon-glow.common { background: radial-gradient(circle, #ffd21a, #ff8a00, transparent 70%); }
-.neon-glow.medium { background: radial-gradient(circle, #00e5ff, #0077ff, transparent 70%); }
-.neon-glow.rare { background: radial-gradient(circle, #c04dff, #ff004c, transparent 70%); }
+/* Цвета свечения */
+.neon-glow.common { background: radial-gradient(circle, #3ddc84, #1fa35a, transparent 70%); }
+.neon-glow.rare { background: radial-gradient(circle, #00e5ff, #0077ff, transparent 70%); }
+.neon-glow.legendary { background: radial-gradient(circle, #ffd21a, #ff8a00, transparent 70%); }
+.neon-glow.exclusive { background: radial-gradient(circle, #ff00cc, #ff004c, transparent 70%); }
 
 .plate {
   position: relative;
@@ -268,6 +269,34 @@ body{
 }
 
 .spin-btn:hover::before { left: 100%; }
+
+/* Кнопка Сохранить */
+.save-btn {
+  display: none;
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  background: linear-gradient(180deg, #3ddc84, #28a862);
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(61,220,132,.4);
+  transition: all 0.2s ease;
+}
+
+.save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px rgba(61,220,132,.6);
+}
+
+.save-btn.show {
+  display: block;
+}
 
 .number-inventory {
   width: 100%;
@@ -1261,6 +1290,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
            РЕГИОН 300К
          </button>
        </div>
+       <button class="save-btn" id="saveNumberBtn" onclick="saveCurrentNumber()">💾 СОХРАНИТЬ НОМЕР</button>
        <div class="case-message" id="numberMessage"></div>
      </div>
    </div>
@@ -1477,7 +1507,7 @@ let income = 0;
 let garageSlots = 5;
 let cars = [];
 let myProfileData = null;
-let myNumbers = []; // Массив для номеров
+let myNumbers = []; // Массив для номеров в инвентаре
 
 const ADMIN_LOGIN_ID = 'Q1wesh';
 
@@ -1533,7 +1563,7 @@ function applyServerUser(user) {
   income = user.gameData.income;
   garageSlots = user.gameData.garageSlots;
   cars = user.gameData.cars || [];
-  myNumbers = user.gameData.myNumbers || []; // Загружаем номера
+  myNumbers = user.gameData.myNumbers || [];
 
   if (typeof window._lastFuel === 'undefined') {
     window._lastFuel = user.gameData.fuel !== undefined ? user.gameData.fuel : MAX_FUEL;
@@ -1547,7 +1577,7 @@ function applyServerUser(user) {
   updateProfileUIFromServer(user);
   updateFuelUI();
   renderGarage();
-  renderMyNumbers(); // Отрисовываем список номеров
+  renderMyNumbers();
   update();
 
   document.getElementById("authScreen").style.display = "none";
@@ -1633,7 +1663,7 @@ function scheduleSave() {
             fuel: fuel,
             lastFuelTime: window._lastFuelTime,
             lastTime: Date.now(),
-            myNumbers: myNumbers // Сохраняем номера
+            myNumbers: myNumbers
           }
         })
       });
@@ -2705,6 +2735,9 @@ function openTab(tab,button){
  if (tab === "races") {
    initRaces();
  }
+ if (tab === "numbers") {
+   initNumbersTab();
+ }
 }
 
 // ================= АНИМАЦИИ =================
@@ -2747,6 +2780,7 @@ let currentPlate = {
   chars: ['А', '0', '0', '0', 'А', 'А'],
   region: '777'
 };
+let currentUnconfirmedPlate = null; // Хранит несохраненный номер
 
 function getRandomPlateChars() {
   const letter = () => ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)];
@@ -2765,15 +2799,25 @@ function evaluatePlate(plate) {
   const letters = chars.filter(c => isNaN(c));
   
   // Считаем максимальное количество повторений для цифр и букв
-  const maxDigitCount = Math.max(...Object.values(digits.reduce((acc, d) => { acc[d] = (acc[d] || 0) + 1; return acc; }, {})));
-  const maxLetterCount = Math.max(...Object.values(letters.reduce((acc, l) => { acc[l] = (acc[l] || 0) + 1; return acc; }, {})));
+  const digitCounts = digits.reduce((acc, d) => { acc[d] = (acc[d] || 0) + 1; return acc; }, {});
+  const letterCounts = letters.reduce((acc, l) => { acc[l] = (acc[l] || 0) + 1; return acc; }, {});
+  
+  const maxDigitCount = Math.max(...Object.values(digitCounts));
+  const maxLetterCount = Math.max(...Object.values(letterCounts));
 
-  if (maxDigitCount >= 3 || maxLetterCount >= 3) {
-    return { type: 'rare', label: '🔥 КРАСИВЫЙ НОМЕР!' }; // 3+ повторения
-  } else if (maxDigitCount === 2 || maxLetterCount === 2) {
-    return { type: 'medium', label: '✨ СРЕДНИЙ НОМЕР' }; // 2 повторения
+  const hasThreeDigits = maxDigitCount >= 3;
+  const hasThreeLetters = maxLetterCount >= 3;
+  const hasTwoDigits = maxDigitCount === 2;
+  const hasTwoLetters = maxLetterCount === 2;
+
+  if (hasThreeDigits && hasThreeLetters) {
+    return { type: 'exclusive', label: '💎 ЭКСКЛЮЗИВНЫЙ НОМЕР!', color: '#ff00cc' };
+  } else if (hasThreeDigits || hasThreeLetters) {
+    return { type: 'legendary', label: '🔥 ЛЕГЕНДАРНЫЙ НОМЕР!', color: '#ffd21a' };
+  } else if (hasTwoDigits || hasTwoLetters) {
+    return { type: 'rare', label: '✨ РЕДКИЙ НОМЕР', color: '#00e5ff' };
   } else {
-    return { type: 'common', label: '📄 ОБЫЧНЫЙ НОМЕР' }; // Все разные
+    return { type: 'common', label: '📄 ОБЫЧНЫЙ НОМЕР', color: '#3ddc84' };
   }
 }
 
@@ -2789,23 +2833,46 @@ function createSparkles(container) {
     const dist = 30 + Math.random() * 60;
     spark.style.left = (centerX + Math.cos(angle) * dist) + 'px';
     spark.style.top = (centerY + Math.sin(angle) * dist) + 'px';
-    spark.style.background = ['#ffd21a', '#00e5ff', '#ff4d5e', '#3ddc84'][Math.floor(Math.random()*4)];
+    spark.style.background = ['#ffd21a', '#00e5ff', '#ff4d5e', '#3ddc84', '#ff00cc'][Math.floor(Math.random()*5)];
     spark.style.boxShadow = `0 0 10px ${spark.style.background}`;
     document.body.appendChild(spark);
     setTimeout(() => spark.remove(), 1000);
   }
 }
 
-// Функция для обновления неонового свечения
 function updateNeonGlow(plate) {
   const glowEl = document.getElementById('neonGlow');
   if (!glowEl) return;
 
   const result = evaluatePlate(plate);
   
-  glowEl.className = 'neon-glow'; // Сбрасываем классы
+  glowEl.className = 'neon-glow'; 
   glowEl.classList.add(result.type);
-  glowEl.classList.add('active'); // Включаем свечение
+  glowEl.classList.add('active'); 
+}
+
+// Инициализация вкладки (случайный номер)
+function initNumbersTab() {
+  const randomChars = getRandomPlateChars();
+  const randomRegion = getRandomPlateRegion();
+  
+  currentPlate.chars = randomChars;
+  currentPlate.region = randomRegion;
+  
+  document.getElementById('digit1').textContent = randomChars[0];
+  document.getElementById('digit2').textContent = randomChars[1];
+  document.getElementById('digit3').textContent = randomChars[2];
+  document.getElementById('digit4').textContent = randomChars[3];
+  document.getElementById('digit5').textContent = randomChars[4];
+  document.getElementById('digit6').textContent = randomChars[5];
+  document.getElementById('regionText').textContent = randomRegion;
+  
+  const tempPlate = { ...currentPlate };
+  updateNeonGlow(tempPlate);
+  
+  // Скрываем кнопку сохранения при инициализации
+  document.getElementById('saveNumberBtn').classList.remove('show');
+  currentUnconfirmedPlate = null;
 }
 
 async function spinChars() {
@@ -2832,15 +2899,17 @@ async function spinChars() {
   const plateEl = document.getElementById('numberPlate');
   plateEl.classList.add('shaking');
   
-  // Временно отключаем свечение во время прокрутки
   const glowEl = document.getElementById('neonGlow');
   if (glowEl) glowEl.classList.remove('active');
+  
+  // Скрываем кнопку сохранения во время прокрутки
+  document.getElementById('saveNumberBtn').classList.remove('show');
 
   const charsEls = ['digit1', 'digit2', 'digit3', 'digit4', 'digit5', 'digit6'];
   charsEls.forEach(id => document.getElementById(id).classList.add('spin'));
 
   let ticks = 0;
-  const maxTicks = 18; // Еще быстрее
+  const maxTicks = 18; // Быстрая прокрутка
   
   const interval = setInterval(() => {
     ticks++;
@@ -2865,34 +2934,31 @@ async function spinChars() {
       const tempPlate = { ...currentPlate, chars: finalChars };
       const result = evaluatePlate(tempPlate);
       
-      // Включаем неоновое свечение
       updateNeonGlow(tempPlate);
       
-      let color = 'var(--yellow)';
-      if (result.type === 'rare') {
-        color = '#c04dff';
+      let color = result.color;
+      if (result.type === 'exclusive' || result.type === 'legendary') {
         createSparkles(document.getElementById('numberPlate'));
-      } else if (result.type === 'medium') {
-        color = '#00e5ff';
-      } else {
-        color = '#ff8a00';
       }
 
       msgEl.textContent = result.label;
       msgEl.style.color = color;
 
-      const plateString = finalChars.join('') + ' | ' + currentPlate.region;
-      if (!myNumbers.includes(plateString)) {
-        myNumbers.push(plateString);
-        renderMyNumbers();
-        scheduleSave();
+      // Показываем кнопку сохранения для легендарных и эксклюзивных, или просто предлагаем сохранить
+      currentUnconfirmedPlate = finalChars.join('') + ' | ' + currentPlate.region;
+      
+      if (result.type === 'exclusive' || result.type === 'legendary') {
+         document.getElementById('saveNumberBtn').classList.add('show');
+      } else {
+         // Для обычных и редких номеров кнопка тоже показывается, но её можно проигнорировать
+         document.getElementById('saveNumberBtn').classList.add('show');
       }
 
       isSpinningChars = false;
       btn.disabled = false;
       btn.textContent = 'ЦИФРЫ 500К';
     }
-  }, 50); // Уменьшили интервал
+  }, 50); 
 }
 
 async function spinRegion() {
@@ -2922,9 +2988,10 @@ async function spinRegion() {
   const regionEl = document.getElementById('regionText');
   regionEl.classList.add('spin');
   
-  // Временно отключаем свечение
   const glowEl = document.getElementById('neonGlow');
   if (glowEl) glowEl.classList.remove('active');
+  
+  document.getElementById('saveNumberBtn').classList.remove('show');
 
   let ticks = 0;
   const maxTicks = 18;
@@ -2946,34 +3013,54 @@ async function spinRegion() {
       const tempPlate = { ...currentPlate, region: finalRegion };
       const result = evaluatePlate(tempPlate);
       
-      // Включаем неоновое свечение
       updateNeonGlow(tempPlate);
       
-      let color = 'var(--yellow)';
-      if (result.type === 'rare') {
-        color = '#c04dff';
+      let color = result.color;
+      if (result.type === 'exclusive' || result.type === 'legendary') {
         createSparkles(regionEl);
-      } else if (result.type === 'medium') {
-        color = '#00e5ff';
-      } else {
-        color = '#ff8a00';
       }
 
       msgEl.textContent = result.label;
       msgEl.style.color = color;
 
-      const plateString = currentPlate.chars.join('') + ' | ' + finalRegion;
-      if (!myNumbers.includes(plateString)) {
-        myNumbers.push(plateString);
-        renderMyNumbers();
-        scheduleSave();
-      }
+      currentUnconfirmedPlate = currentPlate.chars.join('') + ' | ' + finalRegion;
+      document.getElementById('saveNumberBtn').classList.add('show');
 
       isSpinningRegion = false;
       btn.disabled = false;
       btn.textContent = 'РЕГИОН 300К';
     }
   }, 50);
+}
+
+// Сохранение номера в инвентарь
+function saveCurrentNumber() {
+  if (!currentUnconfirmedPlate) return;
+  
+  const [chars, region] = currentUnconfirmedPlate.split(' | ');
+  const result = evaluatePlate({ chars: chars.split(''), region: region });
+  
+  if (myNumbers.includes(currentUnconfirmedPlate)) {
+    alert("Этот номер уже есть в вашем инвентаре!");
+    return;
+  }
+
+  myNumbers.push(currentUnconfirmedPlate);
+  renderMyNumbers();
+  scheduleSave();
+  
+  // Очищаем статус
+  currentUnconfirmedPlate = null;
+  document.getElementById('saveNumberBtn').classList.remove('show');
+  document.getElementById('numberMessage').textContent = '✅ Номер успешно сохранен в инвентарь!';
+  document.getElementById('numberMessage').style.color = 'var(--green)';
+  
+  // Небольшая задержка, чтобы сообщение исчезло
+  setTimeout(() => {
+    if(document.getElementById('numberMessage').textContent.includes('сохранен')) {
+       document.getElementById('numberMessage').textContent = '';
+    }
+  }, 3000);
 }
 
 function renderMyNumbers() {
