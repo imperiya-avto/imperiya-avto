@@ -1657,14 +1657,15 @@ const catalog = RAW_CARS.map(car=>{
  return {id:car.id, name:car.name, rarity:car.rarity, price, power, income};
 });
 
+// ================= ОБНОВЛЕННЫЕ ШАНСЫ КЕЙСОВ =================
 const CASE_RARITY_CHANCES = {
- rusty:       [72,   16,   8,    3,    0.7,  0.2,  0.1],
- electronic:  [10,   56,   24,   7,    2.2,  0.6,  0.2],
- elite:       [2,    18,   44,   26,   7.5,  2,    0.5],
- mythical:    [0.5,  4,    17,   47,   23,   7.5,  1],
- exclusive:   [0.2,  1,    4,    14,   50,   25,   5.8],
- secret:      [0.1,  0.5,  2,    5,    14,   60,   18.4],
- divine:      [0.1,  0.3,  0.8,  2,    4,    19,   73.8]
+ rusty:       [99.6,  0.35,  0,     0.2,   0,     0,     0],
+ electronic:  [95.5,  0,     4.12,  0.34,  0.036, 0,     0],
+ elite:       [0,     85.3,  12.1,  2.18,  0.36,  0,     0],
+ mythical:    [0,     37.8,  53.9,  7.36,  0.92,  0.02,  0],
+ exclusive:   [0,     0,     67,    27.4,  5.47,  0.17,  0],
+ secret:      [0,     0,     12.5,  69.4,  17.7,  0.44,  0],
+ divine:      [0,     0,     0,     67,    27.4,  5.47,  0.17]
 };
 
 const CASE_TYPES={
@@ -1679,21 +1680,42 @@ const CASE_TYPES={
 
 const CASE_RARITIES=["Обычная","Необычная","Редкая","Эпическая","Легендарная","Мифическая","Божественная"];
 
-function buildPools(){
- const pools = {};
- Object.keys(CASE_TYPES).forEach(caseKey=>{
-  pools[caseKey] = {};
-  CASE_RARITIES.forEach(rarity=>{
-   const carsOfRarity = catalog.filter(c=>c.rarity===rarity);
-   if(!carsOfRarity.length) return;
-   pools[caseKey][rarity] = carsOfRarity.map(car=>{
-     let w = 1;
-     if(car.id.startsWith("low_")) w = 0.4;
-     return {id:car.id, weight:w};
-   });
+// ================= НОВАЯ КОНФИГУРАЦИЯ ПУЛОВ КЕЙСОВ =================
+const CASE_POOL_CONFIG = {
+  rusty:       { "Обычная": 5, "Необычная": 18, "Эпическая": 19 },
+  electronic:  { "Обычная": 9, "Редкая": 18, "Эпическая": 20, "Легендарная": 21 },
+  elite:       { "Необычная": 5, "Редкая": 8, "Эпическая": 20, "Легендарная": 21 },
+  mythical:    { "Необычная": 7, "Редкая": 18, "Эпическая": 20, "Легендарная": 21, "Мифическая": 13 },
+  exclusive:   { "Редкая": 17, "Эпическая": 20, "Легендарная": 21, "Мифическая": 13 },
+  secret:      { "Редкая": 9, "Эпическая": 20, "Легендарная": 21, "Мифическая": 13 },
+  divine:      { "Эпическая": 17, "Легендарная": 20, "Мифическая": 21, "Божественная": 13 }
+};
+
+function buildPools() {
+  const pools = {};
+  
+  Object.keys(CASE_TYPES).forEach(caseKey => {
+    pools[caseKey] = {};
+    const config = CASE_POOL_CONFIG[caseKey] || {};
+    
+    Object.keys(config).forEach(rarity => {
+      const countNeeded = config[rarity];
+      const allCarsOfRarity = catalog.filter(c => c.rarity === rarity);
+      
+      // Перемешиваем и берем нужное количество (если машин меньше, берем сколько есть)
+      const shuffled = allCarsOfRarity.sort(() => 0.5 - Math.random());
+      const selectedCars = shuffled.slice(0, Math.min(countNeeded, allCarsOfRarity.length));
+      
+      if (selectedCars.length > 0) {
+        pools[caseKey][rarity] = selectedCars.map(car => ({
+          id: car.id,
+          weight: 1 // Равный шанс для всех машин внутри одной редкости
+        }));
+      }
+    });
   });
- });
- return pools;
+  
+  return pools;
 }
 const CASE_POOLS = buildPools();
 
@@ -1750,8 +1772,13 @@ function updateCaseOdds(){
  const chances=CASE_RARITY_CHANCES[selectedCaseType];
  document.querySelectorAll("[data-case-rarity]").forEach(el=>{
   const i=Number(el.dataset.caseRarity);
-  el.textContent=CASE_RARITIES[i]+" — "+chances[i]+"%";
-  el.hidden=chances[i]===0;
+  if (chances[i] === 0) {
+    el.textContent = "";
+    el.hidden = true;
+  } else {
+    el.textContent=CASE_RARITIES[i]+" — "+chances[i]+"%";
+    el.hidden=false;
+  }
  });
 }
 
@@ -2086,8 +2113,14 @@ function selectQuantity(q){
 function getRandomCar(){
  const chances=CASE_RARITY_CHANCES[selectedCaseType];
  let roll=Math.random()*100;
- let rarityIndex=chances.findIndex(ch=>{ roll-=ch; return roll<0; });
+ let rarityIndex=chances.findIndex(ch=>{ if(ch===0) return false; roll-=ch; return roll<0; });
  if(rarityIndex<0)rarityIndex=chances.length-1;
+ 
+ // Защита от нулевых шансов
+ while (chances[rarityIndex] === 0 && rarityIndex > 0) {
+     rarityIndex--;
+ }
+
  const rarityName=CASE_RARITIES[rarityIndex];
  const pool=CASE_POOLS[selectedCaseType] && CASE_POOLS[selectedCaseType][rarityName];
  if(!pool||!pool.length){
