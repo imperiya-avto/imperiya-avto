@@ -7,6 +7,28 @@
 <link rel="icon" type="image/png" href="images/logo_image.png">
 
 <style>
+/* ================= БАЗОВЫЕ СТИЛИ ================= */
+:root{
+  --bg:#0a0a0c; --bg-2:#101014; --panel:#15151a; --panel-2:#1b1b22; --panel-3:#23232c;
+  --stroke:#2b2b36; --stroke-2:#3a3a48; --text:#f2f2f5; --muted:#9a9aa8;
+  --yellow:#ffd21a; --yellow-2:#ffb800; --yellow-soft:#ffe680; --yellow-glow:rgba(255,210,26,.45);
+  --green:#3ddc84; --red:#ff4d5e; --blue:#4aa8ff; --radius:16px; --radius-sm:10px;
+  --shadow:0 10px 30px rgba(0,0,0,.55);
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background: radial-gradient(1200px 600px at 50% -10%, rgba(255,210,26,.10), transparent 60%),
+    radial-gradient(900px 500px at 100% 100%, rgba(255,184,0,.06), transparent 60%),
+    linear-gradient(180deg, #0a0a0c 0%, #0e0e12 100%);
+  color:var(--text); font-family:'Segoe UI', Roboto, Arial, sans-serif;
+  overflow-anchor:none; min-height:100vh;
+}
+
+[hidden] { display: none !important; }
+
 /* ================= НОМЕРА (ОБНОВЛЕННЫЕ СТИЛИ) ================= */
 .number-machine {
   display: flex;
@@ -1212,6 +1234,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  <div class="number-machine">
    <div class="plate-zone">
      <div class="number-plate-container">
+       <div class="neon-glow" id="neonGlow"></div>
        <div class="plate" id="numberPlate">
          <div class="plate-left">
            <span class="plate-digit" id="digit1">А</span>
@@ -1231,11 +1254,11 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 
      <div class="number-controls">
        <div class="spin-actions">
-         <button class="spin-btn spin-btn-chars" id="spinCharsBtn" onclick="spinChars()">
-           🎰 КРУТИТЬ ЦИФРЫ (500 000 ₽)
+         <button class="spin-btn" id="spinCharsBtn" onclick="spinChars()">
+           ЦИФРЫ 500К
          </button>
-         <button class="spin-btn spin-btn-region" id="spinRegionBtn" onclick="spinRegion()">
-           🗺️ КРУТИТЬ РЕГИОН (300 000 ₽)
+         <button class="spin-btn" id="spinRegionBtn" onclick="spinRegion()">
+           РЕГИОН 300К
          </button>
        </div>
        <div class="case-message" id="numberMessage"></div>
@@ -2735,24 +2758,23 @@ function getRandomPlateRegion() {
   return ALLOWED_REGIONS[Math.floor(Math.random() * ALLOWED_REGIONS.length)];
 }
 
+// Оценка "красоты" номера
 function evaluatePlate(plate) {
-  let score = 0;
   const chars = plate.chars;
   const digits = chars.filter(c => !isNaN(c));
-  const uniqueDigits = new Set(digits);
-  if (uniqueDigits.size === 1) score += 50;
-  else if (uniqueDigits.size === 2) score += 20;
-
   const letters = chars.filter(c => isNaN(c));
-  const uniqueLetters = new Set(letters);
-  if (uniqueLetters.size === 1) score += 30;
+  
+  // Считаем максимальное количество повторений для цифр и букв
+  const maxDigitCount = Math.max(...Object.values(digits.reduce((acc, d) => { acc[d] = (acc[d] || 0) + 1; return acc; }, {})));
+  const maxLetterCount = Math.max(...Object.values(letters.reduce((acc, l) => { acc[l] = (acc[l] || 0) + 1; return acc; }, {})));
 
-  if (['777', '001', '002', '100', '123', '321', '555', '999'].includes(plate.region)) score += 40;
-  else if (['77', '97', '99', '177', '199'].includes(plate.region)) score += 15;
-
-  if (chars.join('') === 'А001АА' || chars.join('') === 'А777АА') score += 100;
-
-  return score;
+  if (maxDigitCount >= 3 || maxLetterCount >= 3) {
+    return { type: 'rare', label: '🔥 КРАСИВЫЙ НОМЕР!' }; // 3+ повторения
+  } else if (maxDigitCount === 2 || maxLetterCount === 2) {
+    return { type: 'medium', label: '✨ СРЕДНИЙ НОМЕР' }; // 2 повторения
+  } else {
+    return { type: 'common', label: '📄 ОБЫЧНЫЙ НОМЕР' }; // Все разные
+  }
 }
 
 function createSparkles(container) {
@@ -2772,6 +2794,18 @@ function createSparkles(container) {
     document.body.appendChild(spark);
     setTimeout(() => spark.remove(), 1000);
   }
+}
+
+// Функция для обновления неонового свечения
+function updateNeonGlow(plate) {
+  const glowEl = document.getElementById('neonGlow');
+  if (!glowEl) return;
+
+  const result = evaluatePlate(plate);
+  
+  glowEl.className = 'neon-glow'; // Сбрасываем классы
+  glowEl.classList.add(result.type);
+  glowEl.classList.add('active'); // Включаем свечение
 }
 
 async function spinChars() {
@@ -2797,12 +2831,16 @@ async function spinChars() {
 
   const plateEl = document.getElementById('numberPlate');
   plateEl.classList.add('shaking');
+  
+  // Временно отключаем свечение во время прокрутки
+  const glowEl = document.getElementById('neonGlow');
+  if (glowEl) glowEl.classList.remove('active');
 
   const charsEls = ['digit1', 'digit2', 'digit3', 'digit4', 'digit5', 'digit6'];
   charsEls.forEach(id => document.getElementById(id).classList.add('spin'));
 
   let ticks = 0;
-  const maxTicks = 25; 
+  const maxTicks = 18; // Еще быстрее
   
   const interval = setInterval(() => {
     ticks++;
@@ -2825,28 +2863,22 @@ async function spinChars() {
       });
 
       const tempPlate = { ...currentPlate, chars: finalChars };
-      const beautyScore = evaluatePlate(tempPlate);
+      const result = evaluatePlate(tempPlate);
       
-      let message = '';
+      // Включаем неоновое свечение
+      updateNeonGlow(tempPlate);
+      
       let color = 'var(--yellow)';
-
-      if (beautyScore >= 100) {
-        message = '🔥 БОЖЕСТВЕННЫЙ НОМЕР! НЕВЕРОЯТНАЯ УДАЧА!';
-        color = 'var(--green)';
+      if (result.type === 'rare') {
+        color = '#c04dff';
         createSparkles(document.getElementById('numberPlate'));
-      } else if (beautyScore >= 50) {
-        message = '💎 КРАСИВЫЙ НОМЕР! Отличный результат.';
-        color = 'var(--green)';
-        createSparkles(document.getElementById('numberPlate'));
-      } else if (beautyScore >= 20) {
-        message = '✨ Неплохой номер! Есть свои плюсы.';
-        color = 'var(--yellow-soft)';
+      } else if (result.type === 'medium') {
+        color = '#00e5ff';
       } else {
-        message = '📄 Обычный номер. Попробуйте еще раз!';
-        color = 'var(--muted)';
+        color = '#ff8a00';
       }
 
-      msgEl.textContent = message;
+      msgEl.textContent = result.label;
       msgEl.style.color = color;
 
       const plateString = finalChars.join('') + ' | ' + currentPlate.region;
@@ -2858,9 +2890,9 @@ async function spinChars() {
 
       isSpinningChars = false;
       btn.disabled = false;
-      btn.textContent = '🎰 КРУТИТЬ ЦИФРЫ (500 000 ₽)';
+      btn.textContent = 'ЦИФРЫ 500К';
     }
-  }, 60);
+  }, 50); // Уменьшили интервал
 }
 
 async function spinRegion() {
@@ -2889,9 +2921,13 @@ async function spinRegion() {
 
   const regionEl = document.getElementById('regionText');
   regionEl.classList.add('spin');
+  
+  // Временно отключаем свечение
+  const glowEl = document.getElementById('neonGlow');
+  if (glowEl) glowEl.classList.remove('active');
 
   let ticks = 0;
-  const maxTicks = 25;
+  const maxTicks = 18;
   
   const interval = setInterval(() => {
     ticks++;
@@ -2908,24 +2944,22 @@ async function spinRegion() {
       regionEl.textContent = finalRegion;
 
       const tempPlate = { ...currentPlate, region: finalRegion };
-      const beautyScore = evaluatePlate(tempPlate);
+      const result = evaluatePlate(tempPlate);
       
-      let message = '';
+      // Включаем неоновое свечение
+      updateNeonGlow(tempPlate);
+      
       let color = 'var(--yellow)';
-
-      if (beautyScore >= 40) {
-        message = '🔥 ТОПОВЫЙ РЕГИОН! ВЫСШИЙ КЛАСС!';
-        color = 'var(--green)';
+      if (result.type === 'rare') {
+        color = '#c04dff';
         createSparkles(regionEl);
-      } else if (beautyScore >= 15) {
-        message = '✨ Хороший регион! Солидно.';
-        color = 'var(--yellow-soft)';
+      } else if (result.type === 'medium') {
+        color = '#00e5ff';
       } else {
-        message = '📄 Обычный регион. Можно лучше!';
-        color = 'var(--muted)';
+        color = '#ff8a00';
       }
 
-      msgEl.textContent = message;
+      msgEl.textContent = result.label;
       msgEl.style.color = color;
 
       const plateString = currentPlate.chars.join('') + ' | ' + finalRegion;
@@ -2937,9 +2971,9 @@ async function spinRegion() {
 
       isSpinningRegion = false;
       btn.disabled = false;
-      btn.textContent = '🗺️ КРУТИТЬ РЕГИОН (300 000 ₽)';
+      btn.textContent = 'РЕГИОН 300К';
     }
-  }, 60);
+  }, 50);
 }
 
 function renderMyNumbers() {
