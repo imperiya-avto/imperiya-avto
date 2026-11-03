@@ -29,7 +29,7 @@ body{
 
 [hidden] { display: none !important; }
 
-/* ================= НОМЕРА (НОВЫЕ СТИЛИ) ================= */
+/* ================= НОМЕРА (ОБНОВЛЕННЫЕ СТИЛИ) ================= */
 .number-machine {
   display: flex;
   flex-direction: column;
@@ -38,66 +38,94 @@ body{
   padding: 20px 0;
 }
 
+.plate-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  max-width: 600px;
+}
+
 .number-plate-container {
   perspective: 1000px;
   margin-bottom: 10px;
+  position: relative;
 }
 
 .plate {
   display: flex;
   align-items: center;
   background: #ffffff;
-  border-radius: 12px;
-  padding: 10px 15px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 0 2px #333;
-  border: 4px solid #222;
+  border-radius: 10px;
+  padding: 12px 20px;
+  box-shadow: 
+    0 0 0 4px #222,
+    0 0 0 6px #ddd,
+    0 0 25px rgba(0, 0, 0, 0.8),
+    inset 0 0 20px rgba(0,0,0,0.1);
   position: relative;
   overflow: hidden;
-  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.plate:hover {
-  transform: scale(1.05) rotateX(5deg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #333;
 }
 
 .plate::before {
-  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 50%; background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0)); pointer-events: none;
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 45%; background: linear-gradient(to bottom, rgba(255,255,255,0.9), rgba(255,255,255,0)); pointer-events: none; z-index: 2;
+}
+
+.plate.shaking {
+  animation: plateShake 0.15s linear infinite;
+}
+
+@keyframes plateShake {
+  0% { transform: translate(0, 0) rotate(0); }
+  25% { transform: translate(-2px, 2px) rotate(-1deg); }
+  50% { transform: translate(2px, -2px) rotate(1deg); }
+  75% { transform: translate(-2px, -2px) rotate(-0.5deg); }
+  100% { transform: translate(2px, 2px) rotate(0.5deg); }
 }
 
 .plate-left {
   display: flex;
   gap: 2px;
+  position: relative;
+  z-index: 1;
 }
 
 .plate-digit {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 62px;
+  font-family: 'Arial Black', 'Arial Bold', Impact, sans-serif;
+  font-size: 64px;
   font-weight: 900;
-  color: #111;
+  color: #0f0f0f;
   line-height: 1;
-  width: 45px;
+  width: 46px;
   text-align: center;
   position: relative;
-  transition: all 0.1s;
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.5), -1px -1px 0 rgba(0,0,0,0.2);
+  transition: color 0.1s;
 }
 
 .plate-digit.spin {
-  animation: digitSpin 0.1s linear infinite;
-  color: var(--yellow-2);
-  text-shadow: 0 0 10px var(--yellow-2);
+  animation: digitBlur 0.08s linear infinite;
+  color: #ffaa00;
+  text-shadow: 0 0 15px #ffaa00, 0 0 30px #ffaa00;
 }
 
-@keyframes digitSpin {
-  0% { transform: translateY(0); opacity: 1; }
-  50% { transform: translateY(-10px); opacity: 0.5; }
-  100% { transform: translateY(10px); opacity: 1; }
+@keyframes digitBlur {
+  0% { transform: translateY(0); opacity: 1; filter: blur(0); }
+  50% { transform: translateY(-3px); opacity: 0.7; filter: blur(1px); }
+  100% { transform: translateY(3px); opacity: 1; filter: blur(0); }
 }
 
 .plate-divider {
-  width: 4px;
-  height: 60px;
+  width: 3px;
+  height: 56px;
   background: #111;
-  margin: 0 15px;
+  margin: 0 12px;
+  border-radius: 2px;
+  position: relative;
+  z-index: 1;
 }
 
 .plate-right {
@@ -107,42 +135,119 @@ body{
   align-items: center;
   border-left: 2px dashed #aaa;
   padding-left: 15px;
+  position: relative;
+  z-index: 1;
 }
 
 .plate-region {
-  font-family: Arial, sans-serif;
-  font-size: 28px;
+  font-family: 'Arial Black', 'Arial Bold', Impact, sans-serif;
+  font-size: 32px;
   font-weight: 900;
-  color: #111;
+  color: #0f0f0f;
   line-height: 1;
-  transition: all 0.2s;
+  transition: color 0.1s;
 }
 
 .plate-region.spin {
-  animation: digitSpin 0.1s linear infinite;
-  color: var(--yellow-2);
+  animation: regionBlur 0.08s linear infinite;
+  color: #00e5ff;
+  text-shadow: 0 0 15px #00e5ff, 0 0 30px #00e5ff;
+}
+
+@keyframes regionBlur {
+  0% { transform: translateY(0); opacity: 1; filter: blur(0); }
+  50% { transform: translateY(-2px); opacity: 0.7; filter: blur(1px); }
+  100% { transform: translateY(2px); opacity: 1; filter: blur(0); }
 }
 
 .plate-country {
-  font-family: Arial, sans-serif;
-  font-size: 14px;
+  font-family: 'Arial', sans-serif;
+  font-size: 12px;
   font-weight: 900;
   color: #111;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   margin-top: 2px;
+  border-top: 1px solid #111;
+  padding-top: 2px;
+  width: 100%;
+  text-align: center;
 }
 
 .number-controls {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
+  background: rgba(0,0,0,0.3);
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid var(--stroke-2);
+  width: 100%;
 }
 
-.number-price {
-  font-size: 16px;
-  color: var(--muted);
+.spin-actions {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
 }
+
+.spin-btn {
+  flex: 1;
+  min-width: 200px;
+  padding: 15px 20px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  border: none;
+}
+
+.spin-btn-chars {
+  background: linear-gradient(180deg, #ffd21a, #ff8a00);
+  color: #15130a;
+  box-shadow: 0 8px 25px rgba(255,210,26,.4);
+}
+
+.spin-btn-chars:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(255,210,26,.6);
+}
+
+.spin-btn-region {
+  background: linear-gradient(180deg, #00e5ff, #0077ff);
+  color: #fff;
+  box-shadow: 0 8px 25px rgba(0,229,255,.4);
+}
+
+.spin-btn-region:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(0,229,255,.6);
+}
+
+.spin-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.spin-btn::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent);
+  transition: left 0.5s ease;
+}
+
+.spin-btn:hover::before { left: 100%; }
 
 .number-inventory {
   width: 100%;
@@ -151,13 +256,15 @@ body{
   border: 1px solid var(--stroke-2);
   border-radius: 16px;
   padding: 15px;
-  margin-top: 20px;
+  margin-top: 10px;
 }
 
 .number-inventory h3 {
   margin: 0 0 10px;
   color: var(--yellow);
   font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .numbers-list {
@@ -169,19 +276,46 @@ body{
 .saved-plate {
   background: #fff;
   color: #111;
-  border-radius: 8px;
+  border-radius: 6px;
   border: 2px solid #222;
-  padding: 5px 10px;
-  font-family: 'Courier New', Courier, monospace;
+  padding: 6px 12px;
+  font-family: 'Arial Black', Impact, sans-serif;
   font-weight: 900;
-  font-size: 16px;
+  font-size: 18px;
   cursor: pointer;
   transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.saved-plate span {
+  border-left: 2px solid #333;
+  padding-left: 8px;
+  font-size: 14px;
+  color: #555;
 }
 
 .saved-plate:hover {
-  transform: scale(1.1);
-  box-shadow: 0 0 15px var(--yellow);
+  transform: scale(1.05) translateY(-2px);
+  box-shadow: 0 0 20px var(--yellow);
+}
+
+@keyframes sparkle {
+  0% { transform: translateY(0) scale(1); opacity: 1; }
+  100% { transform: translateY(-100px) scale(0); opacity: 0; }
+}
+
+.sparkle {
+  position: absolute;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #ffd21a;
+  box-shadow: 0 0 10px #ffd21a;
+  pointer-events: none;
+  z-index: 100;
+  animation: sparkle 1s ease-out forwards;
 }
 
 /* ================= ОСТАЛЬНЫЕ СТИЛИ ================= */
@@ -841,6 +975,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   .plate-divider { height: 40px; margin: 0 10px; }
   .plate-right { padding-left: 10px; }
   .plate-country { font-size: 10px; }
+  .spin-btn { min-width: 100%; }
 }
 </style>
 </head>
@@ -1077,28 +1212,36 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 <section id="numbers" class="panel" hidden>
  <h2>🔢 Номера</h2>
  <div class="number-machine">
-   <div class="number-plate-container">
-     <div class="plate" id="numberPlate">
-       <div class="plate-left">
-         <span class="plate-digit" id="digit1">A</span>
-         <span class="plate-digit" id="digit2">0</span>
-         <span class="plate-digit" id="digit3">0</span>
-         <span class="plate-digit" id="digit4">0</span>
-         <span class="plate-digit" id="digit5">A</span>
-         <span class="plate-digit" id="digit6">A</span>
-       </div>
-       <div class="plate-divider"></div>
-       <div class="plate-right">
-         <div class="plate-region" id="regionText">777</div>
-         <div class="plate-country">RUS</div>
+   <div class="plate-zone">
+     <div class="number-plate-container">
+       <div class="plate" id="numberPlate">
+         <div class="plate-left">
+           <span class="plate-digit" id="digit1">А</span>
+           <span class="plate-digit" id="digit2">0</span>
+           <span class="plate-digit" id="digit3">0</span>
+           <span class="plate-digit" id="digit4">0</span>
+           <span class="plate-digit" id="digit5">А</span>
+           <span class="plate-digit" id="digit6">А</span>
+         </div>
+         <div class="plate-divider"></div>
+         <div class="plate-right">
+           <div class="plate-region" id="regionText">777</div>
+           <div class="plate-country">RUS</div>
+         </div>
        </div>
      </div>
-   </div>
-   
-   <div class="number-controls">
-     <div class="number-price">Стоимость: <span style="color:var(--yellow); font-weight:900;">500 000 ₽</span></div>
-     <button class="case-button" id="spinNumberBtn" onclick="spinNumberPlate()">КРУТИТЬ ЗА 500 000 ₽</button>
-     <div class="case-message" id="numberMessage"></div>
+
+     <div class="number-controls">
+       <div class="spin-actions">
+         <button class="spin-btn spin-btn-chars" id="spinCharsBtn" onclick="spinChars()">
+           🎰 КРУТИТЬ ЦИФРЫ (500 000 ₽)
+         </button>
+         <button class="spin-btn spin-btn-region" id="spinRegionBtn" onclick="spinRegion()">
+           🗺️ КРУТИТЬ РЕГИОН (300 000 ₽)
+         </button>
+       </div>
+       <div class="case-message" id="numberMessage"></div>
+     </div>
    </div>
    
    <div class="number-inventory">
@@ -2574,18 +2717,24 @@ function triggerBalanceAnimation(amount, isPositive) {
 }
 
 // ================= НОМЕРА =================
-let isSpinning = false;
+let isSpinningChars = false;
+let isSpinningRegion = false;
 const ALLOWED_LETTERS = 'АВЕКМНОРСТУХ';
 const ALLOWED_REGIONS = ['77', '97', '99', '177', '199', '777', '799', '50', '150', '750', '90', '190', '750', '23', '93', '193', '123', '161', '761', '777', '01', '02', '03', '05'];
 
-function getRandomPlate() {
+let currentPlate = {
+  chars: ['А', '0', '0', '0', 'А', 'А'],
+  region: '777'
+};
+
+function getRandomPlateChars() {
   const letter = () => ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)];
   const digit = () => Math.floor(Math.random() * 10);
-  const region = ALLOWED_REGIONS[Math.floor(Math.random() * ALLOWED_REGIONS.length)];
-  return {
-    chars: [letter(), digit(), digit(), digit(), letter(), letter()],
-    region: region
-  };
+  return [letter(), digit(), digit(), digit(), letter(), letter()];
+}
+
+function getRandomPlateRegion() {
+  return ALLOWED_REGIONS[Math.floor(Math.random() * ALLOWED_REGIONS.length)];
 }
 
 function evaluatePlate(plate) {
@@ -2608,8 +2757,27 @@ function evaluatePlate(plate) {
   return score;
 }
 
-async function spinNumberPlate() {
-  if (isSpinning) return;
+function createSparkles(container) {
+  const rect = container.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  
+  for (let i = 0; i < 15; i++) {
+    const spark = document.createElement('div');
+    spark.className = 'sparkle';
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 30 + Math.random() * 60;
+    spark.style.left = (centerX + Math.cos(angle) * dist) + 'px';
+    spark.style.top = (centerY + Math.sin(angle) * dist) + 'px';
+    spark.style.background = ['#ffd21a', '#00e5ff', '#ff4d5e', '#3ddc84'][Math.floor(Math.random()*4)];
+    spark.style.boxShadow = `0 0 10px ${spark.style.background}`;
+    document.body.appendChild(spark);
+    setTimeout(() => spark.remove(), 1000);
+  }
+}
+
+async function spinChars() {
+  if (isSpinningChars || isSpinningRegion) return;
   const cost = 500000;
   if (balance < cost) {
     document.getElementById('numberMessage').textContent = '❌ Недостаточно денег!';
@@ -2620,8 +2788,8 @@ async function spinNumberPlate() {
   balance -= cost;
   triggerBalanceAnimation(cost, false);
   update();
-  isSpinning = true;
-  const btn = document.getElementById('spinNumberBtn');
+  isSpinningChars = true;
+  const btn = document.getElementById('spinCharsBtn');
   btn.disabled = true;
   btn.textContent = 'КРУТИМ...';
   
@@ -2629,45 +2797,49 @@ async function spinNumberPlate() {
   msgEl.textContent = '';
   msgEl.style.color = 'var(--muted)';
 
+  const plateEl = document.getElementById('numberPlate');
+  plateEl.classList.add('shaking');
+
   const charsEls = ['digit1', 'digit2', 'digit3', 'digit4', 'digit5', 'digit6'];
-  const regionEl = document.getElementById('regionText');
-  
   charsEls.forEach(id => document.getElementById(id).classList.add('spin'));
-  regionEl.classList.add('spin');
 
   let ticks = 0;
-  const maxTicks = 40;
+  const maxTicks = 25; 
   
   const interval = setInterval(() => {
     ticks++;
-    const randomPlate = getRandomPlate();
+    const randomChars = getRandomPlateChars();
     charsEls.forEach((id, idx) => {
-      document.getElementById(id).textContent = randomPlate.chars[idx];
+      document.getElementById(id).textContent = randomChars[idx];
     });
-    regionEl.textContent = randomPlate.region;
 
     if (ticks >= maxTicks) {
       clearInterval(interval);
       
       charsEls.forEach(id => document.getElementById(id).classList.remove('spin'));
-      regionEl.classList.remove('spin');
+      plateEl.classList.remove('shaking');
 
-      const finalPlate = getRandomPlate();
+      const finalChars = getRandomPlateChars();
+      currentPlate.chars = finalChars;
+      
       charsEls.forEach((id, idx) => {
-        document.getElementById(id).textContent = finalPlate.chars[idx];
+        document.getElementById(id).textContent = finalChars[idx];
       });
-      regionEl.textContent = finalPlate.region;
 
-      const beautyScore = evaluatePlate(finalPlate);
+      const tempPlate = { ...currentPlate, chars: finalChars };
+      const beautyScore = evaluatePlate(tempPlate);
+      
       let message = '';
       let color = 'var(--yellow)';
 
       if (beautyScore >= 100) {
         message = '🔥 БОЖЕСТВЕННЫЙ НОМЕР! НЕВЕРОЯТНАЯ УДАЧА!';
         color = 'var(--green)';
+        createSparkles(document.getElementById('numberPlate'));
       } else if (beautyScore >= 50) {
         message = '💎 КРАСИВЫЙ НОМЕР! Отличный результат.';
         color = 'var(--green)';
+        createSparkles(document.getElementById('numberPlate'));
       } else if (beautyScore >= 20) {
         message = '✨ Неплохой номер! Есть свои плюсы.';
         color = 'var(--yellow-soft)';
@@ -2679,16 +2851,97 @@ async function spinNumberPlate() {
       msgEl.textContent = message;
       msgEl.style.color = color;
 
-      const plateString = finalPlate.chars.join('') + ' | ' + finalPlate.region;
-      myNumbers.push(plateString);
-      renderMyNumbers();
-      scheduleSave(); // Сохраняем на сервере
+      const plateString = finalChars.join('') + ' | ' + currentPlate.region;
+      if (!myNumbers.includes(plateString)) {
+        myNumbers.push(plateString);
+        renderMyNumbers();
+        scheduleSave();
+      }
 
-      isSpinning = false;
+      isSpinningChars = false;
       btn.disabled = false;
-      btn.textContent = 'КРУТИТЬ ЗА 500 000 ₽';
+      btn.textContent = '🎰 КРУТИТЬ ЦИФРЫ (500 000 ₽)';
     }
-  }, 50);
+  }, 60);
+}
+
+async function spinRegion() {
+  if (isSpinningChars || isSpinningRegion) return;
+  const cost = 300000;
+  if (balance < cost) {
+    document.getElementById('numberMessage').textContent = '❌ Недостаточно денег!';
+    document.getElementById('numberMessage').style.color = 'var(--red)';
+    return;
+  }
+
+  balance -= cost;
+  triggerBalanceAnimation(cost, false);
+  update();
+  isSpinningRegion = true;
+  const btn = document.getElementById('spinRegionBtn');
+  btn.disabled = true;
+  btn.textContent = 'КРУТИМ...';
+  
+  const msgEl = document.getElementById('numberMessage');
+  msgEl.textContent = '';
+  msgEl.style.color = 'var(--muted)';
+
+  const plateEl = document.getElementById('numberPlate');
+  plateEl.classList.add('shaking');
+
+  const regionEl = document.getElementById('regionText');
+  regionEl.classList.add('spin');
+
+  let ticks = 0;
+  const maxTicks = 25;
+  
+  const interval = setInterval(() => {
+    ticks++;
+    regionEl.textContent = getRandomPlateRegion();
+
+    if (ticks >= maxTicks) {
+      clearInterval(interval);
+      
+      regionEl.classList.remove('spin');
+      plateEl.classList.remove('shaking');
+
+      const finalRegion = getRandomPlateRegion();
+      currentPlate.region = finalRegion;
+      regionEl.textContent = finalRegion;
+
+      const tempPlate = { ...currentPlate, region: finalRegion };
+      const beautyScore = evaluatePlate(tempPlate);
+      
+      let message = '';
+      let color = 'var(--yellow)';
+
+      if (beautyScore >= 40) {
+        message = '🔥 ТОПОВЫЙ РЕГИОН! ВЫСШИЙ КЛАСС!';
+        color = 'var(--green)';
+        createSparkles(regionEl);
+      } else if (beautyScore >= 15) {
+        message = '✨ Хороший регион! Солидно.';
+        color = 'var(--yellow-soft)';
+      } else {
+        message = '📄 Обычный регион. Можно лучше!';
+        color = 'var(--muted)';
+      }
+
+      msgEl.textContent = message;
+      msgEl.style.color = color;
+
+      const plateString = currentPlate.chars.join('') + ' | ' + finalRegion;
+      if (!myNumbers.includes(plateString)) {
+        myNumbers.push(plateString);
+        renderMyNumbers();
+        scheduleSave();
+      }
+
+      isSpinningRegion = false;
+      btn.disabled = false;
+      btn.textContent = '🗺️ КРУТИТЬ РЕГИОН (300 000 ₽)';
+    }
+  }, 60);
 }
 
 function renderMyNumbers() {
@@ -2703,9 +2956,10 @@ function renderMyNumbers() {
   myNumbers.forEach((plate, index) => {
     const el = document.createElement('div');
     el.className = 'saved-plate';
-    el.textContent = plate;
+    const [chars, region] = plate.split(' | ');
+    el.innerHTML = `${chars} <span>${region}</span>`;
     el.onclick = () => {
-      alert(`Выбран номер: ${plate}\n(Функция установки на машину в разработке)`);
+      alert(`Выбран номер: ${chars} | ${region}\n(Функция установки на машину в разработке)`);
     };
     listEl.appendChild(el);
   });
