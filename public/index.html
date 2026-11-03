@@ -823,6 +823,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 <nav>
  <button class="active" onclick="openTab('garage',this)">Мой гараж</button>
  <button onclick="openTab('cars',this)">Кейс машин</button>
+ <button onclick="openTab('numbers',this)">Номера</button> <!-- НОВАЯ КНОПКА -->
  <button onclick="openTab('casino',this)">Казино</button>
  <button onclick="openTab('races',this)">Гонки</button>
  <button onclick="openTab('tops',this)">🏆 Топы</button>
@@ -911,6 +912,16 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  </div>
 </section>
 
+<!-- НОВАЯ ВКЛАДКА НОМЕРА -->
+<section id="numbers" class="panel" hidden>
+ <h2>🔢 Номера</h2>
+ <div style="text-align:center; padding:40px 20px; background:rgba(0,0,0,0.2); border:2px dashed var(--stroke-2); border-radius:16px;">
+   <span style="font-size:50px;">🚧</span>
+   <h3 style="color:var(--yellow); margin-top:15px;">В разработке</h3>
+   <p style="color:var(--muted);">Этот раздел скоро появится. Следите за обновлениями!</p>
+ </div>
+</section>
+
 <section id="casino" class="panel" hidden>
  <h2>🎰 Казино</h2>
  <div id="casinoHeader">
@@ -927,6 +938,13 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
      <div class="game-face-title">Кости</div>
      <div class="game-face-sub">Сумма 7 или 11</div>
    </div>
+   <div class="game-face" data-game="blackjack" onclick="openCasinoGame('blackjack')">
+     <div class="game-face-icon">🃏</div>
+     <div class="game-face-title">Блекджек</div>
+     <div class="game-face-sub">До 21</div>
+   </div>
+
+   <!-- Рулетка окно -->
    <div class="game-window" data-game="roulette">
      <div class="game-window-header">
        <div class="game-window-title">🎡 Рулетка</div>
@@ -956,6 +974,8 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
        <button class="play-btn" onclick="playRoulette()">Играть</button>
      </div>
    </div>
+
+   <!-- Кости окно -->
    <div class="game-window" data-game="dice">
      <div class="game-window-header">
        <div class="game-window-title">🎲 Кости</div>
@@ -986,6 +1006,44 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
          </div>
        </div>
        <button class="play-btn" onclick="playDice()">Играть</button>
+     </div>
+   </div>
+
+   <!-- Блекджек окно -->
+   <div class="game-window" data-game="blackjack">
+     <div class="game-window-header">
+       <div class="game-window-title">🃏 Блекджек</div>
+       <button class="casino-back-btn" onclick="closeCasinoGame()">← Назад</button>
+     </div>
+     <div class="game-content">
+       <div class="casino-visual" id="bj-visual" style="height: 180px; flex-direction: column; gap: 10px;">
+         <div style="font-size: 14px; color: var(--muted);">Дилер: <span id="bj-dealer-score">?</span></div>
+         <div class="cards-display" id="bj-dealer-cards"></div>
+         <div style="font-size: 14px; color: var(--muted); margin-top: 5px;">Вы: <span id="bj-player-score">0</span></div>
+         <div class="cards-display" id="bj-player-cards"></div>
+       </div>
+       <div class="game-result" id="bj-result">Сделай ставку и жми «Играть»</div>
+       <div class="bet-panel">
+         <div class="bet-label"><span>Ставка</span><span class="bet-value" id="blackjack-bet-display">10 000 ₽</span></div>
+         <div class="bet-controls">
+           <div class="bet-input-row">
+             <button class="bet-adjust-btn" onclick="adjustBet('blackjack', -1)">−</button>
+             <input type="number" class="bet-input" id="blackjack-input" min="1000" max="5000000000" step="1000" value="10000" oninput="onBetInput('blackjack')">
+             <button class="bet-adjust-btn" onclick="adjustBet('blackjack', 1)">+</button>
+           </div>
+           <div class="bet-quick-buttons">
+             <button class="bet-quick-btn" onclick="setBet('blackjack', 10000)">10K</button>
+             <button class="bet-quick-btn" onclick="setBet('blackjack', 100000)">100K</button>
+             <button class="bet-quick-btn" onclick="setBet('blackjack', 1000000)">1M</button>
+             <button class="bet-quick-btn all-in" onclick="allInBet('blackjack')">ВСЁ</button>
+           </div>
+         </div>
+       </div>
+       <div style="display:flex; gap:10px; width:100%; max-width:300px; margin-top:10px;">
+         <button class="play-btn" id="bj-btn-start" onclick="startBlackjack()" style="flex:1;">Играть</button>
+         <button class="play-btn" id="bj-btn-hit" onclick="bjHit()" style="flex:1; display:none; background:linear-gradient(180deg,#3ddc84,#28a862);">Ещё</button>
+         <button class="play-btn" id="bj-btn-stand" onclick="bjStand()" style="flex:1; display:none; background:linear-gradient(180deg,#ff4d5e,#c8323f);">Хватит</button>
+       </div>
      </div>
    </div>
  </div>
@@ -1113,7 +1171,7 @@ async function handleAuth() {
 // ================= ВЫХОД =================
 function logout() {
   localStorage.removeItem('autoEmpire_activeUser');
-  window.location.reload(); // Перезагружаем страницу, чтобы вернуться на экран входа
+  window.location.reload();
 }
 
 function applyServerUser(user) {
@@ -2198,7 +2256,6 @@ async function adminAdjust(action) {
       return;
     }
 
-    // Если админ изменил свой же баланс, нужно обновить локальные данные
     if (targetId === document.getElementById('profileIdDisplay').textContent) {
         const meRes = await fetch(`${API_URL}/user/${currentUser}`);
         const me = await meRes.json();
@@ -2265,7 +2322,6 @@ async function renderTops() {
 
       row.onclick = () => {
         if (p.login !== currentUser) {
-           // Просмотр чужого профиля (заглушка)
            alert(`Игрок: ${p.name}\nID: ${p.playerId}\nБаланс: ${Math.floor(p.balance).toLocaleString('ru-RU')} ₽`);
         } else {
            openMyProfile();
@@ -2417,6 +2473,134 @@ function playDice() {
       update();
     }
   }, 100);
+}
+
+// ================= БЛЕКДЖЕК =================
+let bjDeck = [];
+let bjPlayerHand = [];
+let bjDealerHand = [];
+let bjGameActive = false;
+
+function createDeck() {
+    const suits = ['♠', '♥', '♦', '♣'];
+    const values = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+    const deck = [];
+    for (let s of suits) {
+        for (let v of values) {
+            deck.push({ v, s, color: (s === '♥' || s === '♦') ? 'red' : 'black' });
+        }
+    }
+    return deck.sort(() => Math.random() - 0.5);
+}
+
+function calculateScore(hand) {
+    let score = 0;
+    let aces = 0;
+    for (let card of hand) {
+        if (card.v === 'A') { aces++; score += 11; }
+        else if (['J','Q','K'].includes(card.v)) score += 10;
+        else score += parseInt(card.v);
+    }
+    while (score > 21 && aces > 0) { score -= 10; aces--; }
+    return score;
+}
+
+function renderCards() {
+    const dealerCardsEl = document.getElementById('bj-dealer-cards');
+    const playerCardsEl = document.getElementById('bj-player-cards');
+
+    dealerCardsEl.innerHTML = bjDealerHand.map((c, i) => {
+        if (!bjGameActive && i === 1) return `<div class="card hidden">?</div>`;
+        return `<div class="card ${c.color}">${c.v}${c.s}</div>`;
+    }).join('');
+
+    playerCardsEl.innerHTML = bjPlayerHand.map(c => `<div class="card ${c.color}">${c.v}${c.s}</div>`).join('');
+
+    document.getElementById('bj-dealer-score').textContent = bjGameActive ? '?' : calculateScore(bjDealerHand);
+    document.getElementById('bj-player-score').textContent = calculateScore(bjPlayerHand);
+}
+
+function startBlackjack() {
+    if (bjGameActive) return;
+    const bet = getBet('blackjack');
+    if (balance < bet) { alert('Недостаточно денег!'); return; }
+
+    balance -= bet;
+    triggerBalanceAnimation(bet, false);
+    update();
+
+    bjDeck = createDeck();
+    bjPlayerHand = [bjDeck.pop(), bjDeck.pop()];
+    bjDealerHand = [bjDeck.pop(), bjDeck.pop()];
+    bjGameActive = true;
+
+    document.getElementById('bj-result').textContent = 'Твой ход';
+    document.getElementById('bj-result').style.color = 'var(--yellow-soft)';
+
+    document.getElementById('bj-btn-start').style.display = 'none';
+    document.getElementById('bj-btn-hit').style.display = 'block';
+    document.getElementById('bj-btn-stand').style.display = 'block';
+
+    renderCards();
+}
+
+function bjHit() {
+    if (!bjGameActive) return;
+    bjPlayerHand.push(bjDeck.pop());
+    renderCards();
+
+    if (calculateScore(bjPlayerHand) > 21) {
+        endBlackjack(false, 'Перебор! Вы проиграли.');
+    }
+}
+
+function bjStand() {
+    if (!bjGameActive) return;
+    bjGameActive = false;
+
+    while (calculateScore(bjDealerHand) < 17) {
+        bjDealerHand.push(bjDeck.pop());
+    }
+
+    const playerScore = calculateScore(bjPlayerHand);
+    const dealerScore = calculateScore(bjDealerHand);
+
+    if (dealerScore > 21) {
+        endBlackjack(true, 'У дилера перебор! Вы победили!');
+    } else if (playerScore > dealerScore) {
+        endBlackjack(true, 'У вас больше! Вы победили!');
+    } else if (playerScore < dealerScore) {
+        endBlackjack(false, 'Дилер выиграл.');
+    } else {
+        endBlackjack(null, 'Ничья!');
+    }
+}
+
+function endBlackjack(win, message) {
+    bjGameActive = false;
+
+    const bet = getBet('blackjack');
+    const resultEl = document.getElementById('bj-result');
+    resultEl.textContent = message;
+
+    if (win === true) {
+        balance += bet * 2;
+        triggerBalanceAnimation(bet * 2, true);
+        resultEl.style.color = 'var(--green)';
+    } else if (win === null) {
+        balance += bet;
+        triggerBalanceAnimation(bet, true);
+        resultEl.style.color = 'var(--yellow-soft)';
+    } else {
+        resultEl.style.color = 'var(--red)';
+    }
+
+    document.getElementById('bj-btn-start').style.display = 'block';
+    document.getElementById('bj-btn-hit').style.display = 'none';
+    document.getElementById('bj-btn-stand').style.display = 'none';
+
+    renderCards();
+    update();
 }
 
 // ================= ГОНКИ =================
