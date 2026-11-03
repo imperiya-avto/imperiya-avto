@@ -6,8 +6,7 @@ const { MongoClient } = require('mongodb');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ================= НАСТРОЙКИ =================
-const ADMIN_LOGIN = 'Q1wesh'; // Твой логин
+const ADMIN_LOGIN = 'Q1wesh'; 
 const MAX_FUEL = 10; 
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://q1weshgg5_db_user:RFWAVljQWN6vqJ3@cluster0.kndazx5.mongodb.net/?retryWrites=true&w=majority';
@@ -30,7 +29,6 @@ MongoClient.connect(MONGODB_URI)
     process.exit(1);
   });
 
-// Регистрация
 app.post('/api/register', async (req, res) => {
   const { login, password } = req.body;
   if (!login || !password) return res.status(400).json({ error: 'Заполните поля!' });
@@ -50,13 +48,15 @@ app.post('/api/register', async (req, res) => {
     playerId,
     profile: { name: login, bio: '', avatar: '' },
     gameData: {
-      balance: 350000, // Стартовый баланс
+      balance: 350000,
       income: 0,
       cars: [{ id: 'rusty_7' }],
       garageSlots: 5,
       fuel: 10,
       lastFuelTime: Date.now(),
-      lastTime: Date.now()
+      lastTime: Date.now(),
+      numbers: [],      // <-- Номера
+      activeNumber: null // <-- Активный номер
     },
     friends: [],
     friendRequests: []
@@ -66,7 +66,6 @@ app.post('/api/register', async (req, res) => {
   res.json({ success: true, user: newUser });
 });
 
-// Вход
 app.post('/api/login', async (req, res) => {
   const { login, password } = req.body;
   const user = await db.collection('users').findOne({ login });
@@ -75,14 +74,12 @@ app.post('/api/login', async (req, res) => {
   res.json({ success: true, user });
 });
 
-// Сохранение
 app.post('/api/save', async (req, res) => {
   const { login, gameData } = req.body;
   await db.collection('users').updateOne({ login }, { $set: { gameData } });
   res.json({ success: true });
 });
 
-// Топ
 app.get('/api/top', async (req, res) => {
   const players = await db.collection('users')
     .find({}, { projection: { login: 1, playerId: 1, profile: 1, 'gameData.balance': 1 } })
@@ -99,47 +96,82 @@ app.get('/api/top', async (req, res) => {
   })));
 });
 
-// Получить пользователя
 app.get('/api/user/:login', async (req, res) => {
   const user = await db.collection('users').findOne({ login: req.params.login });
   if (!user) return res.status(404).json({ error: 'Не найден' });
   res.json(user);
 });
 
-// Обновить профиль
 app.post('/api/profile', async (req, res) => {
   const { login, profile } = req.body;
   await db.collection('users').updateOne({ login }, { $set: { profile } });
   res.json({ success: true });
 });
 
-// ================= АДМИН ПАНЕЛЬ =================
+// Сохранение номера
+app.post('/api/save-number', async (req, res) => {
+  const { login, newNumber } = req.body;
+  const user = await db.collection('users').findOne({ login });
+  if (!user) return res.status(404).json({ error: 'Не найден' });
+
+  if (!user.gameData.numbers) user.gameData.numbers = [];
+  if (user.gameData.numbers.length >= 10) {
+    return res.status(400).json({ error: 'Склад заполнен (макс 10)' });
+  }
+
+  user.gameData.numbers.push(newNumber);
+  await db.collection('users').updateOne(
+    { login },
+    { $set: { 'gameData.numbers': user.gameData.numbers } }
+  );
+
+  res.json({ success: true, numbers: user.gameData.numbers });
+});
+
+// Удаление номера со склада
+app.post('/api/delete-number', async (req, res) => {
+  const { login, index } = req.body;
+  const user = await db.collection('users').findOne({ login });
+  if (!user) return res.status(404).json({ error: 'Не найден' });
+
+  if (!user.gameData.numbers || !user.gameData.numbers[index]) {
+    return res.status(400).json({ error: 'Номер не найден' });
+  }
+
+  const deleted = user.gameData.numbers.splice(index, 1)[0];
+  await db.collection('users').updateOne(
+    { login },
+    { $set: { 'gameData.numbers': user.gameData.numbers } }
+  );
+
+  res.json({ success: true, numbers: user.gameData.numbers });
+});
+
+// Установка активного номера
+app.post('/api/active-number', async (req, res) => {
+  const { login, activeNumber } = req.body;
+  await db.collection('users').updateOne(
+    { login },
+    { $set: { 'gameData.activeNumber': activeNumber } }
+  );
+  res.json({ success: true });
+});
+
+// Админка
 app.post('/api/admin/adjust', async (req, res) => {
   try {
     const { adminLogin, targetId, amount } = req.body;
-
-    // Проверка прав (только Q1wesh)
-    if (adminLogin !== ADMIN_LOGIN) {
-      return res.status(403).json({ error: 'Нет прав администратора!' });
-    }
+    if (adminLogin !== ADMIN_LOGIN) return res.status(403).json({ error: 'Нет прав администратора!' });
 
     const numAmount = Number(amount);
-    if (isNaN(numAmount) || numAmount === 0) {
-      return res.status(400).json({ error: 'Неверная сумма!' });
-    }
+    if (isNaN(numAmount) || numAmount === 0) return res.status(400).json({ error: 'Неверная сумма!' });
 
-    // Ищем игрока по playerId, если нет - по login
     let user = await db.collection('users').findOne({ playerId: targetId });
-    if (!user) {
-      user = await db.collection('users').findOne({ login: targetId });
-    }
-
-    if (!user) {
-      return res.status(404).json({ error: 'Игрок с таким ID не найден!' });
-    }
+    if (!user) user = await db.collection('users').findOne({ login: targetId });
+    if (!user) return res.status(404).json({ error: 'Игрок с таким ID не найден!' });
 
     const currentBalance = user.gameData.balance || 0;
-    const newBalance = Math.max(0, currentBalance + numAmount); // не уходим в минус
+    const newBalance = Math.max(0, currentBalance + numAmount);
 
     await db.collection('users').updateOne(
       { _id: user._id },
