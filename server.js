@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 
 // ================= НАСТРОЙКИ =================
 // ЗАМЕНИТЕ ЭТО НА ВАШ ЛОГИН, ПОД КОТОРЫМ ВЫ ЗАХОДИТЕ В ИГРУ!
-const ADMIN_LOGIN = 'Q1wesh'; 
+const ADMIN_LOGIN = 'Q1wesh';
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://q1weshgg5_db_user:RFWAVljQWN6vqJ3@cluster0.kndazx5.mongodb.net/?retryWrites=true&w=majority';
 const DB_NAME = 'imperiya_avto';

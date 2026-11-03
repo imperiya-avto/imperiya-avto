@@ -266,6 +266,52 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 @keyframes caseFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 .case-fallback { width: 190px;height: 135px;position: relative; background: linear-gradient(145deg,#2a2a34,#101015); border: 3px solid var(--yellow); border-radius: 14px; box-shadow: 0 0 24px rgba(255,210,26,.18), inset 0 0 24px rgba(255,210,26,.18); display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--yellow); letter-spacing: 2px; font-size: 14px; }
 
+/* ===== ОВЕРЛЕЙ "ВЫПАЛА МАШИНА" НА КЕЙСЕ ===== */
+.case-drop-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 12px;
+  background: rgba(5, 5, 8, 0.82);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  border-radius: 16px;
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.case-drop-overlay.show { opacity: 1; animation: dropPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes dropPop {
+  0% { transform: scale(0.7); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.case-drop-overlay .drop-icon {
+  font-size: 34px;
+  line-height: 1;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 0 12px currentColor);
+}
+.case-drop-overlay .drop-rarity {
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+  text-shadow: 0 0 14px currentColor;
+}
+.case-drop-overlay .drop-name {
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.25;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.95), 0 0 20px currentColor;
+}
+
 .quantity-title{color:var(--muted);margin:12px 0 8px;font-size:13px;letter-spacing:.4px}
 .quantity-buttons{display:flex;justify-content:center;flex-wrap:wrap;gap:8px}
 .quantity-button{ background:linear-gradient(180deg,#1e1e26,#14141a); color:#d9d9e2;border:2px solid var(--stroke-2); border-radius:10px;min-width:54px;padding:9px 14px; font-size:14px;font-weight:800; cursor:pointer;}
@@ -284,6 +330,32 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .case-button{ display:block;margin:6px auto 0; background:linear-gradient(180deg,#ffd21a,#ffb800); color:#15130a;border:0;border-radius:12px; padding:13px 28px;font-size:16px;font-weight:900;letter-spacing:.5px; box-shadow:0 12px 30px rgba(255,210,26,.35); position: relative; cursor:pointer;}
 .case-button:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-2px)}
 .case-button:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+
+/* ===== КОМПАКТНАЯ КНОПКА "ПРОДАТЬ ВЫПАВШЕЕ" ===== */
+.sell-dropped-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 16px auto 6px;
+  padding: 10px 22px;
+  background: linear-gradient(180deg, #2ee27a, #1fa35a);
+  color: #0b2a17;
+  border: 1px solid #7dffb4;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(46, 226, 122, 0.35), inset 0 1px 0 rgba(255,255,255,0.35);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+.sell-dropped-btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow: 0 10px 26px rgba(46, 226, 122, 0.5);
+}
+.sell-dropped-btn:active { transform: scale(0.97); }
 
 .case-price{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:16px; }
 .price-row{ display:flex; align-items:center; gap:10px; padding:10px 16px; background:linear-gradient(180deg, rgba(255,210,26,.10), rgba(255,210,26,.03)); border:1px solid rgba(255,210,26,.28); border-radius:12px; box-shadow:0 8px 22px rgba(0,0,0,.45), inset 0 0 14px rgba(255,210,26,.05); }
@@ -548,6 +620,8 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   .roulette-item{flex-basis:88px;width:88px;height:76px}
   .roulette-item .car-icon{font-size:20px}
   .roulette-item .car-name{font-size:10px}
+  .case-drop-overlay .drop-name { font-size: 15px; }
+  .case-drop-overlay .drop-icon { font-size: 28px; }
   .auction-card { flex-direction: column; align-items: center; text-align: center; }
   .auction-car-img-wrap { width: 100%; flex: none; }
   .auction-car-stats { justify-content: center; }
@@ -739,8 +813,8 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
    <span class="skip-text">Пропустить прокрутку</span>
   </label>
   <button class="case-button" id="caseButton" onclick="buyCase()">ОТКРЫТЬ КЕЙС</button>
-  
-  <button id="sellDroppedBtn" class="case-button" style="display:none; background: linear-gradient(180deg, #3ddc84, #28a862); margin-top: 15px;" onclick="sellDroppedCars()">Продать выпавшее</button>
+
+  <button id="sellDroppedBtn" class="sell-dropped-btn" style="display:none;" onclick="sellDroppedCars()">💰 Продать выпавшее</button>
 
   <div class="case-price">
     <div class="price-row">
@@ -918,6 +992,7 @@ let expandedCars = new Set();
 let sortedCarRefs = [];
 let lastCarsFromCase = []; // Для кнопки продажи после кейса
 let isViewingOtherProfile = false;
+let caseDropTimeout = null; // Таймер оверлея выпавшей машины
 
 let balance = 0;
 let income = 0;
@@ -958,10 +1033,38 @@ async function handleAuth() {
     localStorage.setItem('autoEmpire_activeUser', login);
     currentUser = login;
     applyServerUser(data.user);
+
+    // Запускаем тик дохода и сохранения
+    startGameLoop();
   } catch (e) {
     err.textContent = 'Сервер недоступен.';
     console.error(e);
   }
+}
+
+// ================= ВЫХОД ИЗ АККАУНТА =================
+function logout() {
+  localStorage.removeItem('autoEmpire_activeUser');
+  currentUser = null;
+  myProfileData = null;
+  balance = 0;
+  income = 0;
+  cars = [];
+  garageSlots = 5;
+  selectedCars = [];
+  expandedCars.clear();
+  lastCarsFromCase = [];
+  window._lastFuel = 20;
+  window._lastFuelTime = Date.now();
+  if (saveTimeout) { clearTimeout(saveTimeout); saveTimeout = null; }
+
+  closeProfile();
+  document.getElementById("authScreen").style.display = "flex";
+  document.getElementById("userProfileWidget").style.display = "none";
+  document.getElementById("fuelWidget").style.display = "none";
+  document.getElementById("authLogin").value = "";
+  document.getElementById("authPassword").value = "";
+  document.getElementById("authError").textContent = "";
 }
 
 function applyServerUser(user) {
@@ -970,7 +1073,7 @@ function applyServerUser(user) {
   income = user.gameData.income;
   garageSlots = user.gameData.garageSlots;
   cars = user.gameData.cars || [];
-  
+
   if (typeof window._lastFuel === 'undefined') {
     window._lastFuel = user.gameData.fuel !== undefined ? user.gameData.fuel : 20;
     window._lastFuelTime = user.gameData.lastFuelTime || Date.now();
@@ -996,13 +1099,28 @@ function updateProfileUIFromServer(user) {
   document.getElementById("miniAvatar").src = p.avatar || defaultAvatar;
 }
 
+// ================= ИГРОВОЙ ЦИКЛ =================
+let gameLoopStarted = false;
+function startGameLoop() {
+  if (gameLoopStarted) return;
+  gameLoopStarted = true;
+  setInterval(() => {
+    if (currentUser) {
+      income += getRate();
+      update();
+      updateFuelUI();
+      scheduleSave();
+    }
+  }, 1000);
+}
+
 // ================= ТОПЛИВО (С ТАЙМЕРОМ) =================
 function updateFuelUI() {
   const fuelCountEl = document.getElementById('fuelCount');
   if (!fuelCountEl) return;
 
   if (typeof window._lastFuel === 'undefined') window._lastFuel = 20;
-  
+
   // Восстановление (1 ед. в час)
   if (window._lastFuel < 20) {
     const now = Date.now();
@@ -1316,7 +1434,7 @@ function update(){
  if (rateEl) rateEl.textContent = getRate().toLocaleString("ru-RU");
  if (slotsEl) slotsEl.textContent = cars.length;
  if (maxSlotsEl) maxSlotsEl.textContent = garageSlots;
- 
+
  const nextPrice = getNextSlotPrice();
  if (nextSlotPriceEl) nextSlotPriceEl.textContent = nextPrice === null ? "МАКСИМУМ" : nextPrice.toLocaleString("ru-RU");
  if (slotButton) {
@@ -1340,16 +1458,16 @@ function renderGarage(){
   const savedScrollY=window.scrollY;
   const container=document.getElementById("garageCars");
   if(!container) return;
-  
+
   container.innerHTML="";
   expandedCars = new Set([...expandedCars].filter(i=>i>=0&&i<cars.length));
   selectedCars = selectedCars.filter(i => i >= 0 && i < cars.length && !cars[i].locked);
-  
+
   const refs = cars.map((car, originalIndex)=>{
     const item = catalog.find(c=>c.id===car.id);
     return {car, item, originalIndex};
   }).filter(r=>r.item);
-  
+
   refs.sort((a,b)=>{
     const rankA = getRarityRank(a.item.rarity);
     const rankB = getRarityRank(b.item.rarity);
@@ -1357,20 +1475,20 @@ function renderGarage(){
     if(b.item.price !== a.item.price) return b.item.price - a.item.price;
     return b.item.income - a.item.income;
   });
-  
+
   refs.forEach(({car, item, originalIndex})=>{
    const card=document.createElement("div");
    const isExpanded = expandedCars.has(originalIndex);
    const isDivine = item.rarity==="Божественная";
    const isSelected = selectedCars.includes(originalIndex);
-   
+
    card.className="car"+
      (isDivine?" rarity-rainbow":" rarity-glow")+
      (selectMode && !car.locked ? " selectable":"")+
      (isSelected ? " selected":"")+
      (car.locked ? " locked":"")+
      (isExpanded ? " expanded":"");
-     
+
    card.dataset.carIndex=String(originalIndex);
    const color=getRarityColor(item.rarity);
    card.style.setProperty("--rarity-color",color);
@@ -1442,7 +1560,7 @@ function renderGarage(){
    empty.textContent="🔒 Пустая ячейка";
    container.append(empty);
   }
-  
+
   updateGarageSelectionUI();
   update();
   scheduleSave();
@@ -1459,17 +1577,17 @@ function toggleCarDetails(index, cardEl){
   if(hint) hint.textContent = expanded ? "Нажми, чтобы скрыть" : "Показать характеристики";
 }
 
-function toggleSelectMode(){ 
-  selectMode=!selectMode; 
-  selectedCars=[]; 
-  renderGarage(); 
+function toggleSelectMode(){
+  selectMode=!selectMode;
+  selectedCars=[];
+  renderGarage();
 }
 
 function toggleCarSelection(index){
   if(!selectMode||index<0||index>=cars.length||cars[index].locked)return;
   if(selectedCars.includes(index)) selectedCars=selectedCars.filter(i=>i!==index);
   else selectedCars.push(index);
-  
+
   const card=document.querySelector('.car[data-car-index="'+index+'"]');
   if(card){
    const sel=selectedCars.includes(index);
@@ -1508,10 +1626,10 @@ function getNextSlotPrice(){
 function buyGarageSlot(){
  if(garageSlots>=40)return;
  const price=getNextSlotPrice();
- if(balance<price){ 
+ if(balance<price){
    triggerBalanceAnimation(price, false);
-   alert("Недостаточно денег!"); 
-   return; 
+   alert("Недостаточно денег!");
+   return;
  }
  balance-=price;
  triggerBalanceAnimation(price, false);
@@ -1563,10 +1681,10 @@ function openSellAllModal() {
   document.getElementById("sellModal").hidden = false;
 }
 
-function closeSellModal(){ 
-  document.getElementById("sellModal").hidden=true; 
-  sellIndices=[]; 
-  sellAllFlag = false; 
+function closeSellModal(){
+  document.getElementById("sellModal").hidden=true;
+  sellIndices=[];
+  sellAllFlag = false;
 }
 
 function confirmSell(){
@@ -1592,7 +1710,7 @@ function confirmSell(){
     renderGarage();
     return;
   }
-  
+
   if(!sellIndices.length)return;
   const valid=sellIndices.filter(i=>i>=0&&i<cars.length&&!cars[i].locked).sort((a,b)=>b-a);
   let total=0;
@@ -1609,19 +1727,19 @@ function confirmSell(){
   renderGarage();
 }
 
-function collectMoney(){ 
+function collectMoney(){
   if (income <= 0) return;
   const amount = income;
-  balance+=amount; 
-  income=0; 
-  
+  balance+=amount;
+  income=0;
+
   const incBox = document.getElementById("incomeBox");
   if (incBox) showMoneyFloat(incBox, amount, true);
   const incDisplay = document.getElementById("incomeDisplay");
   if (incDisplay) animateValue(incDisplay, amount, true);
-  
+
   triggerBalanceAnimation(amount, true);
-  update(); 
+  update();
 }
 
 // ================= КЕЙСЫ =================
@@ -1635,13 +1753,13 @@ function selectCase(type){
  document.getElementById("selectedCaseName").textContent=s.name;
  document.getElementById("singleCasePrice").textContent=s.price.toLocaleString("ru-RU")+" ₽";
  document.getElementById("totalCasePrice").textContent=(s.price*selectedQuantity).toLocaleString("ru-RU")+" ₽";
- 
+
  const caseImg = document.getElementById("caseImage");
  const caseFallback = document.getElementById("caseFallback");
  caseImg.src = "images/" + s.img;
  caseImg.style.display = "block";
  caseFallback.style.display = "none";
- 
+
  updateCaseOdds();
  document.querySelectorAll(".case-choice").forEach(b=>b.classList.remove("active"));
  const types=Object.keys(CASE_TYPES);
@@ -1753,6 +1871,34 @@ function animateRoulette(roulette){
  });
 }
 
+// ===== Показ выпавшей машины ПРЯМО НА КЕЙСЕ =====
+function showCaseDrop(car){
+  const visual = document.getElementById('caseVisual');
+  if (!visual) return;
+
+  let overlay = visual.querySelector('.case-drop-overlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.className = 'case-drop-overlay';
+    visual.appendChild(overlay);
+  }
+
+  const color = getRarityColor(car.rarity);
+  overlay.style.border = '2px solid ' + color;
+  overlay.style.boxShadow = '0 0 26px ' + color + ', inset 0 0 22px ' + color + '33';
+  overlay.innerHTML = `
+    <div class="drop-icon" style="color:${color}">🚘</div>
+    <div class="drop-rarity" style="color:${color}">${car.rarity}</div>
+    <div class="drop-name">${car.name}</div>
+  `;
+
+  overlay.classList.add('show');
+  if (caseDropTimeout) clearTimeout(caseDropTimeout);
+  caseDropTimeout = setTimeout(() => {
+    overlay.classList.remove('show');
+  }, 2200);
+}
+
 async function buyCase(){
  if(rouletteRunning)return;
  const quantity=selectedQuantity;
@@ -1783,7 +1929,7 @@ async function buyCase(){
  const list=document.getElementById("rouletteList");
  area.hidden=false;
  list.innerHTML="";
- 
+
  // Сброс кнопки "Продать выпавшее"
  const sellDroppedBtn = document.getElementById('sellDroppedBtn');
  if (sellDroppedBtn) sellDroppedBtn.style.display = 'none';
@@ -1813,52 +1959,27 @@ async function buyCase(){
    result.textContent="🎉 "+winner.name+" — "+winner.rarity;
    row.append(header,result);
    list.append(row);
+   // Показываем надпись на кейсе (перезаписывается, показывается последняя)
+   showCaseDrop(winner);
   });
   finishOpening(quantity);
   return;
  }
 
- const roulettes=winners.map((w,i)=>createRoulette(i,w));
- const animations=roulettes.map(r=>animateRoulette(r));
- await Promise.all(animations);
- 
- winners.forEach((winner,index)=>{
-  cars.push({id:winner.id});
-  lastCarsFromCase.push(winner);
-  roulettes[index].result.textContent="🎉 "+winner.name+" — "+winner.rarity;
- });
- 
- // Всплывающий текст в центре
- showCenterAnnouncement(winners[0]);
- 
- finishOpening(quantity);
-}
+ const roulettes = winners.map((w, i) => createRoulette(i, w));
 
-function showCenterAnnouncement(car){
-  const el = document.createElement('div');
-  el.style.position = 'fixed';
-  el.style.top = '50%';
-  el.style.left = '50%';
-  el.style.transform = 'translate(-50%, -50%) scale(0.8)';
-  el.style.background = 'rgba(0,0,0,0.9)';
-  el.style.border = '3px solid ' + getRarityColor(car.rarity);
-  el.style.borderRadius = '20px';
-  el.style.padding = '30px 50px';
-  el.style.zIndex = '99999';
-  el.style.textAlign = 'center';
-  el.style.boxShadow = '0 0 50px ' + getRarityColor(car.rarity);
-  el.style.opacity = '0';
-  el.style.transition = 'all 0.3s ease';
-  el.innerHTML = `
-    <div style="font-size:40px; margin-bottom:10px;">🚘</div>
-    <div style="font-size:12px; color:${getRarityColor(car.rarity)}; text-transform:uppercase; letter-spacing:2px; font-weight:900;">${car.rarity}</div>
-    <div style="font-size:24px; color:#fff; font-weight:900; margin-top:5px;">${car.name}</div>
-  `;
-  document.body.appendChild(el);
-  
-  setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'translate(-50%, -50%) scale(1)'; }, 10);
-  setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translate(-50%, -50%) scale(1.2)'; }, 3000);
-  setTimeout(() => { el.remove(); }, 3500);
+ // Показываем каждую выпавшую машину на кейсе по мере окончания прокрутки
+ const animations = roulettes.map((r, idx) => animateRoulette(r).then(() => {
+   const winner = winners[idx];
+   cars.push({ id: winner.id });
+   lastCarsFromCase.push(winner);
+   r.result.textContent = "🎉 " + winner.name + " — " + winner.rarity;
+   showCaseDrop(winner);
+ }));
+
+ await Promise.all(animations);
+
+ finishOpening(quantity);
 }
 
 function finishOpening(quantity){
@@ -1869,14 +1990,14 @@ function finishOpening(quantity){
  document.getElementById("caseMessage").textContent="✅ Открыто кейсов: "+quantity;
  renderGarage();
  update();
- 
+
  if (lastCarsFromCase.length > 0) {
    const btn = document.getElementById('sellDroppedBtn');
    if (btn) {
-     btn.style.display = 'block';
+     btn.style.display = 'inline-flex';
      let total = 0;
      lastCarsFromCase.forEach(c => total += Math.floor(c.price * 0.15));
-     btn.textContent = `Продать выпавшее за ${total.toLocaleString('ru-RU')} ₽`;
+     btn.textContent = `💰 Продать выпавшее за ${total.toLocaleString('ru-RU')} ₽`;
    }
  }
 }
@@ -1887,20 +2008,20 @@ function sellDroppedCars() {
   lastCarsFromCase.forEach(car => {
     total += Math.floor(car.price * 0.15);
   });
-  
-  // Удаляем эти машины из гаража (они лежат в конце массива)
+
+  // Удаляем эти машины из гаража
   for (let i = cars.length - 1; i >= 0; i--) {
     if (lastCarsFromCase.some(c => c.id === cars[i].id)) {
       cars.splice(i, 1);
     }
   }
-  
+
   balance += total;
   triggerBalanceAnimation(total, true);
   lastCarsFromCase = [];
   document.getElementById('sellDroppedBtn').style.display = 'none';
   document.getElementById('caseMessage').textContent = `✅ Выпавшие машины проданы за ${total.toLocaleString('ru-RU')} ₽!`;
-  
+
   renderGarage();
   update();
 }
@@ -1909,7 +2030,7 @@ function sellDroppedCars() {
 async function openMyProfile() {
   if (!currentUser) return;
   isViewingOtherProfile = false;
-  
+
   try {
     const res = await fetch(`${API_URL}/user/${currentUser}`);
     const user = await res.json();
@@ -1917,12 +2038,12 @@ async function openMyProfile() {
 
     const p = user.profile;
     const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231e1e26' width='100' height='100'/><text x='50' y='50' font-size='50' text-anchor='middle' dominant-baseline='central' fill='%23ffd21a'>👤</text></svg>";
-    
+
     document.getElementById("profileAvatarPreview").src = p.avatar || defaultAvatar;
     document.getElementById("profileNameInput").value = p.name || currentUser;
     document.getElementById("profileBioInput").value = p.bio || "";
     document.getElementById("profileIdDisplay").textContent = user.playerId;
-    
+
     document.getElementById("profileNameInput").disabled = false;
     document.getElementById("profileBioInput").disabled = false;
     document.getElementById("avatarUploadLabel").style.display = "inline-block";
@@ -1938,20 +2059,20 @@ async function showPlayerProfile(login) {
     const res = await fetch(`${API_URL}/user/${login}`);
     if (!res.ok) return;
     const user = await res.json();
-    
+
     const p = user.profile;
     const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231e1e26' width='100' height='100'/><text x='50' y='50' font-size='50' text-anchor='middle' dominant-baseline='central' fill='%23ffd21a'>👤</text></svg>";
-    
+
     document.getElementById("profileAvatarPreview").src = p.avatar || defaultAvatar;
     document.getElementById("profileNameInput").value = p.name || login;
     document.getElementById("profileBioInput").value = p.bio || "";
     document.getElementById("profileIdDisplay").textContent = user.playerId;
-    
+
     document.getElementById("profileNameInput").disabled = true;
     document.getElementById("profileBioInput").disabled = true;
     document.getElementById("avatarUploadLabel").style.display = "none";
     document.getElementById("profileActions").style.display = "none";
-    
+
     document.getElementById("profileModal").hidden = false;
   } catch (e) { console.error(e); }
 }
@@ -2040,9 +2161,9 @@ async function renderTops() {
       if (i === 0) rankHtml = `<div class="top-rank gold">🥇</div>`;
       else if (i === 1) rankHtml = `<div class="top-rank silver">🥈</div>`;
       else if (i === 2) rankHtml = `<div class="top-rank bronze">🥉</div>`;
-      
+
       const avatarSrc = p.avatar || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231e1e26' width='100' height='100'/><text x='50' y='50' font-size='50' text-anchor='middle' dominant-baseline='central' fill='%23ffd21a'>👤</text></svg>";
-      
+
       row.innerHTML = `
         ${rankHtml}
         <img src="${avatarSrc}" class="top-avatar">
@@ -2052,7 +2173,7 @@ async function renderTops() {
         </div>
         <div class="top-balance">${Math.floor(p.balance).toLocaleString('ru-RU')} ₽</div>
       `;
-      
+
       row.onclick = () => {
         if (p.login !== currentUser) showPlayerProfile(p.login);
         else openMyProfile();
@@ -2060,18 +2181,6 @@ async function renderTops() {
       topContainer.appendChild(row);
     }
   } catch (e) { console.error(e); }
-}
-
-// ================= ГАРАЖ И ИНВЕНТАРЬ =================
-function updateGarageSelectionUI(){
-  const modeButton=document.getElementById("selectModeButton");
-  const sellButton=document.getElementById("sellSelectedButton");
-  const hint=document.getElementById("selectionHint");
-  if(!modeButton||!sellButton||!hint)return;
-  modeButton.textContent=selectMode?"Отменить выбор":"Выбрать";
-  sellButton.disabled=!selectMode||selectedCars.length===0;
-  sellButton.textContent="Продать выбранные ("+selectedCars.length+")";
-  hint.textContent=selectMode?"Нажми на машины, чтобы отметить их":"Выбери несколько машин в гараже";
 }
 
 // ================= НАВИГАЦИЯ =================
@@ -2084,9 +2193,12 @@ function openTab(tab,button){
  if (section) section.hidden = false;
  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
  if (button) button.classList.add("active");
- 
+
  if (tab === "tops") {
    renderTops();
+ }
+ if (tab === "races") {
+   initRaces();
  }
 }
 
@@ -2108,7 +2220,7 @@ function animateValue(element, amount, isPositive) {
   if (!element) return;
   element.classList.remove("anim-plus", "anim-minus", "anim-shake");
   void element.offsetWidth;
-  if (isPositive) { element.classList.add("anim-plus"); } 
+  if (isPositive) { element.classList.add("anim-plus"); }
   else { element.classList.add("anim-minus", "anim-shake"); }
   setTimeout(() => { element.classList.remove("anim-plus", "anim-minus", "anim-shake"); }, 900);
 }
@@ -2179,7 +2291,7 @@ function playRoulette() {
         resultEl.textContent = `Проигрыш. -${bet.toLocaleString("ru-RU")} ₽`; resultEl.style.color = "var(--red)";
         visual.innerHTML = '<div class="visual-text" style="color:var(--red)">💀</div>';
       }
-      update(); 
+      update();
     }
   }, 100);
 }
@@ -2209,7 +2321,7 @@ function playDice() {
       } else {
         resultEl.textContent = `Выпало ${sum}. Проигрыш.`; resultEl.style.color = "var(--red)";
       }
-      update(); 
+      update();
     }
   }, 100);
 }
@@ -2255,18 +2367,17 @@ function renderRaceSlots() {
   const grid = document.getElementById("racesGrid");
   if (!grid) return;
   grid.innerHTML = "";
-  
+
   const pool = catalog.filter(c => !c.id.startsWith("low_"));
   const opponents = [];
   for (let i = 0; i < 5; i++) {
     opponents.push(pool[Math.floor(Math.random() * pool.length)]);
   }
-  
+
   opponents.forEach(opp => {
     const cost = Math.floor(opp.price * RACE_COST_PERCENT);
     const reward = Math.floor(opp.price * RACE_REWARD_PERCENT);
-    
-    // Проверяем лимит гонок с этим соперником
+
     const racesWithOpp = raceOpponentsMap[opp.id] || 0;
     const isLocked = racesWithOpp >= 2;
 
@@ -2274,7 +2385,7 @@ function renderRaceSlots() {
     slot.className = "race-slot" + (isLocked ? " locked" : "");
     slot.style.opacity = isLocked ? "0.5" : "1";
     slot.style.cursor = isLocked ? "not-allowed" : "pointer";
-    
+
     if (!isLocked) {
       slot.onclick = () => openRaceDetail(opp, cost, reward);
     }
@@ -2300,7 +2411,7 @@ function renderRaceSlots() {
       </div>
     `;
     grid.appendChild(slot);
-    
+
     if (selectedPlayerCar) {
       const chance = Math.min(95, Math.max(5, Math.round((selectedPlayerCar.power / (selectedPlayerCar.power + opp.power)) * 100)));
       const chanceEl = slot.querySelector(`#chance-${opp.id}`);
@@ -2317,7 +2428,7 @@ function openCarSelect() {
   const modal = document.getElementById("carSelectModal");
   const list = document.getElementById("carSelectList");
   list.innerHTML = "";
-  
+
   if (cars.length === 0) {
     list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--muted);">У вас нет машин</div>';
   } else {
@@ -2366,11 +2477,11 @@ function updateRaceUI() {
 function openRaceDetail(opp, cost, reward) {
   currentRaceData = { opp, cost, reward };
   currentRaceOpp = opp;
-  
+
   document.getElementById("racesMainView").style.display = "none";
   document.getElementById("raceDetailView").style.display = "block";
   updateRaceUI();
-  
+
   resetRaceUI();
   document.getElementById("botLaneLabel").textContent = opp.name;
 }
@@ -2386,13 +2497,13 @@ function resetRaceUI() {
   document.getElementById("btnStartRace").disabled = false;
   document.getElementById("btnGoRace").style.display = "none";
   document.getElementById("btnGoRace").disabled = false;
-  
+
   ['light1','light2','light3','light4'].forEach(id => {
     const el = document.getElementById(id);
     el.className = el.classList.contains('green') ? 'light green' : 'light yellow';
     el.classList.remove('active');
   });
-  
+
   raceState = 'idle';
   playerProgress = 0;
   botProgress = 0;
@@ -2427,8 +2538,7 @@ function startRaceSequence() {
     triggerBalanceAnimation(currentRaceData.cost, false);
     return;
   }
-  
-  // Тратим 10 топлива
+
   if (window._lastFuel < 10) {
     alert("Нужно 10 топлива для гонки!");
     return;
@@ -2436,25 +2546,25 @@ function startRaceSequence() {
   window._lastFuel -= 10;
   if (window._lastFuel === 19) window._lastFuelTime = Date.now();
   updateFuelUI();
-  
+
   balance -= currentRaceData.cost;
   triggerBalanceAnimation(currentRaceData.cost, false);
   update();
-  
+
   raceState = 'starting';
   playerGoPressed = false;
   document.getElementById("btnStartRace").style.display = "none";
   document.getElementById("raceDistance").textContent = "Приготовьтесь...";
-  
+
   const l1 = document.getElementById("light1");
   const l2 = document.getElementById("light2");
   const l3 = document.getElementById("light3");
   const l4 = document.getElementById("light4");
-  
+
   setTimeout(() => { l1.classList.add('active'); }, 500);
   setTimeout(() => { l2.classList.add('active'); }, 1200);
   setTimeout(() => { l3.classList.add('active'); }, 1900);
-  
+
   const greenDelay = 2600 + Math.random() * 800;
   greenLightTimeout = setTimeout(() => {
     l4.classList.add('active');
@@ -2462,7 +2572,7 @@ function startRaceSequence() {
     document.getElementById("btnGoRace").style.display = "block";
     raceState = 'running';
     raceStartTime = Date.now();
-    
+
     startMovement();
   }, greenDelay);
 }
@@ -2472,10 +2582,10 @@ function playerGo() {
     endRace(false, "Фальстарт! Вы нажали до зелёного света. Проигрыш.");
     return;
   }
-  
+
   if (raceState !== 'running') return;
   if (playerFinished) return;
-  
+
   playerGoPressed = true;
   document.getElementById("btnGoRace").style.display = "none";
 }
@@ -2483,11 +2593,11 @@ function playerGo() {
 function startMovement() {
   if (raceInterval) clearInterval(raceInterval);
   const laneWidth = document.getElementById("lanePlayer").offsetWidth - 50;
-  
+
   playerPower = selectedPlayerCar ? selectedPlayerCar.power : 100;
   botPower = currentRaceOpp.power;
-  
-  const pBaseSpeed = playerPower / 150; 
+
+  const pBaseSpeed = playerPower / 150;
   const bBaseSpeed = botPower / 150;
 
   const pRandom = 0.9 + Math.random() * 0.2;
@@ -2495,14 +2605,14 @@ function startMovement() {
 
   const pSpeed = pBaseSpeed * pRandom;
   const bSpeed = bBaseSpeed * bRandom;
-  
+
   let botStarted = false;
   let botTimeoutId = null;
 
   botTimeoutId = setTimeout(() => {
     botStarted = true;
   }, 500);
-  
+
   raceInterval = setInterval(() => {
     if (playerGoPressed && playerProgress < 100 && !playerFinished) {
       playerProgress += pSpeed;
@@ -2512,7 +2622,7 @@ function startMovement() {
       }
       document.getElementById("carPlayer").style.left = (8 + (playerProgress / 100) * laneWidth) + "px";
     }
-    
+
     if (botStarted && botProgress < 100 && !botFinished) {
       botProgress += bSpeed;
       if (botProgress >= 100) {
@@ -2521,7 +2631,7 @@ function startMovement() {
       }
       document.getElementById("carBot").style.left = (8 + (botProgress / 100) * laneWidth) + "px";
     }
-    
+
     const diff = playerProgress - botProgress;
     const distEl = document.getElementById("raceDistance");
     if (playerProgress > 0 && botProgress > 0 && !playerFinished && !botFinished) {
@@ -2536,21 +2646,21 @@ function startMovement() {
         distEl.style.color = "var(--yellow-soft)";
       }
     }
-    
+
     if (playerFinished || botFinished) {
       clearInterval(raceInterval);
       clearTimeout(botTimeoutId);
       raceInterval = null;
       raceState = 'finished';
-      
+
       const pLane = document.getElementById("lanePlayer");
       const bLane = document.getElementById("laneBot");
-      
+
       if (playerFinished && !botFinished) {
         balance += currentRaceData.reward;
         triggerBalanceAnimation(currentRaceData.reward, true);
         update();
-        
+
         pLane.classList.add("win-active");
         bLane.classList.add("lose-active");
         endRace(true, "🏆 Вы победили! Выигрыш: " + currentRaceData.reward.toLocaleString("ru-RU") + " ₽");
@@ -2559,12 +2669,10 @@ function startMovement() {
         bLane.classList.add("win-active");
         endRace(false, "Вы проиграли гонку.");
       }
-      
-      // Обновляем счетчик гонок с этим соперником
+
       const oppId = currentRaceOpp.id;
       raceOpponentsMap[oppId] = (raceOpponentsMap[oppId] || 0) + 1;
-      
-      // Обновляем слоты (перерисовываем, чтобы показать блокировку)
+
       setTimeout(renderRaceSlots, 2000);
     }
   }, 50);
@@ -2575,10 +2683,10 @@ function endRace(win, message) {
   if (raceInterval) { clearInterval(raceInterval); raceInterval = null; }
   if (botGoTimeout) clearTimeout(botGoTimeout);
   if (greenLightTimeout) clearTimeout(greenLightTimeout);
-  
+
   document.getElementById("raceResultMsg").textContent = message;
   document.getElementById("raceResultMsg").style.color = win ? "var(--green)" : "var(--red)";
-  
+
   setTimeout(() => {
     if (document.getElementById("raceDetailView").style.display !== "none") {
       resetRaceUI();
@@ -2603,16 +2711,7 @@ window.addEventListener('load', async () => {
     const user = await res.json();
     currentUser = active;
     applyServerUser(user);
-    
-    setInterval(() => {
-      if (currentUser) {
-        income += getRate();
-        update();
-        updateFuelUI();
-        scheduleSave();
-      }
-    }, 1000);
-    
+    startGameLoop();
   } catch (e) {
     document.getElementById('authScreen').style.display = 'flex';
   }
