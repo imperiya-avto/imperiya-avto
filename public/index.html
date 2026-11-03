@@ -118,108 +118,13 @@ body{
   transition: border-color .2s;
 }
 .profile-field input:focus, .profile-field textarea:focus { border-color: var(--yellow); }
-.profile-field textarea { resize: vertical; min-height: 80px; }
+.profile-field input:disabled, .profile-field textarea:disabled { opacity: 0.7; cursor: not-allowed; }
 .profile-actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
 .profile-actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; transition: all .2s; font-size: 14px; min-width: 100px; }
 .btn-save { background: linear-gradient(180deg, #ffd21a, #ffb800); color: #15130a; }
 .btn-save:hover { filter: brightness(1.1); }
 .btn-logout { background: linear-gradient(180deg, #ff4d5e, #c8323f); color: #fff; }
 .btn-logout:hover { filter: brightness(1.1); }
-.btn-friends { background: linear-gradient(180deg, #328bff, #1a5fbf); color: #fff; position: relative; }
-.btn-friends:hover { filter: brightness(1.1); }
-
-.notification-dot {
-  display: none; width: 12px; height: 12px; background: var(--red);
-  border-radius: 50%; position: absolute; top: 5px; right: 5px;
-  border: 2px solid var(--panel-2); box-shadow: 0 0 10px var(--red);
-  animation: pulseRed 1.5s infinite;
-}
-
-.friends-modal {
-  position: fixed; inset: 0; background: rgba(5,5,8,.9); backdrop-filter: blur(6px);
-  display: flex; align-items: center; justify-content: center; z-index: 100001; padding: 16px;
-}
-.friends-box {
-  background: linear-gradient(180deg,#1c1c24,#121217); border: 2px solid var(--stroke-2);
-  border-radius: 20px; padding: 25px; width: 100%; max-width: 500px; position: relative;
-  box-shadow: 0 30px 80px rgba(0,0,0,.9); max-height: 85vh; display: flex; flex-direction: column;
-}
-.friends-tabs {
-  display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--stroke);
-  padding-bottom: 10px;
-}
-.friends-tab-btn {
-  flex: 1; padding: 10px; background: transparent; border: none; color: var(--muted);
-  font-weight: 700; cursor: pointer; font-size: 14px; border-radius: 8px; transition: all .2s;
-}
-.friends-tab-btn.active { background: rgba(255,210,26,.15); color: var(--yellow); }
-.friends-tab-btn:hover:not(.active) { color: var(--text); background: rgba(255,255,255,.05); }
-
-.friends-content { flex: 1; overflow-y: auto; padding-right: 5px; }
-.friends-content::-webkit-scrollbar { width: 6px; }
-.friends-content::-webkit-scrollbar-thumb { background: var(--stroke-2); border-radius: 3px; }
-
-.friend-section-title { font-size: 14px; color: var(--muted); text-transform: uppercase; font-weight: 700; margin-bottom: 10px; letter-spacing: 1px; }
-
-.friend-search-box {
-  display: flex; gap: 10px; margin-bottom: 20px;
-}
-.friend-input {
-  flex: 1; padding: 12px; background: #0a0a0c; border: 2px solid var(--stroke-2);
-  border-radius: 10px; color: #fff; font-size: 15px; outline: none;
-}
-.friend-input:focus { border-color: var(--yellow); }
-.friend-add-btn {
-  padding: 12px 20px; background: linear-gradient(180deg, #ffd21a, #ffb800);
-  color: #15130a; border: none; border-radius: 10px; font-weight: 800; cursor: pointer;
-  transition: all .2s;
-}
-.friend-add-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
-
-.friend-item {
-  display: flex; align-items: center; gap: 12px; padding: 12px;
-  background: rgba(255,255,255,.03); border: 1px solid var(--stroke);
-  border-radius: 12px; margin-bottom: 8px;
-}
-.friend-item-avatar {
-  width: 45px; height: 45px; border-radius: 50%; object-fit: cover;
-  border: 2px solid var(--stroke-2); background: #1e1e26;
-}
-.friend-item-info { flex: 1; }
-.friend-item-name { font-weight: 800; color: #fff; font-size: 15px; }
-.friend-item-id { font-size: 12px; color: var(--muted); }
-.friend-item-actions { display: flex; gap: 8px; }
-.friend-btn-accept {
-  padding: 8px 14px; background: linear-gradient(180deg, #3ddc84, #28a862);
-  color: #fff; border: none; border-radius: 8px; font-weight: 800; cursor: pointer;
-  font-size: 13px;
-}
-.friend-btn-reject {
-  padding: 8px 14px; background: linear-gradient(180deg, #ff4d5e, #c8323f);
-  color: #fff; border: none; border-radius: 8px; font-weight: 800; cursor: pointer;
-  font-size: 13px;
-}
-.friend-btn-accept:hover, .friend-btn-reject:hover { filter: brightness(1.1); }
-.friend-btn-remove {
-  padding: 8px 14px; background: rgba(255,255,255,.1); color: var(--muted);
-  border: 1px solid var(--stroke-2); border-radius: 8px; font-weight: 700; cursor: pointer;
-  font-size: 13px; transition: all .2s;
-}
-.friend-btn-remove:hover { background: rgba(255,77,94,.2); color: var(--red); border-color: var(--red); }
-
-.friend-toast {
-  position: fixed; top: 20px; right: 20px; background: linear-gradient(135deg, #1c1c24, #0e0e12);
-  border: 2px solid var(--blue); border-radius: 16px; padding: 16px 20px;
-  box-shadow: 0 10px 40px rgba(74,168,255,.4); z-index: 9999;
-  display: flex; align-items: center; gap: 15px;
-  transform: translateX(120%); transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  max-width: 350px;
-}
-.friend-toast.show { transform: translateX(0); }
-.friend-toast-icon { font-size: 32px; filter: drop-shadow(0 0 10px rgba(74,168,255,.8)); }
-.friend-toast-content h4 { margin: 0 0 5px; color: var(--blue); font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-.friend-toast-content p { margin: 0; color: #fff; font-size: 14px; font-weight: 600; }
-.friend-toast-content p span { color: var(--yellow-soft); font-weight: 900; }
 
 .top-container { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
 .top-row {
@@ -294,20 +199,9 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .select-mode-btn:hover{border-color:rgba(255,210,26,.5);color:var(--yellow-soft)}
 .sell-selected-btn{background:linear-gradient(180deg, #ff4d5e, #c8323f);box-shadow:0 8px 20px rgba(255,77,94,.25)}
 .sell-selected-btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none}
+.sell-all-btn { background: linear-gradient(180deg, #ff8a00, #c8323f); box-shadow: 0 8px 20px rgba(255, 138, 0, 0.3); border: 1px solid #ffb347; }
+.sell-all-btn:hover { filter: brightness(1.1); box-shadow: 0 8px 25px rgba(255, 138, 0, 0.5); }
 .selection-count{color:var(--muted);font-size:13px}
-
-.sell-all-btn {
-    background: linear-gradient(180deg, #ff8a00, #c8323f);
-    box-shadow: 0 8px 20px rgba(255, 138, 0, 0.3);
-    border: 1px solid #ffb347;
-}
-.sell-all-btn:hover {
-    filter: brightness(1.1);
-    box-shadow: 0 8px 25px rgba(255, 138, 0, 0.5);
-}
-.sell-all-btn:active {
-    transform: scale(0.96);
-}
 
 .cars{ display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:12px; overflow-anchor:none; }
 .empty{ color:#6f6f80; text-align:center; padding:18px; min-height:90px; display:flex;align-items:center;justify-content:center; background:linear-gradient(180deg, #14141a, #101015); border:1px dashed var(--stroke-2); border-radius:var(--radius-sm); font-size:13px; }
@@ -323,7 +217,6 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 
 .car.rarity-glow{ border-color:var(--rarity-color,#414c5d)!important; box-shadow: 0 0 0 1px color-mix(in srgb, var(--rarity-color,#414c5d) 55%, transparent), 0 0 10px 1px color-mix(in srgb, var(--rarity-color,#414c5d) 55%, transparent), 0 0 24px 3px color-mix(in srgb, var(--rarity-color,#414c5d) 30%, transparent), 0 12px 30px rgba(0,0,0,.55); animation: rarityPulse 2.8s ease-in-out infinite; }
 @keyframes rarityPulse{ 0%,100%{ box-shadow: 0 0 0 1px color-mix(in srgb, var(--rarity-color,#414c5d) 55%, transparent), 0 0 9px 1px color-mix(in srgb, var(--rarity-color,#414c5d) 50%, transparent), 0 0 18px 2px color-mix(in srgb, var(--rarity-color,#414c5d) 25%, transparent), 0 12px 30px rgba(0,0,0,.55); } 50%{ box-shadow: 0 0 0 1px color-mix(in srgb, var(--rarity-color,#414c5d) 75%, transparent), 0 0 14px 2px color-mix(in srgb, var(--rarity-color,#414c5d) 65%, transparent), 0 0 32px 6px color-mix(in srgb, var(--rarity-color,#414c5d) 40%, transparent), 0 12px 30px rgba(0,0,0,.55); } }
-
 .car.rarity-rainbow{ border:3px solid transparent !important; background: linear-gradient(#1b1b22,#1b1b22) padding-box, conic-gradient(from 0deg, #ff004c, #ff8a00, #ffee00, #33ff66, #00e5ff, #4a7dff, #c04dff, #ff004c) border-box; background-size:auto, 200% 200%; box-shadow: 0 0 8px 1px rgba(255,255,255,.55), 0 0 18px 4px rgba(0,229,255,.45), 0 0 32px 8px rgba(192,77,255,.35), 0 12px 30px rgba(0,0,0,.55); animation: rainbowSpin 4s linear infinite, rainbowGlow 2.4s ease-in-out infinite; }
 @keyframes rainbowSpin{ 0%{background-position:0 0,0% 50%} 100%{background-position:0 0,200% 50%} }
 @keyframes rainbowGlow{ 0%,100%{ box-shadow: 0 0 6px 1px rgba(255,255,255,.45), 0 0 14px 3px rgba(0,229,255,.35), 0 0 24px 6px rgba(192,77,255,.28), 0 12px 30px rgba(0,0,0,.55); } 50%{ box-shadow: 0 0 10px 2px rgba(255,255,255,.7), 0 0 24px 6px rgba(0,229,255,.6), 0 0 42px 12px rgba(192,77,255,.5), 0 12px 30px rgba(0,0,0,.55); } }
@@ -436,10 +329,6 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .modal-buttons button,.tutorial-box button{ border:0;border-radius:10px;padding:12px 22px; color:#fff;font-weight:800;letter-spacing:.3px; cursor:pointer;}
 .confirm-btn{background:linear-gradient(180deg,#ffd21a,#ffb800);color:#15130a!important;box-shadow:0 10px 22px rgba(255,210,26,.3)}
 .cancel-btn{background:linear-gradient(180deg,#3a3a48,#2a2a34)}
-.tutorial-box h2{color:var(--yellow)}
-.tutorial-box p{color:#c9c9d6;line-height:1.55;font-size:14px}
-.tutorial-box button{ background:linear-gradient(180deg,#ffd21a,#ffb800); color:#15130a;margin:6px; box-shadow:0 10px 22px rgba(255,210,26,.28); }
-.tutorial-box .skip{background:linear-gradient(180deg,#2a2a34,#1e1e26);color:#cfcfdc;box-shadow:none}
 
 .case-picker-title{color:var(--yellow);margin-bottom:6px;font-size:20px;letter-spacing:.4px}
 .case-picker-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
@@ -622,27 +511,6 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 ::-webkit-scrollbar-thumb{background:#2c2c38;border-radius:6px}
 ::-webkit-scrollbar-thumb:hover{background:#3a3a48}
 
-/* Стили для админ панели */
-.admin-modal {
-  position: fixed; inset: 0; background: rgba(5,5,8,.9); backdrop-filter: blur(6px);
-  display: flex; align-items: center; justify-content: center; z-index: 100002; padding: 16px;
-}
-.admin-box {
-  background: linear-gradient(180deg,#1c1c24,#121217); border: 2px solid var(--yellow);
-  border-radius: 20px; padding: 25px; width: 100%; max-width: 450px; position: relative;
-  box-shadow: 0 30px 80px rgba(0,0,0,.9);
-}
-.admin-box h2 { color: var(--yellow); text-align: center; margin-top: 0; }
-.admin-field { margin-bottom: 15px; }
-.admin-field label { display: block; font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
-.admin-field input { width: 100%; padding: 12px; background: #0a0a0c; border: 2px solid var(--stroke-2); border-radius: 10px; color: #fff; font-size: 15px; outline: none; }
-.admin-field input:focus { border-color: var(--yellow); }
-.admin-actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
-.admin-actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; font-size: 14px; min-width: 100px; }
-.btn-add-money { background: linear-gradient(180deg, #3ddc84, #28a862); color: #fff; }
-.btn-take-money { background: linear-gradient(180deg, #ff4d5e, #c8323f); color: #fff; }
-.btn-close-admin { background: linear-gradient(180deg, #3a3a48, #2a2a34); color: #fff; }
-
 @media(max-width: 600px) {
   .user-profile-widget { top: 10px; right: 10px; padding: 4px 8px 4px 4px; }
   .user-avatar-mini { width: 32px; height: 32px; }
@@ -707,8 +575,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 </style>
 </head>
 <body>
-
-<!-- ЭКРАН АВТОРИЗАЦИИ -->
+  <!-- ЭКРАН АВТОРИЗАЦИИ -->
 <div id="authScreen">
   <div class="auth-box">
     <h2 id="authTitle">Вход в игру</h2>
@@ -726,12 +593,12 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 <div class="profile-modal" id="profileModal" hidden>
   <div class="profile-box">
     <button class="profile-close" onclick="closeProfile()">×</button>
-    <h2 style="color:var(--yellow); text-align:center; margin-top:0;">Мой профиль</h2>
+    <h2 style="color:var(--yellow); text-align:center; margin-top:0;">Профиль</h2>
     <div class="profile-header">
       <img id="profileAvatarPreview" class="profile-avatar-large" src="" alt="Avatar">
-      <label for="avatarUpload" class="avatar-upload-btn">📷 Изменить аватарку</label>
+      <label for="avatarUpload" class="avatar-upload-btn" id="avatarUploadLabel">📷 Изменить аватарку</label>
       <input type="file" id="avatarUpload" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
-      <div style="font-size: 12px; color: var(--muted); margin-top: 5px;">Ваш ID: <b id="profileIdDisplay" style="color:var(--yellow-soft)"></b></div>
+      <div style="font-size: 12px; color: var(--muted); margin-top: 5px;">ID: <b id="profileIdDisplay" style="color:var(--yellow-soft)"></b></div>
     </div>
     <div class="profile-field">
       <label>Имя / Никнейм</label>
@@ -741,86 +608,17 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
       <label>О себе</label>
       <textarea id="profileBioInput" maxlength="150" placeholder="Расскажите о себе..."></textarea>
     </div>
-    <div class="profile-actions">
+    <div class="profile-actions" id="profileActions">
       <button class="btn-save" onclick="saveProfile()">Сохранить</button>
-      <button class="btn-friends" onclick="openFriends()">
-        👥 Друзья
-        <div class="notification-dot" id="friendNotificationDot"></div>
-      </button>
-      <!-- КНОПКА АДМИНКИ (появится только для Q1wesh) -->
-      <button id="adminPanelBtn" style="display:none; background:linear-gradient(180deg,#ffd21a,#ffb800); color:#15130a; font-weight:900;" onclick="openAdminPanel()">👑 Админ</button>
-      
       <button class="btn-logout" onclick="logout()">Выйти</button>
     </div>
   </div>
 </div>
 
-<!-- Модалка друзей -->
-<div class="friends-modal" id="friendsModal" hidden>
-  <div class="friends-box">
-    <button class="profile-close" onclick="closeFriends()">×</button>
-    <h2 style="color:var(--yellow); text-align:center; margin-top:0; margin-bottom:15px;">👥 Друзья</h2>
-    <div class="friends-tabs">
-      <button class="friends-tab-btn active" id="tabFriendsBtn" onclick="switchFriendsTab('friends')">Мои друзья</button>
-      <button class="friends-tab-btn" id="tabRequestsBtn" onclick="switchFriendsTab('requests')">Заявки <span id="requestsCountBadge" style="color:var(--red); font-weight:900;"></span></button>
-    </div>
-    <div class="friends-content" id="friendsContent"></div>
-    <div class="friend-search-box" id="friendSearchBox" style="margin-top:15px;">
-      <input type="text" id="friendIdInput" class="friend-input" placeholder="Введите ID игрока...">
-      <button class="friend-add-btn" onclick="sendFriendRequest()">Отправить заявку</button>
-    </div>
-  </div>
-</div>
-
-<!-- Модалка Админ-панели -->
-<div class="admin-modal" id="adminModal" hidden>
-  <div class="admin-box">
-    <button class="profile-close" onclick="closeAdminPanel()">×</button>
-    <h2>👑 Админ-панель</h2>
-    <div class="admin-field">
-      <label>ID Игрока (формат 00-00-00)</label>
-      <input type="text" id="adminTargetId" placeholder="00-00-10">
-    </div>
-    <div class="admin-field">
-      <label>Сумма (₽)</label>
-      <input type="number" id="adminAmount" placeholder="10000" min="1">
-    </div>
-    <div class="admin-actions">
-      <button class="btn-add-money" onclick="adminAction('add')">Выдать деньги</button>
-      <button class="btn-take-money" onclick="adminAction('take')">Забрать деньги</button>
-      <button class="btn-close-admin" onclick="closeAdminPanel()">Закрыть</button>
-    </div>
-  </div>
-</div>
-
-<div class="friend-toast" id="friendToast">
-  <div class="friend-toast-icon">👋</div>
-  <div class="friend-toast-content">
-    <h4>Заявка в друзья!</h4>
-    <p>Игрок <span id="toastFriendName">Игрок</span> хочет с вами дружить</p>
-  </div>
-</div>
-
-<div class="auction-toast" id="auctionToast">
-  <div class="auction-toast-icon" id="toastIcon">🔔</div>
-  <div class="auction-toast-content">
-    <h4>Аукцион!</h4>
-    <p>Новый лот: <span id="toastCarName">Машина</span></p>
-  </div>
-</div>
-
-<div class="tutorial" id="tutorial" hidden>
- <div class="tutorial-box">
-  <h2 id="tutorialTitle">🚗 Добро пожаловать!</h2>
-  <p id="tutorialText"></p>
-  <button onclick="nextTutorial()">Далее →</button>
-  <button class="skip" onclick="finishTutorial()">Пропустить</button>
- </div>
-</div>
-
+<!-- Модалка продажи -->
 <div class="modal" id="sellModal" hidden>
  <div class="modal-box">
-  <h2 id="sellModalTitle">🚗 Продажа автомобиля</h2>
+  <h2 id="sellModalTitle">🚗 Продажа</h2>
   <p id="sellText"></p>
   <div class="modal-buttons">
    <button class="confirm-btn" id="confirmSellButton" onclick="confirmSell()">Продать</button>
@@ -829,6 +627,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  </div>
 </div>
 
+<!-- Модалка выбора кейса -->
 <div class="modal" id="casePickerModal" hidden>
  <div class="modal-box">
   <h2 class="case-picker-title">🎁 Выбор кейса</h2>
@@ -846,6 +645,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  </div>
 </div>
 
+<!-- Модалка выбора машины для гонки -->
 <div class="car-select-modal" id="carSelectModal" hidden>
   <div class="car-select-box">
     <h3>Выбери машину для гонки</h3>
@@ -866,8 +666,9 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
     <div class="fuel-widget" id="fuelWidget" style="display:none;">
       <span class="fuel-icon">⛽</span>
       <span class="fuel-count" id="fuelCount">20</span> / 20
+      <span id="fuelTimer" style="color:var(--muted); font-size:12px; margin-left:5px;"></span>
     </div>
-    <div class="user-profile-widget" id="userProfileWidget" onclick="openProfile()" style="display:none; position:static;">
+    <div class="user-profile-widget" id="userProfileWidget" onclick="openMyProfile()" style="display:none; position:static;">
       <img id="miniAvatar" class="user-avatar-mini" src="" alt="Ava">
       <span id="miniName" class="user-name-mini">Игрок</span>
     </div>
@@ -881,9 +682,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 <nav>
  <button class="active" onclick="openTab('garage',this)">Мой гараж</button>
  <button onclick="openTab('cars',this)">Кейс машин</button>
- <button onclick="openTab('parts',this)">Кейс деталей</button>
  <button onclick="openTab('casino',this)">Казино</button>
- <button onclick="openTab('auction',this)">Аукцион</button>
  <button onclick="openTab('races',this)">Гонки</button>
  <button onclick="openTab('tops',this)">🏆 Топы</button>
 </nav>
@@ -940,6 +739,9 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
    <span class="skip-text">Пропустить прокрутку</span>
   </label>
   <button class="case-button" id="caseButton" onclick="buyCase()">ОТКРЫТЬ КЕЙС</button>
+  
+  <button id="sellDroppedBtn" class="case-button" style="display:none; background: linear-gradient(180deg, #3ddc84, #28a862); margin-top: 15px;" onclick="sellDroppedCars()">Продать выпавшее</button>
+
   <div class="case-price">
     <div class="price-row">
       <span class="price-label">Цена за 1 кейс</span>
@@ -968,11 +770,6 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  </div>
 </section>
 
-<section id="parts" class="panel" hidden>
- <h2>🔧 Кейс деталей</h2>
- <p style="color:var(--muted)">Скоро здесь появятся детали для автомобилей!</p>
-</section>
-
 <section id="casino" class="panel" hidden>
  <h2>🎰 Казино</h2>
  <div id="casinoHeader">
@@ -984,20 +781,10 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
      <div class="game-face-title">Рулетка</div>
      <div class="game-face-sub">Испытай удачу</div>
    </div>
-   <div class="game-face" data-game="blackjack" onclick="openCasinoGame('blackjack')">
-     <div class="game-face-icon">🃏</div>
-     <div class="game-face-title">Блекджек</div>
-     <div class="game-face-sub">До 21</div>
-   </div>
    <div class="game-face" data-game="dice" onclick="openCasinoGame('dice')">
      <div class="game-face-icon">🎲</div>
      <div class="game-face-title">Кости</div>
      <div class="game-face-sub">Сумма 7 или 11</div>
-   </div>
-   <div class="game-face" data-game="guess" onclick="openCasinoGame('guess')">
-     <div class="game-face-icon">🔢</div>
-     <div class="game-face-title">Угадай</div>
-     <div class="game-face-sub">x5 за победу</div>
    </div>
    <div class="game-window" data-game="roulette">
      <div class="game-window-header">
@@ -1023,48 +810,9 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
              <button class="bet-quick-btn" onclick="setBet('roulette', 500000)">500K</button>
              <button class="bet-quick-btn all-in" onclick="allInBet('roulette')">ВСЁ</button>
            </div>
-           <div class="bet-hint">Мин: <b>1 000 ₽</b> · Макс: <b>5 000 000 000 ₽</b></div>
          </div>
        </div>
        <button class="play-btn" onclick="playRoulette()">Играть</button>
-     </div>
-   </div>
-   <div class="game-window" data-game="blackjack">
-     <div class="game-window-header">
-       <div class="game-window-title">🃏 Блекджек</div>
-       <button class="casino-back-btn" onclick="closeCasinoGame()">← Назад</button>
-     </div>
-     <div class="game-content">
-       <div class="casino-visual" id="bj-visual">
-         <div class="cards-display" id="bj-cards">
-           <div class="card hidden">?</div>
-           <div class="card hidden">?</div>
-         </div>
-       </div>
-       <div class="game-result" id="bj-result">Сделай ставку и жми «Играть»</div>
-       <div class="game-result" id="bj-status" style="font-size:14px; color:var(--muted)"></div>
-       <div class="bet-panel">
-         <div class="bet-label"><span>Ставка</span><span class="bet-value" id="blackjack-bet-display">10 000 ₽</span></div>
-         <div class="bet-controls">
-           <div class="bet-input-row">
-             <button class="bet-adjust-btn" onclick="adjustBet('blackjack', -1)">−</button>
-             <input type="number" class="bet-input" id="blackjack-input" min="1000" max="5000000000" step="1000" value="10000" oninput="onBetInput('blackjack')">
-             <button class="bet-adjust-btn" onclick="adjustBet('blackjack', 1)">+</button>
-           </div>
-           <div class="bet-quick-buttons">
-             <button class="bet-quick-btn" onclick="setBet('blackjack', 10000)">10K</button>
-             <button class="bet-quick-btn" onclick="setBet('blackjack', 100000)">100K</button>
-             <button class="bet-quick-btn" onclick="setBet('blackjack', 1000000)">1M</button>
-             <button class="bet-quick-btn all-in" onclick="allInBet('blackjack')">ВСЁ</button>
-           </div>
-           <div class="bet-hint">Мин: <b>1 000 ₽</b> · Макс: <b>5 000 000 000 ₽</b></div>
-         </div>
-       </div>
-       <button class="play-btn" id="bj-play-btn" onclick="playBlackjack()">Играть</button>
-       <div id="bj-actions" style="display:none; gap:10px; width:100%; max-width:300px; margin-top:10px;">
-         <button class="play-btn" style="font-size:16px; padding:12px;" onclick="bjHit()">Ещё</button>
-         <button class="play-btn" style="font-size:16px; padding:12px; background:linear-gradient(180deg,#3a3a48,#2a2a34); color:#fff; box-shadow:none;" onclick="bjStand()">Хватит</button>
-       </div>
      </div>
    </div>
    <div class="game-window" data-game="dice">
@@ -1094,86 +842,9 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
              <button class="bet-quick-btn" onclick="setBet('dice', 500000)">500K</button>
              <button class="bet-quick-btn all-in" onclick="allInBet('dice')">ВСЁ</button>
            </div>
-           <div class="bet-hint">Мин: <b>1 000 ₽</b> · Макс: <b>5 000 000 000 ₽</b></div>
          </div>
        </div>
        <button class="play-btn" onclick="playDice()">Играть</button>
-     </div>
-   </div>
-   <div class="game-window" data-game="guess">
-     <div class="game-window-header">
-       <div class="game-window-title">🔢 Угадай число</div>
-       <button class="casino-back-btn" onclick="closeCasinoGame()">← Назад</button>
-     </div>
-     <div class="game-content">
-       <div class="casino-visual" id="guess-visual">
-         <div class="visual-text" id="guess-visual-text">?</div>
-       </div>
-       <div class="game-result" id="guess-result">Угадай число 1-10 и получи x5</div>
-       <div class="guess-input-wrap">
-         <input type="number" class="guess-input" id="guess-number" min="1" max="10" placeholder="1-10" value="5">
-       </div>
-       <div class="bet-panel">
-         <div class="bet-label"><span>Ставка</span><span class="bet-value" id="guess-bet-display">5 000 ₽</span></div>
-         <div class="bet-controls">
-           <div class="bet-input-row">
-             <button class="bet-adjust-btn" onclick="adjustBet('guess', -1)">−</button>
-             <input type="number" class="bet-input" id="guess-input" min="1000" max="5000000000" step="1000" value="5000" oninput="onBetInput('guess')">
-             <button class="bet-adjust-btn" onclick="adjustBet('guess', 1)">+</button>
-           </div>
-           <div class="bet-quick-buttons">
-             <button class="bet-quick-btn" onclick="setBet('guess', 5000)">5K</button>
-             <button class="bet-quick-btn" onclick="setBet('guess', 50000)">50K</button>
-             <button class="bet-quick-btn" onclick="setBet('guess', 500000)">500K</button>
-             <button class="bet-quick-btn all-in" onclick="allInBet('guess')">ВСЁ</button>
-           </div>
-           <div class="bet-hint">Мин: <b>1 000 ₽</b> · Макс: <b>5 000 000 000 ₽</b></div>
-         </div>
-       </div>
-       <button class="play-btn" onclick="playGuess()">Играть</button>
-     </div>
-   </div>
- </div>
-</section>
-
-<section id="auction" class="panel" hidden>
- <h2>🔨 Аукцион</h2>
- <div class="auction-header-box">
-   <div class="auction-timer-wrap">
-     <div class="auction-timer-label">До следующего лота:</div>
-     <div class="auction-timer" id="auctionSpawnTimer">05:00</div>
-   </div>
-   <div style="font-size:13px; color:var(--muted);">Каждые 5 минут на аукцион выставляется редкий автомобиль!</div>
- </div>
- <div id="auctionContent">
-   <div class="auction-empty" id="auctionEmpty">
-     <span>⏳</span>
-     Ожидаем следующий лот...<br>
-     <span style="font-size:13px; margin-top:10px; display:inline-block;">Следующая машина появится по таймеру выше.</span>
-   </div>
-   <div class="auction-card" id="auctionCard" style="display:none;">
-     <div class="auction-car-img-wrap">
-       <img id="auctionCarImg" src="" alt="Car">
-     </div>
-     <div class="auction-car-info">
-       <div>
-         <h3 class="auction-car-title" id="auctionCarName">Название</h3>
-         <span class="auction-car-rarity" id="auctionCarRarity">Редкость</span>
-         <div class="auction-car-stats">
-           <div>⚡ Мощность: <b id="auctionCarPower">0</b> л.с.</div>
-           <div>📈 Доход: <b id="auctionCarIncome">0</b> ₽/сек</div>
-           <div>💰 Рынок: <b id="auctionCarRealPrice">0</b> ₽</div>
-         </div>
-       </div>
-       <div class="auction-bid-panel">
-         <div class="auction-current-price">Текущая ставка: <span id="auctionCurrentBid">0 ₽</span></div>
-         <div class="auction-highest-bidder" id="auctionHighestBidder"></div>
-         <div class="auction-actions">
-           <input type="number" class="auction-bid-input" id="auctionBidInput" placeholder="Ваша ставка">
-           <button class="auction-btn" id="auctionBidBtn" onclick="placeAuctionBid()">Сделать ставку</button>
-         </div>
-         <div class="auction-timer" id="auctionTradeTimer" style="font-size: 20px; text-align: center; margin-top: 5px;">01:18</div>
-       </div>
      </div>
    </div>
  </div>
@@ -1214,7 +885,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
        <div class="light green" id="light4"></div>
      </div>
      <div class="race-actions">
-       <button class="race-action-btn race-btn-start" id="btnStartRace" onclick="startRaceSequence()">Начать</button>
+       <button class="race-action-btn race-btn-start" id="btnStartRace" onclick="startRaceSequence()">Начать (10⛽)</button>
        <button class="race-action-btn race-btn-go" id="btnGoRace" onclick="playerGo()" style="display:none;">Ехать!</button>
      </div>
      <div class="race-result-msg" id="raceResultMsg"></div>
@@ -1234,11 +905,9 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 <script>
 // ================= КОНСТАНТЫ И ПЕРЕМЕННЫЕ =================
 const API_URL = window.location.origin + '/api';
-
 let currentUser = null;
 let isRegisterMode = false;
 
-// Глобальные переменные игры
 let selectedCaseType = 'rusty';
 let selectedQuantity = 1;
 let rouletteRunning = false;
@@ -1247,11 +916,14 @@ let selectMode = false;
 let selectedCars = [];
 let expandedCars = new Set();
 let sortedCarRefs = [];
+let lastCarsFromCase = []; // Для кнопки продажи после кейса
+let isViewingOtherProfile = false;
 
 let balance = 0;
 let income = 0;
 let garageSlots = 5;
 let cars = [];
+let myProfileData = null;
 
 // ================= АВТОРИЗАЦИЯ =================
 function toggleAuthMode() {
@@ -1287,41 +959,34 @@ async function handleAuth() {
     currentUser = login;
     applyServerUser(data.user);
   } catch (e) {
-    err.textContent = 'Сервер недоступен. Проверьте соединение.';
+    err.textContent = 'Сервер недоступен.';
     console.error(e);
   }
 }
 
 function applyServerUser(user) {
+  myProfileData = user;
   balance = user.gameData.balance;
   income = user.gameData.income;
   garageSlots = user.gameData.garageSlots;
-  cars = user.gameData.cars;
+  cars = user.gameData.cars || [];
   
-  if (!Array.isArray(cars)) cars = [];
-  if (typeof garageSlots === 'undefined') garageSlots = 5;
+  if (typeof window._lastFuel === 'undefined') {
+    window._lastFuel = user.gameData.fuel !== undefined ? user.gameData.fuel : 20;
+    window._lastFuelTime = user.gameData.lastFuelTime || Date.now();
+  }
 
   const elapsed = Math.max(0, (Date.now() - (user.gameData.lastTime || Date.now())) / 1000);
   income += elapsed * getRate();
 
   updateProfileUIFromServer(user);
-  updateFuelUIFromServer(user);
+  updateFuelUI();
   renderGarage();
   update();
 
   document.getElementById("authScreen").style.display = "none";
   document.getElementById("userProfileWidget").style.display = "flex";
   document.getElementById("fuelWidget").style.display = "flex";
-
-  // ПОКАЗЫВАЕМ КНОПКУ АДМИНКИ ТОЛЬКО ДЛЯ Q1wesh
-  const adminBtn = document.getElementById('adminPanelBtn');
-  if (adminBtn) {
-    if (user.login === 'Q1wesh') {
-      adminBtn.style.display = 'block';
-    } else {
-      adminBtn.style.display = 'none';
-    }
-  }
 }
 
 function updateProfileUIFromServer(user) {
@@ -1331,249 +996,67 @@ function updateProfileUIFromServer(user) {
   document.getElementById("miniAvatar").src = p.avatar || defaultAvatar;
 }
 
-function updateFuelUIFromServer(user) {
-  const gd = user.gameData;
+// ================= ТОПЛИВО (С ТАЙМЕРОМ) =================
+function updateFuelUI() {
   const fuelCountEl = document.getElementById('fuelCount');
-  if (fuelCountEl) {
-    fuelCountEl.textContent = gd.fuel;
-    if (gd.fuel <= 3) fuelCountEl.classList.add('low');
-    else fuelCountEl.classList.remove('low');
+  if (!fuelCountEl) return;
+
+  if (typeof window._lastFuel === 'undefined') window._lastFuel = 20;
+  
+  // Восстановление (1 ед. в час)
+  if (window._lastFuel < 20) {
+    const now = Date.now();
+    const passed = now - (window._lastFuelTime || now);
+    const hours = Math.floor(passed / 3600000);
+    if (hours > 0) {
+      window._lastFuel = Math.min(20, window._lastFuel + hours);
+      window._lastFuelTime = (window._lastFuelTime || now) + hours * 3600000;
+    }
+  }
+
+  fuelCountEl.textContent = window._lastFuel;
+  if (window._lastFuel <= 3) fuelCountEl.classList.add("low");
+  else fuelCountEl.classList.remove("low");
+
+  // Таймер до следующей единицы
+  const timerEl = document.getElementById('fuelTimer');
+  if (timerEl) {
+    if (window._lastFuel >= 20) {
+      timerEl.textContent = '';
+    } else {
+      const now = Date.now();
+      const timePassed = now - (window._lastFuelTime || now);
+      const timeLeft = 3600000 - (timePassed % 3600000);
+      const mins = Math.floor(timeLeft / 60000);
+      const secs = Math.floor((timeLeft % 60000) / 1000);
+      timerEl.textContent = ` (через ${mins}м ${secs}с)`;
+    }
   }
 }
 
-// ================= СОХРАНЕНИЕ НА СЕРВЕР =================
+// ================= СОХРАНЕНИЕ =================
 let saveTimeout = null;
-
 function scheduleSave() {
   if (saveTimeout) return;
   saveTimeout = setTimeout(async () => {
     saveTimeout = null;
-    await saveToServer();
+    if (!currentUser) return;
+    try {
+      await fetch(`${API_URL}/save`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          login: currentUser,
+          gameData: {
+            balance, income, cars, garageSlots,
+            fuel: window._lastFuel,
+            lastFuelTime: window._lastFuelTime,
+            lastTime: Date.now()
+          }
+        })
+      });
+    } catch (e) { console.error(e); }
   }, 3000);
-}
-
-async function saveToServer() {
-  if (!currentUser) return;
-  try {
-    await fetch(`${API_URL}/save`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        login: currentUser,
-        gameData: {
-          balance,
-          income,
-          cars,
-          garageSlots,
-          fuel: (window._lastFuel ?? 20),
-          lastFuelTime: (window._lastFuelTime ?? Date.now()),
-          lastTime: Date.now()
-        }
-      })
-    });
-  } catch (e) {
-    console.error('Ошибка сохранения на сервер:', e);
-  }
-}
-
-// ================= ПРОФИЛЬ =================
-async function openProfile() {
-  if (!currentUser) return;
-  try {
-    const res = await fetch(`${API_URL}/user/${currentUser}`);
-    const user = await res.json();
-    if (!user) return;
-
-    const p = user.profile;
-    const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231e1e26' width='100' height='100'/><text x='50' y='50' font-size='50' text-anchor='middle' dominant-baseline='central' fill='%23ffd21a'>👤</text></svg>";
-    document.getElementById("profileAvatarPreview").src = p.avatar || defaultAvatar;
-    document.getElementById("profileNameInput").value = p.name || currentUser;
-    document.getElementById("profileBioInput").value = p.bio || "";
-    document.getElementById("profileIdDisplay").textContent = user.playerId;
-
-    document.getElementById("profileModal").hidden = false;
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-function closeProfile() {
-  document.getElementById("profileModal").hidden = true;
-}
-
-function handleAvatarUpload(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      const MAX_SIZE = 150;
-      let width = img.width;
-      let height = img.height;
-      if (width > height) {
-        if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
-      } else {
-        if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
-      }
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, width, height);
-      const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
-      document.getElementById("profileAvatarPreview").src = dataUrl;
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-async function saveProfile() {
-  if (!currentUser) return;
-  try {
-    const newName = document.getElementById("profileNameInput").value.trim();
-    const newBio = document.getElementById("profileBioInput").value.trim();
-    const newAvatar = document.getElementById("profileAvatarPreview").src;
-
-    await fetch(`${API_URL}/profile`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        login: currentUser,
-        profile: { name: newName || currentUser, bio: newBio, avatar: newAvatar.startsWith('data:') ? newAvatar : '' }
-      })
-    });
-
-    const res = await fetch(`${API_URL}/user/${currentUser}`);
-    const user = await res.json();
-    updateProfileUIFromServer(user);
-
-    closeProfile();
-    alert("Профиль сохранен!");
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-// ==== ФУНКЦИЯ ВЫХОДА ====
-function logout() {
-  localStorage.removeItem('autoEmpire_activeUser');
-  window.location.reload(); // Перезагружаем страницу, чтобы вернуться на экран авторизации
-}
-
-// ==== АДМИН ПАНЕЛЬ ====
-function openAdminPanel() {
-  if (currentUser !== 'Q1wesh') {
-    alert('У вас нет прав администратора!');
-    return;
-  }
-  document.getElementById('adminModal').hidden = false;
-}
-
-function closeAdminPanel() {
-  document.getElementById('adminModal').hidden = true;
-}
-
-async function adminAction(action) {
-  if (currentUser !== 'Q1wesh') return;
-
-  const targetId = document.getElementById('adminTargetId').value.trim();
-  const amount = document.getElementById('adminAmount').value.trim();
-
-  if (!targetId || !amount || amount <= 0) {
-    alert('Заполните ID игрока и сумму!');
-    return;
-  }
-
-  try {
-    const res = await fetch(`${API_URL}/admin/money`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        adminLogin: currentUser,
-        targetPlayerId: targetId,
-        amount: Number(amount),
-        action: action // 'add' или 'take'
-      })
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.error || 'Ошибка');
-      return;
-    }
-
-    alert(`Успешно! Новый баланс игрока: ${data.newBalance.toLocaleString('ru-RU')} ₽`);
-    
-    // Если админ изменил свой же баланс, нужно обновить его локально
-    if (targetId === document.getElementById('profileIdDisplay').textContent) {
-        window.location.reload(); 
-    }
-  } catch (e) {
-    console.error(e);
-    alert('Ошибка сервера');
-  }
-}
-
-// ================= ДРУЗЬЯ =================
-function openFriends() { 
-  const modal = document.getElementById('friendsModal');
-  if(modal) {
-      document.getElementById('friendsContent').innerHTML = '<div style="text-align:center; padding:30px; color:var(--muted);"><span style="font-size:40px;">🚧</span><br><br>Функция друзей находится в разработке!</div>';
-      document.getElementById('friendSearchBox').style.display = 'none';
-      modal.hidden = false;
-  }
-}
-function closeFriends() { document.getElementById("friendsModal").hidden = true; }
-
-// ================= ТОПЫ (через сервер) =================
-async function renderTops() {
-  if (!currentUser) return;
-  try {
-    const res = await fetch(`${API_URL}/top`);
-    const players = await res.json();
-
-    const topContainer = document.getElementById('topContainer');
-    topContainer.innerHTML = '';
-
-    const myIndex = players.findIndex(p => p.login === currentUser);
-    const myPlaceEl = document.getElementById('myTopPlace');
-    if (myIndex !== -1 && myIndex >= 200) {
-      myPlaceEl.style.display = 'block';
-      myPlaceEl.textContent = `Вы находитесь на ${myIndex + 1} месте в топе.`;
-    } else {
-      myPlaceEl.style.display = 'none';
-    }
-
-    const topLimit = Math.min(players.length, 200);
-    for (let i = 0; i < topLimit; i++) {
-      const p = players[i];
-      const row = document.createElement('div');
-      row.className = 'top-row' + (p.login === currentUser ? ' my-top-row' : '');
-      let rankHtml = `<div class="top-rank">${i + 1}</div>`;
-      if (i === 0) rankHtml = `<div class="top-rank gold">🥇</div>`;
-      else if (i === 1) rankHtml = `<div class="top-rank silver">🥈</div>`;
-      else if (i === 2) rankHtml = `<div class="top-rank bronze">🥉</div>`;
-      const avatarSrc = p.avatar || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231e1e26' width='100' height='100'/><text x='50' y='50' font-size='50' text-anchor='middle' dominant-baseline='central' fill='%23ffd21a'>👤</text></svg>";
-      row.innerHTML = `
-        ${rankHtml}
-        <img src="${avatarSrc}" class="top-avatar">
-        <div class="top-info">
-          <div class="top-name">${p.name} ${p.login === currentUser ? '(Вы)' : ''}</div>
-          <div class="top-id">ID: ${p.playerId}</div>
-        </div>
-        <div class="top-balance">${Math.floor(p.balance).toLocaleString('ru-RU')} ₽</div>
-      `;
-      row.onclick = () => {
-        if (p.login !== currentUser) alert(`Игрок: ${p.name}\nID: ${p.playerId}\nБаланс: ${Math.floor(p.balance).toLocaleString('ru-RU')} ₽`);
-        else openProfile();
-      };
-      topContainer.appendChild(row);
-    }
-  } catch (e) {
-    console.error('Ошибка загрузки топа:', e);
-  }
 }
 
 // ================= КАТАЛОГ МАШИН =================
@@ -1612,7 +1095,6 @@ const RAW_CARS = [
  {id:"rusty_18", name:"ВАЗ 2109", rarity:"Обычная"},
  {id:"rusty_19", name:"ВАЗ 2110", rarity:"Обычная"},
  {id:"rusty_20", name:"ВАЗ 2114", rarity:"Обычная"},
-
  {id:"low_uncommon_1", name:"Renault Logan (старая)", rarity:"Необычная"},
  {id:"low_uncommon_2", name:"Daewoo Nexia (ржавая)", rarity:"Необычная"},
  {id:"electronic_1", name:"ВАЗ 2114", rarity:"Необычная"},
@@ -1635,7 +1117,6 @@ const RAW_CARS = [
  {id:"electronic_18", name:"Toyota Corolla", rarity:"Необычная"},
  {id:"electronic_19", name:"Honda Civic", rarity:"Необычная"},
  {id:"electronic_20", name:"Subaru Impreza", rarity:"Необычная"},
-
  {id:"low_rare_1", name:"BMW E36 (уставшая)", rarity:"Редкая"},
  {id:"low_rare_2", name:"Mercedes W124 (старая)", rarity:"Редкая"},
  {id:"elite_1", name:"BMW E46", rarity:"Редкая"},
@@ -1658,7 +1139,6 @@ const RAW_CARS = [
  {id:"elite_18", name:"Mercedes-Benz CLS 500", rarity:"Редкая"},
  {id:"elite_19", name:"Porsche Boxster", rarity:"Редкая"},
  {id:"elite_20", name:"Chevrolet Corvette C5", rarity:"Редкая"},
-
  {id:"low_epic_1", name:"BMW M5 E60 (проблемная)", rarity:"Эпическая"},
  {id:"low_epic_2", name:"Audi RS6 C6 (битая)", rarity:"Эпическая"},
  {id:"mythical_1", name:"BMW M5 E60", rarity:"Эпическая"},
@@ -1681,7 +1161,6 @@ const RAW_CARS = [
  {id:"mythical_18", name:"Audi R8 V8", rarity:"Эпическая"},
  {id:"mythical_19", name:"Lamborghini Gallardo", rarity:"Эпическая"},
  {id:"mythical_20", name:"Ferrari F430", rarity:"Эпическая"},
-
  {id:"low_legendary_1", name:"Porsche 911 (старая)", rarity:"Легендарная"},
  {id:"low_legendary_2", name:"Ferrari 458 (проблемная)", rarity:"Легендарная"},
  {id:"exclusive_1", name:"BMW M5 F10", rarity:"Легендарная"},
@@ -1704,7 +1183,6 @@ const RAW_CARS = [
  {id:"exclusive_18", name:"Rolls-Royce Ghost", rarity:"Легендарная"},
  {id:"exclusive_19", name:"Ferrari 488 GTB", rarity:"Легендарная"},
  {id:"exclusive_20", name:"Lamborghini Aventador", rarity:"Легендарная"},
-
  {id:"low_mythic_1", name:"Lamborghini Huracan (убитая)", rarity:"Мифическая"},
  {id:"low_mythic_2", name:"McLaren 720S (аварийная)", rarity:"Мифическая"},
  {id:"secret_1", name:"BMW M5 F90", rarity:"Мифическая"},
@@ -1727,7 +1205,6 @@ const RAW_CARS = [
  {id:"secret_18", name:"Lamborghini Aventador SVJ", rarity:"Мифическая"},
  {id:"secret_19", name:"Porsche 918 Spyder", rarity:"Мифическая"},
  {id:"secret_20", name:"Bugatti Veyron", rarity:"Мифическая"},
-
  {id:"low_divine_1", name:"Bugatti Veyron (старая)", rarity:"Божественная"},
  {id:"low_divine_2", name:"Koenigsegg Agera (проблемная)", rarity:"Божественная"},
  {id:"divine_1", name:"Mercedes-AMG One", rarity:"Божественная"},
@@ -1857,19 +1334,22 @@ function updateCaseOdds(){
  });
 }
 
+// ================= ГАРАЖ =================
 function renderGarage(){
   if (!currentUser) return;
   const savedScrollY=window.scrollY;
   const container=document.getElementById("garageCars");
   if(!container) return;
-  container.style.overflowAnchor="none";
+  
   container.innerHTML="";
   expandedCars = new Set([...expandedCars].filter(i=>i>=0&&i<cars.length));
-  selectedCars=[...new Set(selectedCars)].filter(i=>i>=0&&i<cars.length&&!cars[i].locked);
+  selectedCars = selectedCars.filter(i => i >= 0 && i < cars.length && !cars[i].locked);
+  
   const refs = cars.map((car, originalIndex)=>{
     const item = catalog.find(c=>c.id===car.id);
     return {car, item, originalIndex};
   }).filter(r=>r.item);
+  
   refs.sort((a,b)=>{
     const rankA = getRarityRank(a.item.rarity);
     const rankB = getRarityRank(b.item.rarity);
@@ -1877,17 +1357,20 @@ function renderGarage(){
     if(b.item.price !== a.item.price) return b.item.price - a.item.price;
     return b.item.income - a.item.income;
   });
-  sortedCarRefs = refs;
+  
   refs.forEach(({car, item, originalIndex})=>{
    const card=document.createElement("div");
    const isExpanded = expandedCars.has(originalIndex);
    const isDivine = item.rarity==="Божественная";
+   const isSelected = selectedCars.includes(originalIndex);
+   
    card.className="car"+
      (isDivine?" rarity-rainbow":" rarity-glow")+
-     (selectMode&&!car.locked?" selectable":"")+
-     (selectedCars.includes(originalIndex)?" selected":"")+
-     (car.locked?" locked":"")+
-     (isExpanded?" expanded":"");
+     (selectMode && !car.locked ? " selectable":"")+
+     (isSelected ? " selected":"")+
+     (car.locked ? " locked":"")+
+     (isExpanded ? " expanded":"");
+     
    card.dataset.carIndex=String(originalIndex);
    const color=getRarityColor(item.rarity);
    card.style.setProperty("--rarity-color",color);
@@ -1900,24 +1383,21 @@ function renderGarage(){
      toggleCarDetails(originalIndex, card);
    };
 
-   if(selectMode&&!car.locked){
+   if(selectMode && !car.locked){
     const mark=document.createElement("div");
     mark.className="car-select-mark";
-    mark.textContent=selectedCars.includes(originalIndex)?"✓":"";
+    mark.textContent=isSelected ? "✓" : "";
     card.append(mark);
    }
 
    const lock=document.createElement("button");
    lock.className="car-lock-corner "+(car.locked?"unlock-car-btn":"lock-car-btn");
    lock.textContent=car.locked?"🔓":"🔒";
-   lock.title=car.locked?"Разблокировать машину":"Заблокировать машину";
-   lock.setAttribute("aria-label",lock.title);
    lock.onclick=(e)=>{ e.stopPropagation(); toggleCarLock(originalIndex); };
    card.append(lock);
 
    const img=document.createElement("img");
    img.src="images/"+item.id+".png";
-   img.alt=item.name;
    img.onerror=()=>{img.style.display="none"};
 
    const icon=document.createElement("div");
@@ -1950,7 +1430,7 @@ function renderGarage(){
 
    const hint=document.createElement("div");
    hint.className="car-hint";
-   hint.textContent=isExpanded?"Нажми, чтобы скрыть":"Нажми, чтобы показать характеристики";
+   hint.textContent=isExpanded?"Нажми, чтобы скрыть":"Показать характеристики";
 
    card.append(img,icon,title,details,incomeLine,hint);
    container.append(card);
@@ -1962,10 +1442,10 @@ function renderGarage(){
    empty.textContent="🔒 Пустая ячейка";
    container.append(empty);
   }
+  
   updateGarageSelectionUI();
   update();
   scheduleSave();
-  requestAnimationFrame(()=>window.scrollTo({top:savedScrollY,left:0,behavior:"auto"}));
 }
 
 function toggleCarDetails(index, cardEl){
@@ -1976,15 +1456,20 @@ function toggleCarDetails(index, cardEl){
   if(expanded) expandedCars.add(index);
   else expandedCars.delete(index);
   const hint = card.querySelector(".car-hint");
-  if(hint) hint.textContent = expanded ? "Нажми, чтобы скрыть" : "Нажми, чтобы показать характеристики";
+  if(hint) hint.textContent = expanded ? "Нажми, чтобы скрыть" : "Показать характеристики";
 }
 
-function toggleSelectMode(){ selectMode=!selectMode; selectedCars=[]; renderGarage(); }
+function toggleSelectMode(){ 
+  selectMode=!selectMode; 
+  selectedCars=[]; 
+  renderGarage(); 
+}
 
 function toggleCarSelection(index){
   if(!selectMode||index<0||index>=cars.length||cars[index].locked)return;
   if(selectedCars.includes(index)) selectedCars=selectedCars.filter(i=>i!==index);
   else selectedCars.push(index);
+  
   const card=document.querySelector('.car[data-car-index="'+index+'"]');
   if(card){
    const sel=selectedCars.includes(index);
@@ -2011,7 +1496,7 @@ function updateGarageSelectionUI(){
   modeButton.textContent=selectMode?"Отменить выбор":"Выбрать";
   sellButton.disabled=!selectMode||selectedCars.length===0;
   sellButton.textContent="Продать выбранные ("+selectedCars.length+")";
-  hint.textContent=selectMode?"Нажми на незаблокированные машины, чтобы отметить их":"Выбери несколько машин в гараже";
+  hint.textContent=selectMode?"Нажми на машины, чтобы отметить их":"Выбери несколько машин в гараже";
 }
 
 function getNextSlotPrice(){
@@ -2019,12 +1504,13 @@ function getNextSlotPrice(){
  const purchased=garageSlots-5;
  return Math.round(400000*Math.pow(2.2,Math.floor(purchased/2)));
 }
+
 function buyGarageSlot(){
  if(garageSlots>=40)return;
  const price=getNextSlotPrice();
  if(balance<price){ 
    triggerBalanceAnimation(price, false);
-   alert("Недостаточно денег! Нужно "+price.toLocaleString("ru-RU")+" ₽."); 
+   alert("Недостаточно денег!"); 
    return; 
  }
  balance-=price;
@@ -2033,28 +1519,27 @@ function buyGarageSlot(){
  renderGarage();
 }
 
+// ================= ПРОДАЖА =================
 function openSellModal(index){
   if(index<0||index>=cars.length||cars[index].locked)return;
   sellIndices=[index];
   const item=catalog.find(c=>c.id===cars[index].id);
   if(!item)return;
-  document.getElementById("sellModalTitle").textContent="🚗 Продажа автомобиля";
+  document.getElementById("sellModalTitle").textContent="🚗 Продажа";
   document.getElementById("confirmSellButton").textContent="Продать";
-  document.getElementById("sellText").textContent=
-   "Ты действительно хочешь продать "+item.name+
-   " за "+Math.floor(item.price*0.15).toLocaleString("ru-RU")+" ₽?";
+  document.getElementById("sellText").textContent="Продать "+item.name+" за "+Math.floor(item.price*0.15).toLocaleString("ru-RU")+" ₽?";
   document.getElementById("sellModal").hidden=false;
 }
+
 function openBulkSellModal(){
   if(!selectMode||selectedCars.length===0)return;
   sellIndices=[...selectedCars].filter(i=>i>=0&&i<cars.length&&!cars[i].locked).sort((a,b)=>a-b);
   if(!sellIndices.length)return;
   const items=sellIndices.map(i=>catalog.find(c=>c.id===cars[i].id)).filter(Boolean);
   const total=items.reduce((s,it)=>s+Math.floor(it.price*0.15),0);
-  document.getElementById("sellModalTitle").textContent="🚘 Продажа автомобилей";
-  document.getElementById("confirmSellButton").textContent="Подтвердить продажу";
-  document.getElementById("sellText").textContent=
-   "Ты уверен, что хочешь продать? Общая сумма: "+total.toLocaleString("ru-RU")+" ₽?";
+  document.getElementById("sellModalTitle").textContent="🚘 Продажа";
+  document.getElementById("confirmSellButton").textContent="Подтвердить";
+  document.getElementById("sellText").textContent="Продать выбранные машины за "+total.toLocaleString("ru-RU")+" ₽?";
   document.getElementById("sellModal").hidden=false;
 }
 
@@ -2062,7 +1547,7 @@ let sellAllFlag = false;
 function openSellAllModal() {
   const unlocked = cars.filter(c => !c.locked);
   if (unlocked.length === 0) {
-    alert("Нет незаблокированных машин для продажи.");
+    alert("Нет машин для продажи.");
     return;
   }
   let total = 0;
@@ -2073,12 +1558,17 @@ function openSellAllModal() {
   sellIndices = [];
   sellAllFlag = true;
   document.getElementById("sellModalTitle").textContent = "🚘 Продать всё";
-  document.getElementById("confirmSellButton").textContent = "Подтвердить продажу";
-  document.getElementById("sellText").textContent = `Вы уверены, что хотите продать ВСЕ незаблокированные машины (${unlocked.length} шт.) за ${total.toLocaleString("ru-RU")} ₽?`;
+  document.getElementById("confirmSellButton").textContent = "Подтвердить";
+  document.getElementById("sellText").textContent = `Продать ВСЕ незаблокированные машины (${unlocked.length} шт.) за ${total.toLocaleString("ru-RU")} ₽?`;
   document.getElementById("sellModal").hidden = false;
 }
 
-function closeSellModal(){ document.getElementById("sellModal").hidden=true; sellIndices=[]; sellAllFlag = false; }
+function closeSellModal(){ 
+  document.getElementById("sellModal").hidden=true; 
+  sellIndices=[]; 
+  sellAllFlag = false; 
+}
+
 function confirmSell(){
   if (sellAllFlag) {
     const unlocked = cars.filter(c => !c.locked);
@@ -2131,12 +1621,13 @@ function collectMoney(){
   if (incDisplay) animateValue(incDisplay, amount, true);
   
   triggerBalanceAnimation(amount, true);
-
   update(); 
 }
 
+// ================= КЕЙСЫ =================
 function openCasePicker(){ if(rouletteRunning)return; document.getElementById("casePickerModal").hidden=false; }
 function closeCasePicker(){ document.getElementById("casePickerModal").hidden=true; }
+
 function selectCase(type){
  if(rouletteRunning||!CASE_TYPES[type])return;
  selectedCaseType=type;
@@ -2160,6 +1651,7 @@ function selectCase(type){
  document.getElementById("caseMessage").textContent="";
  closeCasePicker();
 }
+
 function selectQuantity(q){
  if(rouletteRunning)return;
  selectedQuantity=q;
@@ -2269,11 +1761,11 @@ async function buyCase(){
  const message=document.getElementById("caseMessage");
 
  if(freeSlots<quantity){
-  message.textContent="❌ Недостаточно мест в гараже! Нужно "+quantity+" свободных мест, а у тебя только "+freeSlots+".";
+  message.textContent="❌ Недостаточно мест в гараже!";
   return;
  }
  if(balance<totalPrice){
-  message.textContent="❌ Недостаточно денег! Нужно "+totalPrice.toLocaleString("ru-RU")+" ₽, не хватает "+(totalPrice-balance).toLocaleString("ru-RU")+" ₽.";
+  message.textContent="❌ Недостаточно денег!";
   triggerBalanceAnimation(totalPrice, false);
   return;
  }
@@ -2291,6 +1783,11 @@ async function buyCase(){
  const list=document.getElementById("rouletteList");
  area.hidden=false;
  list.innerHTML="";
+ 
+ // Сброс кнопки "Продать выпавшее"
+ const sellDroppedBtn = document.getElementById('sellDroppedBtn');
+ if (sellDroppedBtn) sellDroppedBtn.style.display = 'none';
+ lastCarsFromCase = [];
 
  const winners=[];
  for(let i=0;i<quantity;i++) winners.push(getRandomCar());
@@ -2299,6 +1796,7 @@ async function buyCase(){
  if(skip){
   winners.forEach((winner,index)=>{
    cars.push({id:winner.id});
+   lastCarsFromCase.push(winner);
    const row=document.createElement("div");
    row.className="roulette-row";
    const header=document.createElement("div");
@@ -2323,11 +1821,44 @@ async function buyCase(){
  const roulettes=winners.map((w,i)=>createRoulette(i,w));
  const animations=roulettes.map(r=>animateRoulette(r));
  await Promise.all(animations);
+ 
  winners.forEach((winner,index)=>{
   cars.push({id:winner.id});
-  roulettes[index].result.textContent="🎉 "+winner.name+" — "+winner.rarity+" | "+winner.power+" л.с.";
+  lastCarsFromCase.push(winner);
+  roulettes[index].result.textContent="🎉 "+winner.name+" — "+winner.rarity;
  });
+ 
+ // Всплывающий текст в центре
+ showCenterAnnouncement(winners[0]);
+ 
  finishOpening(quantity);
+}
+
+function showCenterAnnouncement(car){
+  const el = document.createElement('div');
+  el.style.position = 'fixed';
+  el.style.top = '50%';
+  el.style.left = '50%';
+  el.style.transform = 'translate(-50%, -50%) scale(0.8)';
+  el.style.background = 'rgba(0,0,0,0.9)';
+  el.style.border = '3px solid ' + getRarityColor(car.rarity);
+  el.style.borderRadius = '20px';
+  el.style.padding = '30px 50px';
+  el.style.zIndex = '99999';
+  el.style.textAlign = 'center';
+  el.style.boxShadow = '0 0 50px ' + getRarityColor(car.rarity);
+  el.style.opacity = '0';
+  el.style.transition = 'all 0.3s ease';
+  el.innerHTML = `
+    <div style="font-size:40px; margin-bottom:10px;">🚘</div>
+    <div style="font-size:12px; color:${getRarityColor(car.rarity)}; text-transform:uppercase; letter-spacing:2px; font-weight:900;">${car.rarity}</div>
+    <div style="font-size:24px; color:#fff; font-weight:900; margin-top:5px;">${car.name}</div>
+  `;
+  document.body.appendChild(el);
+  
+  setTimeout(() => { el.style.opacity = '1'; el.style.transform = 'translate(-50%, -50%) scale(1)'; }, 10);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transform = 'translate(-50%, -50%) scale(1.2)'; }, 3000);
+  setTimeout(() => { el.remove(); }, 3500);
 }
 
 function finishOpening(quantity){
@@ -2335,25 +1866,215 @@ function finishOpening(quantity){
  const button=document.getElementById("caseButton");
  button.disabled=false;
  button.textContent="ОТКРЫТЬ КЕЙС";
- document.getElementById("caseMessage").textContent="✅ Открыто кейсов: "+quantity+". Все автомобили добавлены в гараж!";
+ document.getElementById("caseMessage").textContent="✅ Открыто кейсов: "+quantity;
  renderGarage();
  update();
+ 
+ if (lastCarsFromCase.length > 0) {
+   const btn = document.getElementById('sellDroppedBtn');
+   if (btn) {
+     btn.style.display = 'block';
+     let total = 0;
+     lastCarsFromCase.forEach(c => total += Math.floor(c.price * 0.15));
+     btn.textContent = `Продать выпавшее за ${total.toLocaleString('ru-RU')} ₽`;
+   }
+ }
 }
 
-// --- ТУТОРИАЛ ---
-const tutorialSteps=[
- {title:"🚗 Добро пожаловать!",text:"Здесь ты сможешь построить собственную автомобильную империю!"},
- {title:"💰 Твой баланс",text:"Зарабатывай деньги с помощью своих автомобилей. Мы уже начислили тебе 350 000 ₽ для отличного старта!"},
- {title:"🏎️ Твой гараж",text:"Машины сортируются: сверху самые редкие и дорогие. Нажми на карточку, чтобы увидеть характеристики и кнопку продажи."},
- {title:"🎁 Кейсы автомобилей",text:"Редкости идут по возрастанию: Обычная < Необычная < Редкая < Эпическая < Легендарная < Мифическая < Божественная. В каждом кейсе есть шанс на плохую машину — азарт!"},
- {title:"⛽ Топливо",text:"На гонки тратится топливо! У тебя максимум 20 ед. Одна гонка = 1 ед. топлива. Восстанавливается 1 ед. в час."},
- {title:"🏁 Пора начинать!",text:"Удачи! Создай самую богатую автомобильную империю!"}
-];
-let tutorialIndex=0;
-function nextTutorial(){ tutorialIndex++; if(tutorialIndex>=tutorialSteps.length){ finishTutorial(); return; } showTutorialStep(); }
-function showTutorialStep(){ const s=tutorialSteps[tutorialIndex]; document.getElementById("tutorialTitle").textContent=s.title; document.getElementById("tutorialText").textContent=s.text; }
-function finishTutorial(){ document.getElementById("tutorial").hidden=true; if(currentUser) localStorage.setItem("tutorialCompleted_" + currentUser, "true"); }
+function sellDroppedCars() {
+  if (lastCarsFromCase.length === 0) return;
+  let total = 0;
+  lastCarsFromCase.forEach(car => {
+    total += Math.floor(car.price * 0.15);
+  });
+  
+  // Удаляем эти машины из гаража (они лежат в конце массива)
+  for (let i = cars.length - 1; i >= 0; i--) {
+    if (lastCarsFromCase.some(c => c.id === cars[i].id)) {
+      cars.splice(i, 1);
+    }
+  }
+  
+  balance += total;
+  triggerBalanceAnimation(total, true);
+  lastCarsFromCase = [];
+  document.getElementById('sellDroppedBtn').style.display = 'none';
+  document.getElementById('caseMessage').textContent = `✅ Выпавшие машины проданы за ${total.toLocaleString('ru-RU')} ₽!`;
+  
+  renderGarage();
+  update();
+}
 
+// ================= ПРОФИЛЬ (СВОЙ И ЧУЖОЙ) =================
+async function openMyProfile() {
+  if (!currentUser) return;
+  isViewingOtherProfile = false;
+  
+  try {
+    const res = await fetch(`${API_URL}/user/${currentUser}`);
+    const user = await res.json();
+    if (!user) return;
+
+    const p = user.profile;
+    const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231e1e26' width='100' height='100'/><text x='50' y='50' font-size='50' text-anchor='middle' dominant-baseline='central' fill='%23ffd21a'>👤</text></svg>";
+    
+    document.getElementById("profileAvatarPreview").src = p.avatar || defaultAvatar;
+    document.getElementById("profileNameInput").value = p.name || currentUser;
+    document.getElementById("profileBioInput").value = p.bio || "";
+    document.getElementById("profileIdDisplay").textContent = user.playerId;
+    
+    document.getElementById("profileNameInput").disabled = false;
+    document.getElementById("profileBioInput").disabled = false;
+    document.getElementById("avatarUploadLabel").style.display = "inline-block";
+    document.getElementById("profileActions").style.display = "flex";
+
+    document.getElementById("profileModal").hidden = false;
+  } catch (e) { console.error(e); }
+}
+
+async function showPlayerProfile(login) {
+  isViewingOtherProfile = true;
+  try {
+    const res = await fetch(`${API_URL}/user/${login}`);
+    if (!res.ok) return;
+    const user = await res.json();
+    
+    const p = user.profile;
+    const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231e1e26' width='100' height='100'/><text x='50' y='50' font-size='50' text-anchor='middle' dominant-baseline='central' fill='%23ffd21a'>👤</text></svg>";
+    
+    document.getElementById("profileAvatarPreview").src = p.avatar || defaultAvatar;
+    document.getElementById("profileNameInput").value = p.name || login;
+    document.getElementById("profileBioInput").value = p.bio || "";
+    document.getElementById("profileIdDisplay").textContent = user.playerId;
+    
+    document.getElementById("profileNameInput").disabled = true;
+    document.getElementById("profileBioInput").disabled = true;
+    document.getElementById("avatarUploadLabel").style.display = "none";
+    document.getElementById("profileActions").style.display = "none";
+    
+    document.getElementById("profileModal").hidden = false;
+  } catch (e) { console.error(e); }
+}
+
+function closeProfile() {
+  document.getElementById("profileModal").hidden = true;
+}
+
+function handleAvatarUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const MAX_SIZE = 150;
+      let width = img.width;
+      let height = img.height;
+      if (width > height) {
+        if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; }
+      } else {
+        if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0, width, height);
+      const dataUrl = canvas.toDataURL("image/jpeg", 0.7);
+      document.getElementById("profileAvatarPreview").src = dataUrl;
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveProfile() {
+  if (!currentUser || isViewingOtherProfile) return;
+  try {
+    const newName = document.getElementById("profileNameInput").value.trim();
+    const newBio = document.getElementById("profileBioInput").value.trim();
+    const newAvatar = document.getElementById("profileAvatarPreview").src;
+
+    await fetch(`${API_URL}/profile`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        login: currentUser,
+        profile: { name: newName || currentUser, bio: newBio, avatar: newAvatar.startsWith('data:') ? newAvatar : '' }
+      })
+    });
+
+    const res = await fetch(`${API_URL}/user/${currentUser}`);
+    const user = await res.json();
+    updateProfileUIFromServer(user);
+
+    closeProfile();
+    alert("Профиль сохранен!");
+  } catch (e) { console.error(e); }
+}
+
+// ================= ТОПЫ =================
+async function renderTops() {
+  if (!currentUser) return;
+  try {
+    const res = await fetch(`${API_URL}/top`);
+    const players = await res.json();
+    const topContainer = document.getElementById('topContainer');
+    topContainer.innerHTML = '';
+
+    const myIndex = players.findIndex(p => p.login === currentUser);
+    const myPlaceEl = document.getElementById('myTopPlace');
+    if (myIndex !== -1 && myIndex >= 200) {
+      myPlaceEl.style.display = 'block';
+      myPlaceEl.textContent = `Вы на ${myIndex + 1} месте.`;
+    } else {
+      myPlaceEl.style.display = 'none';
+    }
+
+    const topLimit = Math.min(players.length, 200);
+    for (let i = 0; i < topLimit; i++) {
+      const p = players[i];
+      const row = document.createElement('div');
+      row.className = 'top-row' + (p.login === currentUser ? ' my-top-row' : '');
+      let rankHtml = `<div class="top-rank">${i + 1}</div>`;
+      if (i === 0) rankHtml = `<div class="top-rank gold">🥇</div>`;
+      else if (i === 1) rankHtml = `<div class="top-rank silver">🥈</div>`;
+      else if (i === 2) rankHtml = `<div class="top-rank bronze">🥉</div>`;
+      
+      const avatarSrc = p.avatar || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231e1e26' width='100' height='100'/><text x='50' y='50' font-size='50' text-anchor='middle' dominant-baseline='central' fill='%23ffd21a'>👤</text></svg>";
+      
+      row.innerHTML = `
+        ${rankHtml}
+        <img src="${avatarSrc}" class="top-avatar">
+        <div class="top-info">
+          <div class="top-name">${p.name} ${p.login === currentUser ? '(Вы)' : ''}</div>
+          <div class="top-id">ID: ${p.playerId}</div>
+        </div>
+        <div class="top-balance">${Math.floor(p.balance).toLocaleString('ru-RU')} ₽</div>
+      `;
+      
+      row.onclick = () => {
+        if (p.login !== currentUser) showPlayerProfile(p.login);
+        else openMyProfile();
+      };
+      topContainer.appendChild(row);
+    }
+  } catch (e) { console.error(e); }
+}
+
+// ================= ГАРАЖ И ИНВЕНТАРЬ =================
+function updateGarageSelectionUI(){
+  const modeButton=document.getElementById("selectModeButton");
+  const sellButton=document.getElementById("sellSelectedButton");
+  const hint=document.getElementById("selectionHint");
+  if(!modeButton||!sellButton||!hint)return;
+  modeButton.textContent=selectMode?"Отменить выбор":"Выбрать";
+  sellButton.disabled=!selectMode||selectedCars.length===0;
+  sellButton.textContent="Продать выбранные ("+selectedCars.length+")";
+  hint.textContent=selectMode?"Нажми на машины, чтобы отметить их":"Выбери несколько машин в гараже";
+}
+
+// ================= НАВИГАЦИЯ =================
 function openTab(tab,button){
  if(rouletteRunning)return;
  if(tab !== "casino") closeCasinoGame();
@@ -2367,6 +2088,36 @@ function openTab(tab,button){
  if (tab === "tops") {
    renderTops();
  }
+}
+
+// ================= АНИМАЦИИ ДЕНЕГ =================
+function showMoneyFloat(container, amount, isPositive) {
+  if (!container) return;
+  const el = document.createElement("div");
+  el.className = "money-float " + (isPositive ? "green" : "red");
+  el.textContent = (isPositive ? "+" : "-") + Math.abs(amount).toLocaleString("ru-RU") + " ₽";
+  const rect = container.getBoundingClientRect();
+  document.body.appendChild(el);
+  el.style.left = (rect.left + rect.width / 2) + "px";
+  el.style.top = (rect.top + 10) + "px";
+  el.style.position = "fixed";
+  setTimeout(() => el.remove(), 1200);
+}
+
+function animateValue(element, amount, isPositive) {
+  if (!element) return;
+  element.classList.remove("anim-plus", "anim-minus", "anim-shake");
+  void element.offsetWidth;
+  if (isPositive) { element.classList.add("anim-plus"); } 
+  else { element.classList.add("anim-minus", "anim-shake"); }
+  setTimeout(() => { element.classList.remove("anim-plus", "anim-minus", "anim-shake"); }, 900);
+}
+
+function triggerBalanceAnimation(amount, isPositive) {
+  const balanceBox = document.getElementById("balanceBox");
+  const balanceSpan = document.getElementById("balance");
+  if(balanceBox) showMoneyFloat(balanceBox, amount, isPositive);
+  if(balanceSpan) animateValue(balanceSpan, amount, isPositive);
 }
 
 // ================= КАЗИНО =================
@@ -2433,15 +2184,6 @@ function playRoulette() {
   }, 100);
 }
 
-let bjPlayerCards = []; let bjBotCards = []; let bjGameActive = false;
-function getCard() { const suits = ['♠', '♥', '♦', '♣']; const values = ['2','3','4','5','6','7','8','9','10','J','Q','K','A']; const v = values[Math.floor(Math.random() * values.length)]; const s = suits[Math.floor(Math.random() * suits.length)]; return { v, s, color: (s === '♥' || s === '♦') ? 'red' : 'black' }; }
-function calcHand(cards) { let sum = 0, aces = 0; cards.forEach(c => { if (c.v === 'A') { aces++; sum += 11; } else if (['J','Q','K'].includes(c.v)) sum += 10; else sum += parseInt(c.v); }); while (sum > 21 && aces > 0) { sum -= 10; aces--; } return sum; }
-function renderBJ() { const cardsEl = document.getElementById("bj-cards"); const statusEl = document.getElementById("bj-status"); cardsEl.innerHTML = bjPlayerCards.map(c => `<div class="card ${c.color}">${c.v}${c.s}</div>`).join(''); const pScore = calcHand(bjPlayerCards); const bScore = calcHand(bjBotCards); if (bjGameActive) { statusEl.textContent = `Твои очки: ${pScore} | Бот: ?`; } else { statusEl.textContent = `Твои очки: ${pScore} | Бот: ${bScore}`; } }
-function playBlackjack() { if (bjGameActive) return; const bet = getBet("blackjack"); if (balance < bet) { alert("Недостаточно денег!"); return; } balance -= bet; triggerBalanceAnimation(bet, false); update(); bjPlayerCards = [getCard(), getCard()]; bjBotCards = [getCard(), getCard()]; bjGameActive = true; document.getElementById("bj-result").textContent = "Игра идёт..."; document.getElementById("bj-actions").style.display = "flex"; document.getElementById("bj-play-btn").style.display = "none"; renderBJ(); }
-function bjHit() { if (!bjGameActive) return; bjPlayerCards.push(getCard()); renderBJ(); if (calcHand(bjPlayerCards) > 21) { bjEndGame(false, "Перебор! Проигрыш."); } }
-function bjStand() { if (!bjGameActive) return; bjGameActive = false; const pScore = calcHand(bjPlayerCards); while (calcHand(bjBotCards) < 17) bjBotCards.push(getCard()); const bScore = calcHand(bjBotCards); if (bScore > 21) bjEndGame(true, "У бота перебор! Победа!"); else if (pScore > bScore) bjEndGame(true, "У тебя больше! Победа!"); else if (pScore < bScore) bjEndGame(false, "Бот выиграл. Проигрыш."); else bjEndGame(null, "Ничья!"); }
-function bjEndGame(win, message) { bjGameActive = false; const bet = getBet("blackjack"); const resultEl = document.getElementById("bj-result"); resultEl.textContent = message; if (win === true) { balance += bet * 2; triggerBalanceAnimation(bet * 2, true); resultEl.style.color = "var(--green)"; } else if (win === null) { balance += bet; triggerBalanceAnimation(bet, true); resultEl.style.color = "var(--muted)"; } else { resultEl.style.color = "var(--red)"; } document.getElementById("bj-actions").style.display = "none"; document.getElementById("bj-play-btn").style.display = "block"; update(); renderBJ(); }
-
 function playDice() {
   const bet = getBet("dice");
   if (balance < bet) { alert("Недостаточно денег!"); return; }
@@ -2472,267 +2214,6 @@ function playDice() {
   }, 100);
 }
 
-function playGuess() {
-  const bet = getBet("guess");
-  const userNum = parseInt(document.getElementById("guess-number").value);
-  if (isNaN(userNum) || userNum < 1 || userNum > 10) { alert("Введи число от 1 до 10!"); return; }
-  if (balance < bet) { alert("Недостаточно денег!"); return; }
-  balance -= bet; triggerBalanceAnimation(bet, false); update();
-  const resultEl = document.getElementById("guess-result"); const visual = document.getElementById("guess-visual-text");
-  resultEl.textContent = "Загадываем..."; resultEl.style.color = "var(--yellow-soft)"; visual.textContent = "?";
-  setTimeout(() => {
-    const secret = Math.floor(Math.random() * 10) + 1; visual.textContent = secret;
-    if (userNum === secret) {
-      balance += bet * 5; triggerBalanceAnimation(bet * 5, true);
-      resultEl.textContent = `Ты угадал! +${(bet*5).toLocaleString("ru-RU")} ₽`; resultEl.style.color = "var(--green)";
-    } else {
-      resultEl.textContent = `Не угадал. Было ${secret}. Проигрыш.`; resultEl.style.color = "var(--red)";
-    }
-    update(); 
-  }, 800);
-}
-
-// ================= АУКЦИОН =================
-let auctionCar = null;
-let auctionCurrentBid = 0;
-let auctionHighestBidder = "Нет ставок";
-let auctionTradeTimer = null;
-let auctionSpawnTimer = null;
-let auctionTradeTimeLeft = 0;
-let auctionSpawnTimeLeft = 300;
-const AUCTION_BOT_NAMES = ["Иван", "Дмитрий", "Алексей", "Максим", "Сергей", "Андрей", "Егор", "Кирилл"];
-
-function initAuction() {
-  clearInterval(auctionSpawnTimer);
-  auctionSpawnTimeLeft = 300;
-  updateSpawnTimerUI();
-  
-  auctionSpawnTimer = setInterval(() => {
-    auctionSpawnTimeLeft--;
-    updateSpawnTimerUI();
-    if (auctionSpawnTimeLeft <= 0) {
-      if (auctionCar === null) {
-        spawnAuctionCar();
-      } else {
-        auctionSpawnTimeLeft = 300; 
-      }
-    }
-  }, 1000);
-}
-
-function updateSpawnTimerUI() {
-  const el = document.getElementById("auctionSpawnTimer");
-  if (!el) return;
-  if (auctionCar !== null) {
-    el.textContent = "Идут торги!";
-    el.classList.add("urgent");
-    return;
-  }
-  el.classList.remove("urgent");
-  const m = Math.floor(auctionSpawnTimeLeft / 60).toString().padStart(2, '0');
-  const s = (auctionSpawnTimeLeft % 60).toString().padStart(2, '0');
-  el.textContent = `${m}:${s}`;
-}
-
-function updateTradeTimerUI() {
-  const el = document.getElementById("auctionTradeTimer");
-  if (!el) return;
-  if (auctionTradeTimeLeft <= 0) {
-    el.textContent = "Торги завершены";
-    el.classList.add("urgent");
-    return;
-  }
-  if (auctionTradeTimeLeft <= 15) el.classList.add("urgent");
-  else el.classList.remove("urgent");
-  
-  const m = Math.floor(auctionTradeTimeLeft / 60).toString().padStart(2, '0');
-  const s = (auctionTradeTimeLeft % 60).toString().padStart(2, '0');
-  el.textContent = `До конца торгов: ${m}:${s}`;
-}
-
-function spawnAuctionCar() {
-  const rarities = ["Легендарная", "Мифическая", "Божественная"];
-  const chosenRarity = rarities[Math.floor(Math.random() * rarities.length)];
-  const pool = catalog.filter(c => c.rarity === chosenRarity && !c.id.startsWith("low_"));
-  if (!pool.length) return;
-  
-  auctionCar = pool[Math.floor(Math.random() * pool.length)];
-  auctionCurrentBid = Math.floor(auctionCar.price * 0.15);
-  auctionHighestBidder = "Нет ставок";
-  
-  document.getElementById("auctionEmpty").style.display = "none";
-  const card = document.getElementById("auctionCard");
-  card.style.display = "flex";
-  card.className = "auction-card";
-  if (chosenRarity === "Легендарная") card.classList.add("spawn-legendary");
-  else if (chosenRarity === "Мифическая") card.classList.add("spawn-mythic");
-  else if (chosenRarity === "Божественная") card.classList.add("spawn-divine");
-  
-  document.getElementById("auctionCarName").textContent = auctionCar.name;
-  const rarityEl = document.getElementById("auctionCarRarity");
-  rarityEl.textContent = auctionCar.rarity;
-  rarityEl.style.backgroundColor = getRarityColor(auctionCar.rarity) + "22";
-  rarityEl.style.color = getRarityColor(auctionCar.rarity);
-  rarityEl.style.border = `1px solid ${getRarityColor(auctionCar.rarity)}`;
-  
-  document.getElementById("auctionCarPower").textContent = auctionCar.power;
-  document.getElementById("auctionCarIncome").textContent = auctionCar.income.toLocaleString("ru-RU");
-  document.getElementById("auctionCarRealPrice").textContent = auctionCar.price.toLocaleString("ru-RU");
-  
-  const img = document.getElementById("auctionCarImg");
-  img.src = "images/" + auctionCar.id + ".png";
-  img.onerror = () => { img.style.display = "none"; };
-  img.onload = () => { img.style.display = "block"; };
-  
-  updateAuctionBidUI();
-  
-  document.getElementById("toastCarName").textContent = auctionCar.name;
-  const toast = document.getElementById("auctionToast");
-  toast.classList.add("show");
-  setTimeout(() => { toast.classList.remove("show"); }, 5000);
-  
-  auctionTradeTimeLeft = 78;
-  updateTradeTimerUI();
-  
-  clearInterval(auctionTradeTimer);
-  auctionTradeTimer = setInterval(() => {
-    auctionTradeTimeLeft--;
-    updateTradeTimerUI();
-    if (auctionTradeTimeLeft <= 0) {
-      endAuction();
-    } else {
-      if (auctionTradeTimeLeft % 3 === 0 && auctionHighestBidder !== "Вы") {
-        botMakeBid();
-      }
-    }
-  }, 1000);
-}
-
-function updateAuctionBidUI() {
-  document.getElementById("auctionCurrentBid").textContent = auctionCurrentBid.toLocaleString("ru-RU") + " ₽";
-  document.getElementById("auctionHighestBidder").textContent = auctionHighestBidder === "Нет ставок" ? "Ставок пока нет" : "Лидирует: " + auctionHighestBidder;
-  
-  const input = document.getElementById("auctionBidInput");
-  const minNextBid = Math.floor(auctionCurrentBid * 1.05);
-  input.placeholder = `Мин: ${minNextBid.toLocaleString("ru-RU")}`;
-  input.value = minNextBid;
-}
-
-function placeAuctionBid() {
-  if (!auctionCar || auctionTradeTimeLeft <= 0) {
-    alert("Торги уже завершены!");
-    return;
-  }
-  const input = document.getElementById("auctionBidInput");
-  let bidAmount = parseInt(input.value);
-  if (isNaN(bidAmount)) { alert("Введите корректную сумму!"); return; }
-  
-  const minNextBid = Math.floor(auctionCurrentBid * 1.05);
-  if (bidAmount < minNextBid) {
-    alert(`Ваша ставка должна быть не менее ${minNextBid.toLocaleString("ru-RU")} ₽`);
-    return;
-  }
-  
-  if (balance < bidAmount) {
-    alert("Недостаточно денег на балансе!");
-    triggerBalanceAnimation(bidAmount, false);
-    return;
-  }
-  
-  if (auctionHighestBidder === "Вы") {
-    balance += auctionCurrentBid;
-    triggerBalanceAnimation(auctionCurrentBid, true);
-  }
-  
-  balance -= bidAmount;
-  triggerBalanceAnimation(bidAmount, false);
-  
-  auctionCurrentBid = bidAmount;
-  auctionHighestBidder = "Вы";
-  
-  updateAuctionBidUI();
-  update();
-}
-
-function botMakeBid() {
-  if (Math.random() > 0.6) return;
-  const botName = AUCTION_BOT_NAMES[Math.floor(Math.random() * AUCTION_BOT_NAMES.length)];
-  const increasePercent = 0.05 + Math.random() * 0.1;
-  const newBid = Math.floor(auctionCurrentBid * (1 + increasePercent));
-  
-  if (newBid > auctionCar.price * 2) return; 
-  
-  if (auctionHighestBidder === "Вы") {
-    balance += auctionCurrentBid;
-    triggerBalanceAnimation(auctionCurrentBid, true);
-    update();
-  }
-  
-  auctionCurrentBid = newBid;
-  auctionHighestBidder = botName;
-  
-  updateAuctionBidUI();
-  
-  const toast = document.getElementById("auctionToast");
-  document.getElementById("toastIcon").textContent = "⚔️";
-  document.getElementById("toastCarName").innerHTML = `<span style="color:var(--red)">${botName}</span> перебил вашу ставку!`;
-  toast.classList.add("show");
-  setTimeout(() => { 
-    toast.classList.remove("show"); 
-    setTimeout(() => { document.getElementById("toastIcon").textContent = "🔔"; }, 500);
-  }, 4000);
-}
-
-function endAuction() {
-  clearInterval(auctionTradeTimer);
-  auctionTradeTimeLeft = 0;
-  updateTradeTimerUI();
-  
-  const resultEl = document.getElementById("auctionHighestBidder");
-  
-  if (auctionHighestBidder === "Вы") {
-    cars.push({ id: auctionCar.id });
-    renderGarage();
-    
-    resultEl.textContent = "Поздравляем! Вы выиграли лот!";
-    resultEl.style.color = "var(--green)";
-    resultEl.style.fontSize = "16px";
-    resultEl.style.fontWeight = "900";
-    resultEl.style.textAlign = "center";
-    
-    const toast = document.getElementById("auctionToast");
-    document.getElementById("toastIcon").textContent = "🏆";
-    document.getElementById("toastCarName").innerHTML = `<span style="color:var(--green)">Вы выиграли ${auctionCar.name}!</span>`;
-    toast.classList.add("show");
-    setTimeout(() => { 
-      toast.classList.remove("show"); 
-      setTimeout(() => { document.getElementById("toastIcon").textContent = "🔔"; }, 500);
-    }, 5000);
-    
-  } else {
-    if (auctionHighestBidder === "Нет ставок") {
-      resultEl.textContent = "Лот не продан. Ставок не было.";
-    } else {
-      resultEl.textContent = `Лот выиграл: ${auctionHighestBidder}`;
-    }
-    resultEl.style.color = "var(--red)";
-    resultEl.style.fontSize = "16px";
-    resultEl.style.fontWeight = "900";
-    resultEl.style.textAlign = "center";
-  }
-  
-  document.getElementById("auctionBidBtn").disabled = true;
-  
-  setTimeout(() => {
-    auctionCar = null;
-    document.getElementById("auctionCard").style.display = "none";
-    document.getElementById("auctionEmpty").style.display = "block";
-    document.getElementById("auctionBidBtn").disabled = false;
-    auctionSpawnTimeLeft = 300;
-    updateSpawnTimerUI();
-  }, 5000);
-}
-
 // ================= ГОНКИ =================
 const RACE_COST_PERCENT = 0.30;
 const RACE_REWARD_PERCENT = 1.0;
@@ -2751,6 +2232,8 @@ let raceStartTime = 0;
 let playerPower = 0;
 let botPower = 0;
 let playerGoPressed = false;
+
+let raceOpponentsMap = {}; // Храним количество гонок с каждым соперником
 
 function initRaces() {
   renderRaceSlots();
@@ -2783,14 +2266,25 @@ function renderRaceSlots() {
     const cost = Math.floor(opp.price * RACE_COST_PERCENT);
     const reward = Math.floor(opp.price * RACE_REWARD_PERCENT);
     
+    // Проверяем лимит гонок с этим соперником
+    const racesWithOpp = raceOpponentsMap[opp.id] || 0;
+    const isLocked = racesWithOpp >= 2;
+
     const slot = document.createElement("div");
-    slot.className = "race-slot";
-    slot.onclick = () => openRaceDetail(opp, cost, reward);
+    slot.className = "race-slot" + (isLocked ? " locked" : "");
+    slot.style.opacity = isLocked ? "0.5" : "1";
+    slot.style.cursor = isLocked ? "not-allowed" : "pointer";
+    
+    if (!isLocked) {
+      slot.onclick = () => openRaceDetail(opp, cost, reward);
+    }
+
     slot.innerHTML = `
       <div class="race-slot-header">
         <div>
           <div class="race-slot-title">${opp.name}</div>
           <div class="race-slot-power">⚡ Мощность: <b>${opp.power} л.с.</b></div>
+          ${isLocked ? '<div style="color:var(--red); font-size:12px; margin-top:5px; font-weight:700;">Лимит гонок (2/2)</div>' : ''}
         </div>
         <div class="race-slot-chance" id="chance-${opp.id}">...</div>
       </div>
@@ -2867,20 +2361,6 @@ function updateRaceUI() {
     nameEl.textContent = "Не выбрана";
     nameEl.style.color = "var(--red)";
   }
-  
-  if (currentRaceOpp) {
-    const chance = Math.min(95, Math.max(5, Math.round((selectedPlayerCar.power / (selectedPlayerCar.power + currentRaceOpp.power)) * 100)));
-    document.querySelectorAll(".race-slot").forEach(slot => {
-      if (slot.textContent.includes(currentRaceOpp.name)) {
-        const chanceEl = slot.querySelector(".race-slot-chance");
-        if (chanceEl) {
-          chanceEl.textContent = `${chance}% поб.`;
-          if (chance > 60) chanceEl.style.color = "var(--green)";
-          else if (chance < 40) chanceEl.style.color = "var(--red)";
-        }
-      }
-    });
-  }
 }
 
 function openRaceDetail(opp, cost, reward) {
@@ -2948,15 +2428,14 @@ function startRaceSequence() {
     return;
   }
   
-  // Тратим топливо
-  if (window._lastFuel === undefined) window._lastFuel = 20;
-  if (window._lastFuel <= 0) {
-    alert("У вас закончилось топливо! Ждите восстановления (1 ед. в час).");
+  // Тратим 10 топлива
+  if (window._lastFuel < 10) {
+    alert("Нужно 10 топлива для гонки!");
     return;
   }
-  window._lastFuel -= 1;
+  window._lastFuel -= 10;
   if (window._lastFuel === 19) window._lastFuelTime = Date.now();
-  updateFuelUIFromServer({ gameData: { fuel: window._lastFuel } });
+  updateFuelUI();
   
   balance -= currentRaceData.cost;
   triggerBalanceAnimation(currentRaceData.cost, false);
@@ -3080,6 +2559,13 @@ function startMovement() {
         bLane.classList.add("win-active");
         endRace(false, "Вы проиграли гонку.");
       }
+      
+      // Обновляем счетчик гонок с этим соперником
+      const oppId = currentRaceOpp.id;
+      raceOpponentsMap[oppId] = (raceOpponentsMap[oppId] || 0) + 1;
+      
+      // Обновляем слоты (перерисовываем, чтобы показать блокировку)
+      setTimeout(renderRaceSlots, 2000);
     }
   }, 50);
 }
@@ -3100,53 +2586,6 @@ function endRace(win, message) {
   }, 4000);
 }
 
-// ================= АНИМАЦИИ ДЕНЕГ =================
-function showMoneyFloat(container, amount, isPositive) {
-  if (!container) return;
-  const el = document.createElement("div");
-  el.className = "money-float " + (isPositive ? "green" : "red");
-  el.textContent = (isPositive ? "+" : "-") + Math.abs(amount).toLocaleString("ru-RU") + " ₽";
-  const rect = container.getBoundingClientRect();
-  document.body.appendChild(el);
-  el.style.left = (rect.left + rect.width / 2) + "px";
-  el.style.top = (rect.top + 10) + "px";
-  el.style.position = "fixed";
-  setTimeout(() => el.remove(), 1200);
-}
-
-function animateValue(element, amount, isPositive) {
-  if (!element) return;
-  element.classList.remove("anim-plus", "anim-minus", "anim-shake");
-  void element.offsetWidth;
-  if (isPositive) { element.classList.add("anim-plus"); } 
-  else { element.classList.add("anim-minus", "anim-shake"); }
-  setTimeout(() => { element.classList.remove("anim-plus", "anim-minus", "anim-shake"); }, 900);
-}
-
-function triggerBalanceAnimation(amount, isPositive) {
-  const balanceBox = document.getElementById("balanceBox");
-  const balanceSpan = document.getElementById("balance");
-  if(balanceBox) showMoneyFloat(balanceBox, amount, isPositive);
-  if(balanceSpan) animateValue(balanceSpan, amount, isPositive);
-}
-
-// ================= НАДЁЖНАЯ ЗАГРУЗКА ЛОГОТИПА =================
-(function loadLogo(){
-  const img = document.getElementById("mainLogo");
-  const fallback = document.querySelector(".header-fallback-text");
-  if (!img || !fallback) return;
-  const candidates = ["images/logo_image.png", "logo_image.png", "images/logo_image.PNG", "images/logo_image.jpg", "images/logo_image.jpeg", "images/logo_image.webp"];
-  let i = 0;
-  function tryNext(){
-    if (i >= candidates.length){ img.style.display = "none"; fallback.style.display = "block"; return; }
-    const src = candidates[i++];
-    img.onload = () => { img.style.display = "block"; fallback.style.display = "none"; };
-    img.onerror = () => { tryNext(); };
-    img.src = src;
-  }
-  tryNext();
-})();
-
 // ================= АВТОВХОД =================
 window.addEventListener('load', async () => {
   const active = localStorage.getItem('autoEmpire_activeUser');
@@ -3163,45 +2602,23 @@ window.addEventListener('load', async () => {
     }
     const user = await res.json();
     currentUser = active;
-    window._lastFuel = user.gameData.fuel || 20;
-    window._lastFuelTime = user.gameData.lastFuelTime || Date.now();
     applyServerUser(user);
+    
+    setInterval(() => {
+      if (currentUser) {
+        income += getRate();
+        update();
+        updateFuelUI();
+        scheduleSave();
+      }
+    }, 1000);
+    
   } catch (e) {
     document.getElementById('authScreen').style.display = 'flex';
   }
 });
 
-// ================= ИНИЦИАЛИЗАЦИЯ =================
 updateCaseOdds();
-['roulette', 'blackjack', 'dice', 'guess'].forEach(game => {
-  updateBetDisplay(game);
-});
-
-setInterval(() => {
-  if (currentUser) {
-    income += getRate();
-    update();
-    scheduleSave();
-    
-    // Восстановление топлива
-    if (window._lastFuel === undefined) window._lastFuel = 20;
-    if (window._lastFuel < 20) {
-      const now = Date.now();
-      const passed = now - (window._lastFuelTime || now);
-      const hours = Math.floor(passed / 3600000);
-      if (hours > 0) {
-        window._lastFuel = Math.min(20, window._lastFuel + hours);
-        window._lastFuelTime = (window._lastFuelTime || now) + hours * 3600000;
-        updateFuelUIFromServer({ gameData: { fuel: window._lastFuel } });
-      }
-    }
-  }
-}, 1000);
-
-initAuction();
-initRaces();
-updateRaceUI();
-
 </script>
 </body>
 </html>

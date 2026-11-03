@@ -6,8 +6,11 @@ const { MongoClient } = require('mongodb');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Строка подключения к базе данных
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+// ================= НАСТРОЙКИ =================
+// ЗАМЕНИТЕ ЭТО НА ВАШ ЛОГИН, ПОД КОТОРЫМ ВЫ ЗАХОДИТЕ В ИГРУ!
+const ADMIN_LOGIN = 'Q1wesh'; 
+
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://q1weshgg5_db_user:RFWAVljQWN6vqJ3@cluster0.kndazx5.mongodb.net/?retryWrites=true&w=majority';
 const DB_NAME = 'imperiya_avto';
 
 app.use(cors());
@@ -16,7 +19,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 let db;
 
-// Подключение к MongoDB
 MongoClient.connect(MONGODB_URI)
   .then(client => {
     console.log('✅ Подключено к MongoDB');
@@ -24,11 +26,10 @@ MongoClient.connect(MONGODB_URI)
     app.listen(PORT, () => console.log(`✅ Сервер запущен на порту ${PORT}`));
   })
   .catch(err => {
-    console.error('❌ Ошибка подключения к базе данных:', err);
+    console.error('❌ Ошибка подключения:', err);
     process.exit(1);
   });
 
-// Регистрация
 app.post('/api/register', async (req, res) => {
   const { login, password } = req.body;
   if (!login || !password) return res.status(400).json({ error: 'Заполните поля!' });
@@ -48,7 +49,7 @@ app.post('/api/register', async (req, res) => {
     playerId,
     profile: { name: login, bio: '', avatar: '' },
     gameData: {
-      balance: 350000, // Стартовый баланс
+      balance: 400000,
       income: 0,
       cars: [{ id: 'rusty_7' }],
       garageSlots: 5,
@@ -64,7 +65,6 @@ app.post('/api/register', async (req, res) => {
   res.json({ success: true, user: newUser });
 });
 
-// Вход
 app.post('/api/login', async (req, res) => {
   const { login, password } = req.body;
   const user = await db.collection('users').findOne({ login });
@@ -73,14 +73,12 @@ app.post('/api/login', async (req, res) => {
   res.json({ success: true, user });
 });
 
-// Сохранение
 app.post('/api/save', async (req, res) => {
   const { login, gameData } = req.body;
   await db.collection('users').updateOne({ login }, { $set: { gameData } });
   res.json({ success: true });
 });
 
-// Топ
 app.get('/api/top', async (req, res) => {
   const players = await db.collection('users')
     .find({}, { projection: { login: 1, playerId: 1, profile: 1, 'gameData.balance': 1 } })
@@ -93,73 +91,53 @@ app.get('/api/top', async (req, res) => {
     playerId: p.playerId,
     name: p.profile?.name || p.login,
     avatar: p.profile?.avatar || '',
+    bio: p.profile?.bio || '',
     balance: p.gameData?.balance || 0
   })));
 });
 
-// Получить пользователя
 app.get('/api/user/:login', async (req, res) => {
   const user = await db.collection('users').findOne({ login: req.params.login });
   if (!user) return res.status(404).json({ error: 'Не найден' });
   res.json(user);
 });
 
-// Профиль
 app.post('/api/profile', async (req, res) => {
   const { login, profile } = req.body;
   await db.collection('users').updateOne({ login }, { $set: { profile } });
   res.json({ success: true });
 });
 
-// --- API ДЛЯ АДМИН ПАНЕЛИ (УЛУЧШЕННЫЙ) ---
-app.post('/api/admin/money', async (req, res) => {
-  const { adminLogin, targetPlayerId, amount, action } = req.body; 
-  
-  console.log(`[ADMIN] Запрос от ${adminLogin}: ${action} ${amount} для ID: ${targetPlayerId}`);
-
-  if (adminLogin !== 'Q1wesh') {
-    return res.status(403).json({ error: 'Доступ запрещен. Вы не администратор.' });
-  }
-
+// ================= АДМИН ПАНЕЛЬ =================
+app.post('/api/admin/give', async (req, res) => {
   try {
-    // Ищем игрока по ID или по логину (на случай, если ID в базе не совпадает)
-    let targetUser = await db.collection('users').findOne({ playerId: targetPlayerId });
-    
-    // Если по ID не нашли, пробуем найти по логину
-    if (!targetUser) {
-      targetUser = await db.collection('users').findOne({ login: targetPlayerId });
+    const adminLogin = req.body.adminLogin || req.body.login || req.body.admin;
+    const targetId = req.body.targetId || req.body.playerId || req.body.id;
+    const amount = req.body.amount || req.body.money || req.body.sum;
+
+    if (adminLogin !== ADMIN_LOGIN) {
+      return res.status(403).json({ error: 'У вас нет прав администратора!' });
     }
 
-    if (!targetUser) {
-      return res.status(404).json({ error: `Игрок с ID/Логином "${targetPlayerId}" не найден в базе!` });
+    const numAmount = Number(amount);
+    if (isNaN(numAmount)) {
+      return res.status(400).json({ error: 'Неверная сумма!' });
     }
 
-    let currentBalance = targetUser.gameData?.balance || 0;
-    let newBalance = currentBalance;
-    const numericAmount = Number(amount);
-
-    if (isNaN(numericAmount) || numericAmount <= 0) {
-       return res.status(400).json({ error: 'Неверная сумма!' });
+    const user = await db.collection('users').findOne({ playerId: targetId });
+    if (!user) {
+      return res.status(404).json({ error: 'Игрок не найден!' });
     }
 
-    if (action === 'add') {
-      newBalance += numericAmount;
-    } else if (action === 'take') {
-      newBalance -= numericAmount;
-      if (newBalance < 0) newBalance = 0; 
-    }
-
-    // Сохраняем
+    const newBalance = (user.gameData.balance || 0) + numAmount;
     await db.collection('users').updateOne(
-      { _id: targetUser._id },
+      { playerId: targetId },
       { $set: { 'gameData.balance': newBalance } }
     );
 
-    console.log(`[ADMIN] Успех! Новый баланс ${targetUser.login}: ${newBalance}`);
-    res.json({ success: true, newBalance, targetLogin: targetUser.login });
-
-  } catch (err) {
-    console.error('[ADMIN] ОШИБКА:', err);
-    res.status(500).json({ error: 'Внутренняя ошибка сервера: ' + err.message });
+    res.json({ success: true, newBalance });
+  } catch (e) {
+    console.error("Ошибка в админке:", e);
+    res.status(500).json({ error: 'Ошибка сервера' });
   }
 });
