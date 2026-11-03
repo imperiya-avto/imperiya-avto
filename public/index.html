@@ -915,10 +915,37 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 <!-- НОВАЯ ВКЛАДКА НОМЕРА -->
 <section id="numbers" class="panel" hidden>
  <h2>🔢 Номера</h2>
- <div style="text-align:center; padding:40px 20px; background:rgba(0,0,0,0.2); border:2px dashed var(--stroke-2); border-radius:16px;">
-   <span style="font-size:50px;">🚧</span>
-   <h3 style="color:var(--yellow); margin-top:15px;">В разработке</h3>
-   <p style="color:var(--muted);">Этот раздел скоро появится. Следите за обновлениями!</p>
+ <div class="number-machine">
+   <div class="number-plate-container">
+     <div class="plate" id="numberPlate">
+       <div class="plate-left">
+         <span class="plate-digit" id="digit1">A</span>
+         <span class="plate-digit" id="digit2">0</span>
+         <span class="plate-digit" id="digit3">0</span>
+         <span class="plate-digit" id="digit4">0</span>
+         <span class="plate-digit" id="digit5">A</span>
+         <span class="plate-digit" id="digit6">A</span>
+       </div>
+       <div class="plate-divider"></div>
+       <div class="plate-right">
+         <div class="plate-region" id="regionText">777</div>
+         <div class="plate-country">RUS</div>
+       </div>
+     </div>
+   </div>
+   
+   <div class="number-controls">
+     <div class="number-price">Стоимость: <span style="color:var(--yellow); font-weight:900;">500 000 ₽</span></div>
+     <button class="case-button" id="spinNumberBtn" onclick="spinNumberPlate()">КРУТИТЬ ЗА 500 000 ₽</button>
+     <div class="case-message" id="numberMessage"></div>
+   </div>
+   
+   <div class="number-inventory">
+     <h3>Мои номера</h3>
+     <div class="numbers-list" id="numbersList">
+       <p style="color:var(--muted); font-size:13px;">У вас пока нет красивых номеров</p>
+     </div>
+   </div>
  </div>
 </section>
 
