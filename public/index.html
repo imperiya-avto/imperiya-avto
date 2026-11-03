@@ -774,7 +774,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   <div style="display:flex; align-items:center; gap:15px; position:absolute; top:16px; right:24px;">
     <div class="fuel-widget" id="fuelWidget" style="display:none;">
       <span class="fuel-icon">⛽</span>
-      <span class="fuel-count" id="fuelCount">20</span> / 20
+      <span class="fuel-count" id="fuelCount">10</span> / 10
       <span id="fuelTimer" style="color:var(--muted); font-size:12px; margin-left:5px;"></span>
     </div>
     <div class="user-profile-widget" id="userProfileWidget" onclick="openMyProfile()" style="display:none; position:static;">
@@ -994,7 +994,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
        <div class="light green" id="light4"></div>
      </div>
      <div class="race-actions">
-       <button class="race-action-btn race-btn-start" id="btnStartRace" onclick="startRaceSequence()">Начать (10⛽)</button>
+       <button class="race-action-btn race-btn-start" id="btnStartRace" onclick="startRaceSequence()">Начать (1⛽)</button>
        <button class="race-action-btn race-btn-go" id="btnGoRace" onclick="playerGo()" style="display:none;">Ехать!</button>
      </div>
      <div class="race-result-msg" id="raceResultMsg"></div>
@@ -1014,6 +1014,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 <script>
 // ================= КОНСТАНТЫ И ПЕРЕМЕННЫЕ =================
 const API_URL = window.location.origin + '/api';
+const MAX_FUEL = 10;
 let currentUser = null;
 let isRegisterMode = false;
 
@@ -1090,7 +1091,7 @@ function logout() {
   selectedCars = [];
   expandedCars.clear();
   lastCarsFromCase = [];
-  window._lastFuel = 20;
+  window._lastFuel = MAX_FUEL;
   window._lastFuelTime = Date.now();
   if (saveTimeout) { clearTimeout(saveTimeout); saveTimeout = null; }
 
@@ -1111,7 +1112,7 @@ function applyServerUser(user) {
   cars = user.gameData.cars || [];
 
   if (typeof window._lastFuel === 'undefined') {
-    window._lastFuel = user.gameData.fuel !== undefined ? user.gameData.fuel : 20;
+    window._lastFuel = user.gameData.fuel !== undefined ? user.gameData.fuel : MAX_FUEL;
     window._lastFuelTime = user.gameData.lastFuelTime || Date.now();
   }
 
@@ -1155,14 +1156,14 @@ function updateFuelUI() {
   const fuelCountEl = document.getElementById('fuelCount');
   if (!fuelCountEl) return;
 
-  if (typeof window._lastFuel === 'undefined') window._lastFuel = 20;
+  if (typeof window._lastFuel === 'undefined') window._lastFuel = MAX_FUEL;
 
-  if (window._lastFuel < 20) {
+  if (window._lastFuel < MAX_FUEL) {
     const now = Date.now();
     const passed = now - (window._lastFuelTime || now);
     const hours = Math.floor(passed / 3600000);
     if (hours > 0) {
-      window._lastFuel = Math.min(20, window._lastFuel + hours);
+      window._lastFuel = Math.min(MAX_FUEL, window._lastFuel + hours);
       window._lastFuelTime = (window._lastFuelTime || now) + hours * 3600000;
     }
   }
@@ -1173,7 +1174,7 @@ function updateFuelUI() {
 
   const timerEl = document.getElementById('fuelTimer');
   if (timerEl) {
-    if (window._lastFuel >= 20) {
+    if (window._lastFuel >= MAX_FUEL) {
       timerEl.textContent = '';
     } else {
       const now = Date.now();
@@ -2635,7 +2636,7 @@ function startRaceSequence() {
     return;
   }
   window._lastFuel -= 1;
-  if (window._lastFuel === 19) window._lastFuelTime = Date.now();
+  if (window._lastFuel === MAX_FUEL - 1) window._lastFuelTime = Date.now();
   updateFuelUI();
   scheduleSave();
 
