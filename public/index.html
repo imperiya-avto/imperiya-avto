@@ -622,6 +622,27 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 ::-webkit-scrollbar-thumb{background:#2c2c38;border-radius:6px}
 ::-webkit-scrollbar-thumb:hover{background:#3a3a48}
 
+/* Стили для админ панели */
+.admin-modal {
+  position: fixed; inset: 0; background: rgba(5,5,8,.9); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center; z-index: 100002; padding: 16px;
+}
+.admin-box {
+  background: linear-gradient(180deg,#1c1c24,#121217); border: 2px solid var(--yellow);
+  border-radius: 20px; padding: 25px; width: 100%; max-width: 450px; position: relative;
+  box-shadow: 0 30px 80px rgba(0,0,0,.9);
+}
+.admin-box h2 { color: var(--yellow); text-align: center; margin-top: 0; }
+.admin-field { margin-bottom: 15px; }
+.admin-field label { display: block; font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
+.admin-field input { width: 100%; padding: 12px; background: #0a0a0c; border: 2px solid var(--stroke-2); border-radius: 10px; color: #fff; font-size: 15px; outline: none; }
+.admin-field input:focus { border-color: var(--yellow); }
+.admin-actions { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+.admin-actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; cursor: pointer; font-size: 14px; min-width: 100px; }
+.btn-add-money { background: linear-gradient(180deg, #3ddc84, #28a862); color: #fff; }
+.btn-take-money { background: linear-gradient(180deg, #ff4d5e, #c8323f); color: #fff; }
+.btn-close-admin { background: linear-gradient(180deg, #3a3a48, #2a2a34); color: #fff; }
+
 @media(max-width: 600px) {
   .user-profile-widget { top: 10px; right: 10px; padding: 4px 8px 4px 4px; }
   .user-avatar-mini { width: 32px; height: 32px; }
@@ -726,6 +747,9 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
         👥 Друзья
         <div class="notification-dot" id="friendNotificationDot"></div>
       </button>
+      <!-- КНОПКА АДМИНКИ (появится только для Q1wesh) -->
+      <button id="adminPanelBtn" style="display:none; background:linear-gradient(180deg,#ffd21a,#ffb800); color:#15130a; font-weight:900;" onclick="openAdminPanel()">👑 Админ</button>
+      
       <button class="btn-logout" onclick="logout()">Выйти</button>
     </div>
   </div>
@@ -744,6 +768,27 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
     <div class="friend-search-box" id="friendSearchBox" style="margin-top:15px;">
       <input type="text" id="friendIdInput" class="friend-input" placeholder="Введите ID игрока...">
       <button class="friend-add-btn" onclick="sendFriendRequest()">Отправить заявку</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка Админ-панели -->
+<div class="admin-modal" id="adminModal" hidden>
+  <div class="admin-box">
+    <button class="profile-close" onclick="closeAdminPanel()">×</button>
+    <h2>👑 Админ-панель</h2>
+    <div class="admin-field">
+      <label>ID Игрока (формат 00-00-00)</label>
+      <input type="text" id="adminTargetId" placeholder="00-00-10">
+    </div>
+    <div class="admin-field">
+      <label>Сумма (₽)</label>
+      <input type="number" id="adminAmount" placeholder="10000" min="1">
+    </div>
+    <div class="admin-actions">
+      <button class="btn-add-money" onclick="adminAction('add')">Выдать деньги</button>
+      <button class="btn-take-money" onclick="adminAction('take')">Забрать деньги</button>
+      <button class="btn-close-admin" onclick="closeAdminPanel()">Закрыть</button>
     </div>
   </div>
 </div>
@@ -1208,8 +1253,6 @@ let income = 0;
 let garageSlots = 5;
 let cars = [];
 
-// Функции из старого кода, связанные с id элементов, оставляем как есть
-
 // ================= АВТОРИЗАЦИЯ =================
 function toggleAuthMode() {
   isRegisterMode = !isRegisterMode;
@@ -1261,7 +1304,6 @@ function applyServerUser(user) {
   const elapsed = Math.max(0, (Date.now() - (user.gameData.lastTime || Date.now())) / 1000);
   income += elapsed * getRate();
 
-  // Обновляем UI
   updateProfileUIFromServer(user);
   updateFuelUIFromServer(user);
   renderGarage();
@@ -1270,6 +1312,16 @@ function applyServerUser(user) {
   document.getElementById("authScreen").style.display = "none";
   document.getElementById("userProfileWidget").style.display = "flex";
   document.getElementById("fuelWidget").style.display = "flex";
+
+  // ПОКАЗЫВАЕМ КНОПКУ АДМИНКИ ТОЛЬКО ДЛЯ Q1wesh
+  const adminBtn = document.getElementById('adminPanelBtn');
+  if (adminBtn) {
+    if (user.login === 'Q1wesh') {
+      adminBtn.style.display = 'block';
+    } else {
+      adminBtn.style.display = 'none';
+    }
+  }
 }
 
 function updateProfileUIFromServer(user) {
@@ -1404,8 +1456,76 @@ async function saveProfile() {
   }
 }
 
-// ================= ДРУЗЬЯ (оставляем локальную логику, она не влияет на топ) =================
-// ... (все функции друзей остаются как в старом коде, они берут данные из user)
+// ==== ФУНКЦИЯ ВЫХОДА ====
+function logout() {
+  localStorage.removeItem('autoEmpire_activeUser');
+  window.location.reload(); // Перезагружаем страницу, чтобы вернуться на экран авторизации
+}
+
+// ==== АДМИН ПАНЕЛЬ ====
+function openAdminPanel() {
+  if (currentUser !== 'Q1wesh') {
+    alert('У вас нет прав администратора!');
+    return;
+  }
+  document.getElementById('adminModal').hidden = false;
+}
+
+function closeAdminPanel() {
+  document.getElementById('adminModal').hidden = true;
+}
+
+async function adminAction(action) {
+  if (currentUser !== 'Q1wesh') return;
+
+  const targetId = document.getElementById('adminTargetId').value.trim();
+  const amount = document.getElementById('adminAmount').value.trim();
+
+  if (!targetId || !amount || amount <= 0) {
+    alert('Заполните ID игрока и сумму!');
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_URL}/admin/money`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        adminLogin: currentUser,
+        targetPlayerId: targetId,
+        amount: Number(amount),
+        action: action // 'add' или 'take'
+      })
+    });
+
+    const data = await res.json();
+    if (!res.ok) {
+      alert(data.error || 'Ошибка');
+      return;
+    }
+
+    alert(`Успешно! Новый баланс игрока: ${data.newBalance.toLocaleString('ru-RU')} ₽`);
+    
+    // Если админ изменил свой же баланс, нужно обновить его локально
+    if (targetId === document.getElementById('profileIdDisplay').textContent) {
+        window.location.reload(); 
+    }
+  } catch (e) {
+    console.error(e);
+    alert('Ошибка сервера');
+  }
+}
+
+// ================= ДРУЗЬЯ =================
+function openFriends() { 
+  const modal = document.getElementById('friendsModal');
+  if(modal) {
+      document.getElementById('friendsContent').innerHTML = '<div style="text-align:center; padding:30px; color:var(--muted);"><span style="font-size:40px;">🚧</span><br><br>Функция друзей находится в разработке!</div>';
+      document.getElementById('friendSearchBox').style.display = 'none';
+      modal.hidden = false;
+  }
+}
+function closeFriends() { document.getElementById("friendsModal").hidden = true; }
 
 // ================= ТОПЫ (через сервер) =================
 async function renderTops() {
@@ -1456,7 +1576,7 @@ async function renderTops() {
   }
 }
 
-// ================= КАТАЛОГ МАШИН (без изменений) =================
+// ================= КАТАЛОГ МАШИН =================
 const RARITY_BASE = {
  "Обычная":      {priceMin: 15000,    priceMax: 90000,     incomeMin: 1.5,  incomeMax: 4.5},
  "Необычная":    {priceMin: 120000,   priceMax: 500000,    incomeMin: 6,    incomeMax: 18},
@@ -2223,7 +2343,7 @@ function finishOpening(quantity){
 // --- ТУТОРИАЛ ---
 const tutorialSteps=[
  {title:"🚗 Добро пожаловать!",text:"Здесь ты сможешь построить собственную автомобильную империю!"},
- {title:"💰 Твой баланс",text:"Зарабатывай деньги с помощью своих автомобилей. Мы уже начислили тебе 400 000 ₽ для отличного старта!"},
+ {title:"💰 Твой баланс",text:"Зарабатывай деньги с помощью своих автомобилей. Мы уже начислили тебе 350 000 ₽ для отличного старта!"},
  {title:"🏎️ Твой гараж",text:"Машины сортируются: сверху самые редкие и дорогие. Нажми на карточку, чтобы увидеть характеристики и кнопку продажи."},
  {title:"🎁 Кейсы автомобилей",text:"Редкости идут по возрастанию: Обычная < Необычная < Редкая < Эпическая < Легендарная < Мифическая < Божественная. В каждом кейсе есть шанс на плохую машину — азарт!"},
  {title:"⛽ Топливо",text:"На гонки тратится топливо! У тебя максимум 20 ед. Одна гонка = 1 ед. топлива. Восстанавливается 1 ед. в час."},
@@ -3026,20 +3146,6 @@ function triggerBalanceAnimation(amount, isPositive) {
   }
   tryNext();
 })();
-
-// ================= ДРУЗЬЯ (оставляем функционал) =================
-// Так как все данные теперь на сервере, но запросы друзей не обрабатываются сервером в этой версии,
-// временно отключаем их или делаем локальными (для простоты). Чтобы не ломать интерфейс,
-// оставим функции-заглушки.
-function openFriends() { alert('Функция друзей пока не подключена к серверу.'); }
-function closeFriends() { document.getElementById("friendsModal").hidden = true; }
-function switchFriendsTab() {}
-function renderFriendsList() {}
-function sendFriendRequest() { alert('Функция друзей пока не подключена к серверу.'); }
-function acceptFriendRequest() {}
-function rejectFriendRequest() {}
-function removeFriend() {}
-function checkFriendRequests() {}
 
 // ================= АВТОВХОД =================
 window.addEventListener('load', async () => {
