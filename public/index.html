@@ -518,6 +518,82 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .auction-toast-content p { margin: 0; color: #fff; font-size: 14px; font-weight: 600; }
 .auction-toast-content p span { color: var(--yellow-soft); font-weight: 900; }
 
+/* ===== ГОНКИ: ЯЧЕЙКИ С ЛУЧШИМИ МАШИНАМИ ===== */
+.race-cars-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+.race-car-card {
+  position: relative;
+  background: linear-gradient(180deg, #1e1e26, #14141a);
+  border: 2px solid var(--stroke-2);
+  border-radius: 12px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  overflow: hidden;
+}
+.race-car-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255,210,26,.55);
+}
+.race-car-card.selected {
+  border-color: var(--yellow);
+  background: linear-gradient(180deg, rgba(255,210,26,.18), rgba(255,210,26,.04));
+  box-shadow: 0 0 0 1px var(--yellow), 0 0 20px rgba(255,210,26,.4);
+}
+.race-car-card .race-car-img {
+  width: 100%;
+  height: 60px;
+  object-fit: contain;
+  background: linear-gradient(180deg, #f4f4f6, #dedee4);
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+.race-car-card .race-car-icon { font-size: 32px; margin-bottom: 6px; }
+.race-car-card .race-car-name {
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 26px;
+}
+.race-car-card .race-car-power {
+  font-size: 11px;
+  color: var(--yellow-soft);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.race-car-card .race-car-chance {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--green);
+  text-shadow: 0 0 10px rgba(61,220,132,.4);
+}
+.race-car-card .race-car-chance.low { color: var(--red); text-shadow: 0 0 10px rgba(255,77,94,.4); }
+.race-cars-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 20px;
+  color: var(--muted);
+  font-size: 14px;
+  background: rgba(0,0,0,0.2);
+  border: 2px dashed var(--stroke-2);
+  border-radius: 12px;
+}
+
 .races-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
 .race-slot { background: linear-gradient(180deg, #1c1c24 0%, #111116 100%); border: 2px solid var(--stroke-2); border-radius: 20px; padding: 20px; display: flex; flex-direction: column; gap: 15px; cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,.5); }
 .race-slot:hover { transform: translateY(-5px); border-color: rgba(255,210,26,.6); box-shadow: 0 15px 40px rgba(255,210,26,.15); }
@@ -636,6 +712,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   .auction-btn { width: 100%; }
   .auction-toast { right: 10px; left: 10px; max-width: none; transform: translateY(-200%); }
   .auction-toast.show { transform: translateY(0); }
+  .race-cars-grid { grid-template-columns: repeat(2, 1fr); }
   .race-window { padding: 15px; }
   .race-window-title { font-size: 16px; }
   .track-lane { height: 50px; }
@@ -962,6 +1039,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 <section id="races" class="panel" hidden>
  <h2>🏁 Гонки</h2>
  <div id="racesMainView">
+   <div class="race-cars-grid" id="raceCarsGrid"></div>
    <div class="races-grid" id="racesGrid"></div>
  </div>
  <div id="raceDetailView" style="display:none;">
@@ -972,7 +1050,6 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
      </div>
      <div style="width:100%; display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; z-index:2; position:relative;">
        <div style="font-size:14px; color:var(--muted);">Ваша машина: <b id="playerCarName" style="color:var(--yellow);">Не выбрана</b></div>
-       <button class="casino-back-btn" onclick="openCarSelect()">Сменить</button>
      </div>
      <div class="track-container">
        <div class="track-lane player-lane" id="lanePlayer">
@@ -1026,9 +1103,9 @@ let selectMode = false;
 let selectedCars = [];
 let expandedCars = new Set();
 let sortedCarRefs = [];
-let lastCarsFromCase = []; // Для кнопки продажи после кейса
+let lastCarsFromCase = [];
 let isViewingOtherProfile = false;
-let caseDropTimeout = null; // Таймер оверлея выпавшей машины
+let caseDropTimeout = null;
 
 let balance = 0;
 let income = 0;
@@ -1036,7 +1113,7 @@ let garageSlots = 5;
 let cars = [];
 let myProfileData = null;
 
-const ADMIN_LOGIN_ID = 'Q1wesh'; // Только этот логин видит кнопку админки
+const ADMIN_LOGIN_ID = 'Q1wesh';
 
 // ================= АВТОРИЗАЦИЯ =================
 function toggleAuthMode() {
@@ -1079,7 +1156,7 @@ async function handleAuth() {
   }
 }
 
-// ================= ВЫХОД ИЗ АККАУНТА =================
+// ================= ВЫХОД =================
 function logout() {
   localStorage.removeItem('autoEmpire_activeUser');
   currentUser = null;
@@ -1115,6 +1192,8 @@ function applyServerUser(user) {
     window._lastFuel = user.gameData.fuel !== undefined ? user.gameData.fuel : MAX_FUEL;
     window._lastFuelTime = user.gameData.lastFuelTime || Date.now();
   }
+  // Обрезаем до максимума
+  if (window._lastFuel > MAX_FUEL) window._lastFuel = MAX_FUEL;
 
   const elapsed = Math.max(0, (Date.now() - (user.gameData.lastTime || Date.now())) / 1000);
   income += elapsed * getRate();
@@ -1157,6 +1236,7 @@ function updateFuelUI() {
   if (!fuelCountEl) return;
 
   if (typeof window._lastFuel === 'undefined') window._lastFuel = MAX_FUEL;
+  if (window._lastFuel > MAX_FUEL) window._lastFuel = MAX_FUEL;
 
   if (window._lastFuel < MAX_FUEL) {
     const now = Date.now();
@@ -1194,6 +1274,7 @@ function scheduleSave() {
   saveTimeout = setTimeout(async () => {
     saveTimeout = null;
     if (!currentUser) return;
+    const fuel = Math.min(window._lastFuel, MAX_FUEL);
     try {
       await fetch(`${API_URL}/save`, {
         method: 'POST',
@@ -1202,7 +1283,7 @@ function scheduleSave() {
           login: currentUser,
           gameData: {
             balance, income, cars, garageSlots,
-            fuel: window._lastFuel,
+            fuel: fuel,
             lastFuelTime: window._lastFuelTime,
             lastTime: Date.now()
           }
@@ -1490,7 +1571,6 @@ function updateCaseOdds(){
 // ================= ГАРАЖ =================
 function renderGarage(){
   if (!currentUser) return;
-  const savedScrollY=window.scrollY;
   const container=document.getElementById("garageCars");
   if(!container) return;
 
@@ -2078,8 +2158,6 @@ async function openMyProfile() {
     document.getElementById("profileBioInput").disabled = false;
     document.getElementById("avatarUploadLabel").style.display = "inline-block";
     document.getElementById("profileActions").style.display = "flex";
-    
-    // Показываем кнопку админки ТОЛЬКО для логина Q1wesh
     document.getElementById("adminPanelBtnWrap").style.display = (currentUser === ADMIN_LOGIN_ID) ? "block" : "none";
 
     document.getElementById("profileModal").hidden = false;
@@ -2211,14 +2289,31 @@ async function adminAdjust(action) {
       return;
     }
 
+    // === ФИКС: перечитываем актуальные данные с сервера, чтобы локальный balance совпал с БД ===
+    // Находим логин по playerId и перечитываем
+    try {
+      const allRes = await fetch(`${API_URL}/top`);
+      const allPlayers = await allRes.json();
+      const targetPlayer = allPlayers.find(p => p.playerId === targetId);
+      if (targetPlayer && targetPlayer.login === currentUser) {
+        // Если выдали себе — обновляем локальный баланс
+        const meRes = await fetch(`${API_URL}/user/${currentUser}`);
+        const me = await meRes.json();
+        balance = me.gameData.balance;
+        income = me.gameData.income || 0;
+        cars = me.gameData.cars || [];
+        garageSlots = me.gameData.garageSlots || 5;
+        if (typeof me.gameData.fuel === 'number') {
+          window._lastFuel = Math.min(me.gameData.fuel, MAX_FUEL);
+          window._lastFuelTime = me.gameData.lastFuelTime;
+        }
+        update();
+      }
+    } catch(e) {}
+
     msgEl.textContent = `✅ ${action === 'give' ? 'Выдано' : 'Забрано'} ${amount.toLocaleString('ru-RU')} ₽. Новый баланс игрока: ${data.newBalance.toLocaleString('ru-RU')} ₽`;
     msgEl.style.color = 'var(--green)';
     document.getElementById('adminAmount').value = '';
-    
-    if (targetId === myProfileData?.playerId) {
-      balance = data.newBalance;
-      update();
-    }
   } catch (e) {
     msgEl.textContent = '❌ Ошибка соединения';
     msgEl.style.color = 'var(--red)';
@@ -2438,20 +2533,69 @@ let playerGoPressed = false;
 
 let raceOpponentsMap = {};
 
-function initRaces() {
-  renderRaceSlots();
-  if (cars.length > 0) {
-    let bestCar = null;
-    let maxPower = -1;
-    cars.forEach(c => {
-      const item = catalog.find(x => x.id === c.id);
-      if (item && item.power > maxPower) {
-        maxPower = item.power;
-        bestCar = item;
-      }
-    });
-    selectedPlayerCar = bestCar;
+// ===== Обновление ячеек с лучшими машинами =====
+function renderRaceCarsGrid() {
+  const grid = document.getElementById('raceCarsGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  // Собираем все уникальные машины игрока с их мощностью
+  const uniqueCars = [];
+  const seen = new Set();
+  cars.forEach(c => {
+    const item = catalog.find(x => x.id === c.id);
+    if (item && !seen.has(item.id)) {
+      seen.add(item.id);
+      uniqueCars.push(item);
+    }
+  });
+
+  // Сортируем по мощности (от лучшей к худшей)
+  uniqueCars.sort((a, b) => b.power - a.power);
+  const topCars = uniqueCars.slice(0, 4);
+
+  if (topCars.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'race-cars-empty';
+    empty.textContent = 'У вас пока нет машин. Откройте кейс, чтобы получить автомобиль!';
+    grid.appendChild(empty);
+    return;
   }
+
+  // Если выбранной машины нет в топ-4 — сбросим выбор на лучшую
+  if (!selectedPlayerCar || !topCars.some(c => c.id === selectedPlayerCar.id)) {
+    selectedPlayerCar = topCars[0];
+  }
+
+  // Считаем шанс победы = среднее по 5 случайным соперникам (тем, что сейчас в слотах)
+  // Но проще: берём среднее по всем машинам каталога без "low_"
+  const opponentsPool = catalog.filter(c => !c.id.startsWith('low_'));
+  const avgOppPower = opponentsPool.reduce((s, c) => s + c.power, 0) / opponentsPool.length;
+
+  topCars.forEach(car => {
+    const chance = Math.min(95, Math.max(5, Math.round((car.power / (car.power + avgOppPower)) * 100)));
+    const card = document.createElement('div');
+    card.className = 'race-car-card' + (selectedPlayerCar && selectedPlayerCar.id === car.id ? ' selected' : '');
+    const color = getRarityColor(car.rarity);
+    card.style.borderColor = color;
+    card.onclick = () => {
+      selectedPlayerCar = car;
+      renderRaceCarsGrid();
+    };
+    card.innerHTML = `
+      <img class="race-car-img" src="images/${car.id}.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <div class="race-car-icon" style="display:none;">🚘</div>
+      <div class="race-car-name">${car.name}</div>
+      <div class="race-car-power">⚡ ${car.power} л.с.</div>
+      <div class="race-car-chance ${chance < 40 ? 'low' : ''}">${chance}% победы</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function initRaces() {
+  renderRaceCarsGrid();
+  renderRaceSlots();
 }
 
 function renderRaceSlots() {
@@ -2470,7 +2614,7 @@ function renderRaceSlots() {
     const reward = Math.floor(opp.price * RACE_REWARD_PERCENT);
 
     const racesWithOpp = raceOpponentsMap[opp.id] || 0;
-    const isLocked = racesWithOpp >= 2;
+    const isLocked = racesWithOpp >= 10; // лимит 10 гонок с одним соперником
 
     const slot = document.createElement("div");
     slot.className = "race-slot" + (isLocked ? " locked" : "");
@@ -2486,7 +2630,7 @@ function renderRaceSlots() {
         <div>
           <div class="race-slot-title">${opp.name}</div>
           <div class="race-slot-power">⚡ Мощность: <b>${opp.power} л.с.</b></div>
-          ${isLocked ? '<div style="color:var(--red); font-size:12px; margin-top:5px; font-weight:700;">Лимит гонок (2/2)</div>' : ''}
+          ${isLocked ? `<div style="color:var(--red); font-size:12px; margin-top:5px; font-weight:700;">Лимит гонок (${racesWithOpp}/10)</div>` : ''}
         </div>
         <div class="race-slot-chance" id="chance-${opp.id}">...</div>
       </div>
@@ -2532,6 +2676,7 @@ function openCarSelect() {
         selectedPlayerCar = item;
         closeCarSelect();
         updateRaceUI();
+        renderRaceCarsGrid();
       };
       el.innerHTML = `
         <img src="images/${item.id}.png" onerror="this.style.display='none'">
@@ -2566,6 +2711,10 @@ function updateRaceUI() {
 }
 
 function openRaceDetail(opp, cost, reward) {
+  if (!selectedPlayerCar) {
+    alert("Сначала выберите машину для гонки!");
+    return;
+  }
   currentRaceData = { opp, cost, reward };
   currentRaceOpp = opp;
 
@@ -2615,13 +2764,14 @@ function closeRaceDetail() {
   if (raceInterval) clearInterval(raceInterval);
   if (botGoTimeout) clearTimeout(botGoTimeout);
   if (greenLightTimeout) clearTimeout(greenLightTimeout);
+  renderRaceCarsGrid();
+  renderRaceSlots();
 }
 
 function startRaceSequence() {
   if (!currentRaceData) return;
   if (!selectedPlayerCar) {
     alert("Сначала выберите машину для гонки!");
-    openCarSelect();
     return;
   }
   if (balance < currentRaceData.cost) {
@@ -2630,7 +2780,6 @@ function startRaceSequence() {
     return;
   }
 
-  // Тратим 1 топливо за гонку
   if (window._lastFuel < 1) {
     alert("Нужен 1 бензин для гонки!");
     return;
