@@ -302,6 +302,161 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .case-button:hover:not(:disabled){filter:brightness(1.05);transform:translateY(-2px)}
 .case-button:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
 
+  /* ================= НОМЕРА ================= */
+.number-machine {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.number-plate-container {
+  perspective: 1000px;
+  margin-bottom: 10px;
+}
+
+.plate {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 10px 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6), inset 0 0 0 2px #333;
+  border: 4px solid #222;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.plate:hover {
+  transform: scale(1.05) rotateX(5deg);
+}
+
+.plate::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 50%; background: linear-gradient(to bottom, rgba(255,255,255,0.8), rgba(255,255,255,0)); pointer-events: none;
+}
+
+.plate-left {
+  display: flex;
+  gap: 2px;
+}
+
+.plate-digit {
+  font-family: 'Courier New', Courier, monospace; /* Шрифт, похожий на трафарет */
+  font-size: 62px;
+  font-weight: 900;
+  color: #111;
+  line-height: 1;
+  width: 45px;
+  text-align: center;
+  position: relative;
+  transition: all 0.1s;
+}
+
+.plate-digit.spin {
+  animation: digitSpin 0.1s linear infinite;
+  color: var(--yellow-2);
+  text-shadow: 0 0 10px var(--yellow-2);
+}
+
+@keyframes digitSpin {
+  0% { transform: translateY(0); opacity: 1; }
+  50% { transform: translateY(-10px); opacity: 0.5; }
+  100% { transform: translateY(10px); opacity: 1; }
+}
+
+.plate-divider {
+  width: 4px;
+  height: 60px;
+  background: #111;
+  margin: 0 15px;
+}
+
+.plate-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-left: 2px dashed #aaa;
+  padding-left: 15px;
+}
+
+.plate-region {
+  font-family: Arial, sans-serif;
+  font-size: 28px;
+  font-weight: 900;
+  color: #111;
+  line-height: 1;
+  transition: all 0.2s;
+}
+
+.plate-region.spin {
+  animation: digitSpin 0.1s linear infinite;
+  color: var(--yellow-2);
+}
+
+.plate-country {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 900;
+  color: #111;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.number-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.number-price {
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.number-inventory {
+  width: 100%;
+  max-width: 600px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--stroke-2);
+  border-radius: 16px;
+  padding: 15px;
+  margin-top: 20px;
+}
+
+.number-inventory h3 {
+  margin: 0 0 10px;
+  color: var(--yellow);
+  font-size: 16px;
+}
+
+.numbers-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.saved-plate {
+  background: #fff;
+  color: #111;
+  border-radius: 8px;
+  border: 2px solid #222;
+  padding: 5px 10px;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.saved-plate:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 15px var(--yellow);
+}
+  
 /* ===== КОМПАКТНАЯ КНОПКА "ПРОДАТЬ ВЫПАВШЕЕ" ===== */
 .sell-dropped-btn {
   display: none; align-items: center; justify-content: center; gap: 8px;
