@@ -700,7 +700,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 </div>
 
 <!-- Модалка админки -->
-<div class="modal" id="adminModal" hidden>
+<div class="modal" id="adminModal" hidden style="z-index: 100005;">
  <div class="modal-box">
   <h2 style="color:var(--yellow);">⚙️ Админ-панель</h2>
   <p style="color:var(--muted); font-size:13px;">Выдать или забрать деньги у игрока</p>
@@ -2629,13 +2629,15 @@ function startRaceSequence() {
     return;
   }
 
-  if (window._lastFuel < 10) {
-    alert("Нужно 10 топлива для гонки!");
+  // Тратим 1 топливо за гонку
+  if (window._lastFuel < 1) {
+    alert("Нужен 1 бензин для гонки!");
     return;
   }
-  window._lastFuel -= 10;
+  window._lastFuel -= 1;
   if (window._lastFuel === 19) window._lastFuelTime = Date.now();
   updateFuelUI();
+  scheduleSave();
 
   balance -= currentRaceData.cost;
   triggerBalanceAnimation(currentRaceData.cost, false);
