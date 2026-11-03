@@ -54,7 +54,8 @@ app.post('/api/register', async (req, res) => {
       garageSlots: 5,
       fuel: 10,
       lastFuelTime: Date.now(),
-      lastTime: Date.now()
+      lastTime: Date.now(),
+      myNumbers: [] // Добавлено поле для номеров
     },
     friends: [],
     friendRequests: []
