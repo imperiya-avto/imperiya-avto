@@ -1252,7 +1252,10 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 
      <div class="number-controls">
        <div class="spin-actions">
-         <button class="spin-btn" id="spinCharsBtn" onclick="spinChars()">
+         <button class="spin-btn" id="spinLettersBtn" onclick="spinLetters()">
+           БУКВЫ 400К
+         </button>
+         <button class="spin-btn" id="spinDigitsBtn" onclick="spinDigits()">
            ЦИФРЫ 500К
          </button>
          <button class="spin-btn" id="spinRegionBtn" onclick="spinRegion()">
@@ -1505,7 +1508,8 @@ let currentUnconfirmedPlate = null;
 let sellNumberIndex = -1;
 
 // --- PITY SYSTEM ---
-let pityCounter = 0;
+let pityLetters = 0;
+let pityDigits = 0;
 const PITY_THRESHOLD = 30;
 
 const ADMIN_LOGIN_ID = 'Q1wesh';
@@ -1584,7 +1588,8 @@ function applyServerUser(user) {
   // Загрузка номеров
   myNumbers = user.gameData.myNumbers || [];
   numbersSlots = user.gameData.numbersSlots || 10;
-  pityCounter = user.gameData.pityCounter || 0;
+  pityLetters = user.gameData.pityLetters || 0;
+  pityDigits = user.gameData.pityDigits || 0;
 
   // Загрузка заданий
   const now = Date.now();
@@ -1708,7 +1713,8 @@ function scheduleSave() {
             numbersSlots: numbersSlots,
             tasksData: tasksData,
             tasksResetTime: tasksResetTime,
-            pityCounter: pityCounter
+            pityLetters: pityLetters,
+            pityDigits: pityDigits
           }
         })
       });
@@ -2885,7 +2891,8 @@ function triggerBalanceAnimation(amount, isPositive) {
 }
 
 // ================= НОМЕРА =================
-let isSpinningChars = false;
+let isSpinningLetters = false;
+let isSpinningDigits = false;
 let isSpinningRegion = false;
 const ALLOWED_LETTERS = 'АВЕКМНОРСТУХ';
 // Много разных регионов для разнообразия
@@ -2904,83 +2911,20 @@ let currentPlate = {
   region: '777'
 };
 
-// Генерация случайных символов с повышенным шансом на одинаковые
 function getRandomPlateChars() {
-  // Сначала определяем, будет ли "красивый" номер
-  const roll = Math.random();
-  
-  let letters, digits;
-  
-  if (roll < 0.05) {
-    // 5% - полный рандом (без повторов)
-    const availableLetters = ALLOWED_LETTERS.split('');
-    const availableDigits = ['0','1','2','3','4','5','6','7','8','9'];
-    
-    letters = [];
-    for (let i = 0; i < 3; i++) {
-      const idx = Math.floor(Math.random() * availableLetters.length);
-      letters.push(availableLetters[idx]);
-      availableLetters.splice(idx, 1);
-    }
-    
-    digits = [];
-    for (let i = 0; i < 3; i++) {
-      const idx = Math.floor(Math.random() * availableDigits.length);
-      digits.push(availableDigits[idx]);
-      availableDigits.splice(idx, 1);
-    }
-  } else if (roll < 0.35) {
-    // 30% - две одинаковые буквы или две одинаковые цифры
-    if (Math.random() < 0.5) {
-      const letter = ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)];
-      letters = [letter, letter, ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)]];
-      letters = letters.sort(() => Math.random() - 0.5);
-    } else {
-      letters = [];
-      for (let i = 0; i < 3; i++) letters.push(ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)]);
-    }
-    
-    if (Math.random() < 0.5) {
-      const digit = Math.floor(Math.random() * 10).toString();
-      digits = [digit, digit, Math.floor(Math.random() * 10).toString()];
-      digits = digits.sort(() => Math.random() - 0.5);
-    } else {
-      digits = [];
-      for (let i = 0; i < 3; i++) digits.push(Math.floor(Math.random() * 10).toString());
-    }
-  } else if (roll < 0.65) {
-    // 30% - три одинаковые буквы ИЛИ три одинаковые цифры (легендарный)
-    if (Math.random() < 0.5) {
-      const letter = ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)];
-      letters = [letter, letter, letter];
-      digits = [];
-      for (let i = 0; i < 3; i++) digits.push(Math.floor(Math.random() * 10).toString());
-    } else {
-      letters = [];
-      for (let i = 0; i < 3; i++) letters.push(ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)]);
-      const digit = Math.floor(Math.random() * 10).toString();
-      digits = [digit, digit, digit];
-    }
-  } else if (roll < 0.85) {
-    // 20% - две одинаковые буквы И две одинаковые цифры (редкий+)
-    const letter = ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)];
-    letters = [letter, letter, ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)]];
-    letters = letters.sort(() => Math.random() - 0.5);
-    
-    const digit = Math.floor(Math.random() * 10).toString();
-    digits = [digit, digit, Math.floor(Math.random() * 10).toString()];
-    digits = digits.sort(() => Math.random() - 0.5);
-  } else {
-    // 15% - три одинаковые буквы И три одинаковые цифры (эксклюзив)
-    const letter = ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)];
-    letters = [letter, letter, letter];
-    
-    const digit = Math.floor(Math.random() * 10).toString();
-    digits = [digit, digit, digit];
-  }
-  
-  // Собираем в порядке: буква, цифра, цифра, цифра, буква, буква
-  return [letters[0], digits[0], digits[1], digits[2], letters[1], letters[2]];
+  const letter = () => ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)];
+  const digit = () => Math.floor(Math.random() * 10);
+  return [letter(), digit(), digit(), digit(), letter(), letter()];
+}
+
+function getRandomLetters() {
+  const letter = () => ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)];
+  return [letter(), letter(), letter()];
+}
+
+function getRandomDigits() {
+  const digit = () => Math.floor(Math.random() * 10);
+  return [digit(), digit(), digit()];
 }
 
 function getRandomPlateRegion() {
@@ -3004,8 +2948,8 @@ function evaluatePlate(charsArr) {
   const hasTwoDigits = maxDigitCount === 2;
   const hasTwoLetters = maxLetterCount === 2;
 
-  // Эксклюзив: 3 одинаковые цифры И 3 одинаковые буквы (А 777 АА) или 4 одинаковые (А 1111)
-  if ((hasThreeDigits && hasThreeLetters) || maxDigitCount >= 4) {
+  // Эксклюзив: 3 одинаковые цифры И 3 одинаковые буквы (А 777 АА)
+  if (hasThreeDigits && hasThreeLetters) {
     return { type: 'exclusive', label: '💎 ЭКСКЛЮЗИВНЫЙ НОМЕР!', color: '#ff00cc' };
   } 
   // Легендарный: 3 одинаковые цифры ИЛИ 3 одинаковые буквы
@@ -3104,17 +3048,10 @@ function continueAfterRareNumber() {
   }
 }
 
-// Проверка на гарантированный эксклюзив
-function forceExclusiveChars() {
-  const letter = ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)];
-  const digit = Math.floor(Math.random() * 10);
-  // Формат: А 777 АА
-  return [letter, digit, digit, digit, letter, letter];
-}
-
-async function spinChars() {
-  if (isSpinningChars || isSpinningRegion) return;
-  const cost = 500000;
+// Прокрутка букв (400к)
+async function spinLetters() {
+  if (isSpinningLetters || isSpinningDigits || isSpinningRegion) return;
+  const cost = 400000;
   if (balance < cost) {
     document.getElementById('numberMessage').textContent = '❌ Недостаточно денег!';
     document.getElementById('numberMessage').style.color = 'var(--red)';
@@ -3124,8 +3061,8 @@ async function spinChars() {
   balance -= cost;
   triggerBalanceAnimation(cost, false);
   update();
-  isSpinningChars = true;
-  const btn = document.getElementById('spinCharsBtn');
+  isSpinningLetters = true;
+  const btn = document.getElementById('spinLettersBtn');
   btn.disabled = true;
   btn.textContent = 'КРУТИМ...';
   
@@ -3141,7 +3078,7 @@ async function spinChars() {
   
   document.getElementById('saveNumberBtn').classList.remove('show');
 
-  const charsEls = ['digit1', 'digit2', 'digit3', 'digit4', 'digit5', 'digit6'];
+  const charsEls = ['digit1', 'digit5', 'digit6'];
   charsEls.forEach(id => document.getElementById(id).classList.add('spin'));
 
   let ticks = 0;
@@ -3149,9 +3086,9 @@ async function spinChars() {
   
   const interval = setInterval(() => {
     ticks++;
-    const randomChars = getRandomPlateChars();
+    const randomLetters = getRandomLetters();
     charsEls.forEach((id, idx) => {
-      document.getElementById(id).textContent = randomChars[idx];
+      document.getElementById(id).textContent = randomLetters[idx];
     });
 
     if (ticks >= maxTicks) {
@@ -3160,27 +3097,31 @@ async function spinChars() {
       charsEls.forEach(id => document.getElementById(id).classList.remove('spin'));
       plateEl.classList.remove('shaking');
 
-      // Проверка на Pity System
-      pityCounter++;
-      let finalChars;
+      // Проверка на Pity System для букв
+      pityLetters++;
+      let finalLetters;
       let isPity = false;
 
-      if (pityCounter >= PITY_THRESHOLD) {
-        // Гарантированный эксклюзив
-        finalChars = forceExclusiveChars();
-        pityCounter = 0; // Сброс
+      if (pityLetters >= PITY_THRESHOLD) {
+        // Гарантированные одинаковые буквы
+        const letter = ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)];
+        finalLetters = [letter, letter, letter];
+        pityLetters = 0; // Сброс
         isPity = true;
       } else {
-        finalChars = getRandomPlateChars();
+        finalLetters = getRandomLetters();
       }
 
-      currentPlate.chars = finalChars;
+      // Обновляем буквы в currentPlate
+      currentPlate.chars[0] = finalLetters[0];
+      currentPlate.chars[4] = finalLetters[1];
+      currentPlate.chars[5] = finalLetters[2];
       
       charsEls.forEach((id, idx) => {
-        document.getElementById(id).textContent = finalChars[idx];
+        document.getElementById(id).textContent = finalLetters[idx];
       });
 
-      const result = evaluatePlate(finalChars);
+      const result = evaluatePlate(currentPlate.chars);
       updateNeonGlow(result.type);
       
       if (result.type === 'exclusive' || result.type === 'legendary') {
@@ -3188,22 +3129,135 @@ async function spinChars() {
       }
 
       if (isPity) {
-        msgEl.textContent = '💎 ГАРАНТИРОВАННЫЙ ЭКСКЛЮЗИВНЫЙ НОМЕР!';
-        msgEl.style.color = '#ff00cc';
+        msgEl.textContent = '🔥 ГАРАНТИРОВАННЫЕ ОДИНАКОВЫЕ БУКВЫ!';
+        msgEl.style.color = '#ffd21a';
       } else {
         msgEl.textContent = result.label;
         msgEl.style.color = result.color;
       }
 
       currentUnconfirmedPlate = {
-        chars: finalChars.join(''),
+        chars: currentPlate.chars.join(''),
         region: currentPlate.region,
         type: result.type
       };
       
       document.getElementById('saveNumberBtn').classList.add('show');
 
-      isSpinningChars = false;
+      isSpinningLetters = false;
+      btn.disabled = false;
+      btn.textContent = 'БУКВЫ 400К';
+
+      // Задание на прокрутку номеров
+      updateTaskProgress('spin_numbers', 1);
+
+      // Если выпал редкий номер - показываем модалку!
+      if (result.type === 'exclusive' || result.type === 'legendary' || isPity) {
+        showRareNumberModal(currentUnconfirmedPlate, () => {
+           // Ничего делать не надо, просто даем посмотреть
+        });
+      }
+    }
+  }, 50); 
+}
+
+// Прокрутка цифр (500к)
+async function spinDigits() {
+  if (isSpinningLetters || isSpinningDigits || isSpinningRegion) return;
+  const cost = 500000;
+  if (balance < cost) {
+    document.getElementById('numberMessage').textContent = '❌ Недостаточно денег!';
+    document.getElementById('numberMessage').style.color = 'var(--red)';
+    return;
+  }
+
+  balance -= cost;
+  triggerBalanceAnimation(cost, false);
+  update();
+  isSpinningDigits = true;
+  const btn = document.getElementById('spinDigitsBtn');
+  btn.disabled = true;
+  btn.textContent = 'КРУТИМ...';
+  
+  const msgEl = document.getElementById('numberMessage');
+  msgEl.textContent = '';
+  msgEl.style.color = 'var(--muted)';
+
+  const plateEl = document.getElementById('numberPlate');
+  plateEl.classList.add('shaking');
+  
+  const glowEl = document.getElementById('neonGlow');
+  if (glowEl) glowEl.classList.remove('active');
+  
+  document.getElementById('saveNumberBtn').classList.remove('show');
+
+  const charsEls = ['digit2', 'digit3', 'digit4'];
+  charsEls.forEach(id => document.getElementById(id).classList.add('spin'));
+
+  let ticks = 0;
+  const maxTicks = 18;
+  
+  const interval = setInterval(() => {
+    ticks++;
+    const randomDigits = getRandomDigits();
+    charsEls.forEach((id, idx) => {
+      document.getElementById(id).textContent = randomDigits[idx];
+    });
+
+    if (ticks >= maxTicks) {
+      clearInterval(interval);
+      
+      charsEls.forEach(id => document.getElementById(id).classList.remove('spin'));
+      plateEl.classList.remove('shaking');
+
+      // Проверка на Pity System для цифр
+      pityDigits++;
+      let finalDigits;
+      let isPity = false;
+
+      if (pityDigits >= PITY_THRESHOLD) {
+        // Гарантированные одинаковые цифры
+        const digit = Math.floor(Math.random() * 10);
+        finalDigits = [digit, digit, digit];
+        pityDigits = 0; // Сброс
+        isPity = true;
+      } else {
+        finalDigits = getRandomDigits();
+      }
+
+      // Обновляем цифры в currentPlate
+      currentPlate.chars[1] = finalDigits[0];
+      currentPlate.chars[2] = finalDigits[1];
+      currentPlate.chars[3] = finalDigits[2];
+      
+      charsEls.forEach((id, idx) => {
+        document.getElementById(id).textContent = finalDigits[idx];
+      });
+
+      const result = evaluatePlate(currentPlate.chars);
+      updateNeonGlow(result.type);
+      
+      if (result.type === 'exclusive' || result.type === 'legendary') {
+        createSparkles(document.getElementById('numberPlate'));
+      }
+
+      if (isPity) {
+        msgEl.textContent = '🔥 ГАРАНТИРОВАННЫЕ ОДИНАКОВЫЕ ЦИФРЫ!';
+        msgEl.style.color = '#ffd21a';
+      } else {
+        msgEl.textContent = result.label;
+        msgEl.style.color = result.color;
+      }
+
+      currentUnconfirmedPlate = {
+        chars: currentPlate.chars.join(''),
+        region: currentPlate.region,
+        type: result.type
+      };
+      
+      document.getElementById('saveNumberBtn').classList.add('show');
+
+      isSpinningDigits = false;
       btn.disabled = false;
       btn.textContent = 'ЦИФРЫ 500К';
 
@@ -3221,7 +3275,7 @@ async function spinChars() {
 }
 
 async function spinRegion() {
-  if (isSpinningChars || isSpinningRegion) return;
+  if (isSpinningLetters || isSpinningDigits || isSpinningRegion) return;
   const cost = 300000;
   if (balance < cost) {
     document.getElementById('numberMessage').textContent = '❌ Недостаточно денег!';
