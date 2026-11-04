@@ -20,7 +20,6 @@
 html,body{height:100%}
 body{
   margin:0;
-  /* Базовый фон остается темным, свечения добавляются через отдельный слой */
   background: #08080a; 
   color:var(--text); font-family:'Segoe UI', Roboto, Arial, sans-serif;
   overflow-anchor:none; min-height:100vh;
@@ -31,7 +30,7 @@ body{
 .bg-lights-container {
   position: fixed;
   top: 0; left: 0; width: 100vw; height: 100vh;
-  z-index: -2; /* Самый задний план */
+  z-index: -2;
   overflow: hidden;
   pointer-events: none;
   background: #08080a;
@@ -73,11 +72,6 @@ body{
 @keyframes pulseOrb {
   0% { opacity: 0.3; }
   100% { opacity: 0.6; }
-}
-
-/* Остальные слои должны быть выше фона */
-header, nav, main, footer, .balance-container, .modal, .profile-modal, .auth-box, .bg-lights-container {
-  /* Уже заданы или не требуют изменений */
 }
 
 [hidden] { display: none !important; }
@@ -160,6 +154,24 @@ header, nav, main, footer, .balance-container, .modal, .profile-modal, .auth-box
 .user-profile-widget:hover { border-color: var(--yellow); }
 .user-avatar-mini { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #1e1e26; border: 2px solid var(--yellow); position: relative; }
 .user-name-mini { font-size: 14px; font-weight: 800; color: #fff; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* УРОВЕНЬ ИГРОКА (КРУЖОК) */
+.user-level-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ffd21a, #ffb800);
+  color: #15130a;
+  font-size: 11px;
+  font-weight: 900;
+  box-shadow: 0 0 10px rgba(255,210,26,0.6);
+  margin-left: 5px;
+  border: 1px solid #fff2a8;
+  vertical-align: middle;
+}
 
 .profile-modal { position: fixed; inset: 0; background: rgba(5,5,8,.9); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 100000; padding: 16px; }
 .profile-box { background: linear-gradient(180deg,#1c1c24,#121217); border: 2px solid var(--stroke-2); border-radius: 20px; padding: 25px; width: 100%; max-width: 450px; position: relative; box-shadow: 0 30px 80px rgba(0,0,0,.9); z-index: 2; }
@@ -926,6 +938,16 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 #noFuelModal .btn-wait:hover {
   filter: brightness(1.1);
 }
+
+/* Стили для отображения последней активности */
+.last-active-text {
+  font-size: 11px;
+  color: var(--yellow-soft);
+  margin-top: 5px;
+  text-align: center;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
 </style>
 </head>
 <body>
@@ -1142,6 +1164,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
     <div class="user-profile-widget" id="userProfileWidget" onclick="openMyProfile()" style="display:none; position:relative;">
       <img id="miniAvatar" class="user-avatar-mini" src="" alt="Ava">
       <span id="miniName" class="user-name-mini">Игрок</span>
+      <span id="miniLevel" class="user-level-badge">1</span>
     </div>
   </div>
 </header>
@@ -1554,7 +1577,7 @@ let balance = 0;
 let income = 0;
 let garageSlots = 5;
 let cars = [];
-let collectionCars = []; // НОВОЕ: Массив ID всех машин, которые когда-либо были у игрока
+let collectionCars = []; 
 let myProfileData = null;
 
 // --- ДАННЫЕ ДЛЯ НОМЕРОВ ---
@@ -1576,12 +1599,11 @@ let selectedPlateIndex = -1;
 const ADMIN_LOGIN_ID = 'Q1wesh';
 
 // --- ЗАДАНИЯ ---
-// Полный пул заданий (используется для рандома при обновлении)
 const ALL_TASK_TEMPLATES = [
   { id: 'open_2_cases', title: 'Откройте 2 кейса', target: 2, reward: 250000 },
   { id: 'sell_car', title: 'Продайте машину', target: 1, reward: 150000 },
   { id: 'win_casino', title: 'Выиграйте в казино', target: 1, reward: 200000 },
-  { id: 'change_avatar', title: 'Измените аватарку', target: 1, reward: 150000, oneTime: true }, // Одноразовое
+  { id: 'change_avatar', title: 'Измените аватарку', target: 1, reward: 150000, oneTime: true },
   { id: 'spin_numbers', title: 'Прокрутите номера', target: 1, reward: 1000000 },
   { id: 'get_legendary_car', title: 'Выбейте легендарную машину', target: 1, reward: 1200000 },
   { id: 'get_mythic_car', title: 'Выбейте мифическую машину', target: 1, reward: 1300000 },
@@ -1598,7 +1620,6 @@ const ALL_TASK_TEMPLATES = [
   { id: 'put_plate', title: 'Установить номерной знак на машину', target: 1, reward: 3000000 }
 ];
 
-// Базовые задания для новичка (8 штук)
 const STARTER_TASK_IDS = [
   'open_2_cases',
   'change_avatar',
@@ -1613,17 +1634,17 @@ const STARTER_TASK_IDS = [
 let tasksData = [];
 let tasksResetTime = 0;
 let taskTimerInterval = null;
-let playTimeCounter = 0; // Счетчик для задания "Отыграть 30 минут"
+let playTimeCounter = 0; 
 
 // --- КОНТЕЙНЕРЫ ---
-const CONTAINER_PRICE = 3500000; 
+const CONTAINER_PRICE = 10000000; // ИЗМЕНЕНО: 10 000 000
 let containerTimerInterval = null;
 let containerEndTime = 0;
 const CONTAINER_COLORS = ['red', 'green', 'blue'];
 
 // --- КОЛЛЕКЦИЯ ---
-let collectionFilter = 'all'; // 'all', 'collected', 'missing'
-let collectionBonusApplied = false; // Флаг, чтобы не начислять бонус дважды
+let collectionFilter = 'all';
+let collectionBonusApplied = false;
 
 // ================= АВТОРИЗАЦИЯ =================
 function toggleAuthMode() {
@@ -1671,14 +1692,27 @@ function logout() {
   window.location.reload();
 }
 
+// ================= ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ УРОВНЯ =================
+// Формула: уровень = floor(sqrt(опыт / 100)) + 1 (примерная)
+// Для простоты: уровень = floor(опыт / 100) + 1 (каждые 100 опыта = 1 уровень)
+function getPlayerLevel(xp) {
+  if (!xp || xp < 100) return 1;
+  return Math.floor(xp / 100) + 1;
+}
+
+function addExperience(amount) {
+  if (!myProfileData) return;
+  myProfileData.gameData.xp = (myProfileData.gameData.xp || 0) + amount;
+  updateProfileUIFromServer(myProfileData);
+  scheduleSave();
+}
+
 function applyServerUser(user) {
   myProfileData = user;
   balance = user.gameData.balance;
   income = user.gameData.income;
   garageSlots = user.gameData.garageSlots;
   cars = user.gameData.cars || [];
-  
-  // Загрузка коллекции
   collectionCars = user.gameData.collectionCars || [];
 
   myNumbers = user.gameData.myNumbers || [];
@@ -1689,36 +1723,26 @@ function applyServerUser(user) {
   const now = Date.now();
   let needSaveTasks = false;
 
-  // Проверка на обновление заданий (рандомизация)
   if (!user.gameData.tasksData || !user.gameData.tasksResetTime || user.gameData.tasksResetTime < now) {
     if (!user.gameData.tasksData) {
-        // Первый запуск (новичок) - даем 8 базовых + 2 случайных
         let starterTasks = STARTER_TASK_IDS.map(id => {
             const t = ALL_TASK_TEMPLATES.find(tmpl => tmpl.id === id);
             return { id: t.id, progress: 0, claimed: false };
         });
-
-        // Добавляем 2 случайных из оставшихся
         const availableForRandom = ALL_TASK_TEMPLATES.filter(t => !STARTER_TASK_IDS.includes(t.id) && !t.oneTime);
         const shuffled = [...availableForRandom].sort(() => 0.5 - Math.random());
         const randomTasks = shuffled.slice(0, 2).map(t => ({ id: t.id, progress: 0, claimed: false }));
-
         tasksData = [...starterTasks, ...randomTasks];
     } else {
-        // Обычное обновление - 10 случайных заданий, исключая одноразовые, если они уже выполнены
         const completedOneTime = user.gameData.tasksData.filter(t => t.claimed && ALL_TASK_TEMPLATES.find(tmpl => tmpl.id === t.id && tmpl.oneTime)).map(t => t.id);
-        
         const availableTasks = ALL_TASK_TEMPLATES.filter(t => {
             if (completedOneTime.includes(t.id)) return false;
             return true;
         });
-
         const shuffled = [...availableTasks].sort(() => 0.5 - Math.random());
         const selectedTasks = shuffled.slice(0, 10);
-        
         tasksData = selectedTasks.map(t => ({ id: t.id, progress: 0, claimed: false }));
     }
-    
     tasksResetTime = now + 5 * 60 * 60 * 1000; 
     needSaveTasks = true;
   } else {
@@ -1742,8 +1766,6 @@ function applyServerUser(user) {
   renderTasks(); 
   updateTaskBadge(); 
   update();
-  
-  // Проверка коллекции при загрузке
   checkCollectionBonus();
 
   if (needSaveTasks) scheduleSave();
@@ -1758,6 +1780,12 @@ function updateProfileUIFromServer(user) {
   document.getElementById("miniName").textContent = p.name || currentUser;
   const defaultAvatar = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%231e1e26' width='100' height='100'/><text x='50' y='50' font-size='50' text-anchor='middle' dominant-baseline='central' fill='%23ffd21a'>👤</text></svg>";
   document.getElementById("miniAvatar").src = p.avatar || defaultAvatar;
+  
+  // Обновляем уровень
+  const xp = user.gameData.xp || 0;
+  const level = getPlayerLevel(xp);
+  const levelBadge = document.getElementById("miniLevel");
+  if (levelBadge) levelBadge.textContent = level;
 }
 
 // ================= ИГРОВОЙ ЦИКЛ =================
@@ -1773,14 +1801,12 @@ function startGameLoop() {
       scheduleSave();
       updateTaskTimer();
       
-      // Задание "Отыграть 30 минут" (проверка раз в секунду)
       playTimeCounter++;
-      if (playTimeCounter >= 60) { // Раз в минуту
+      if (playTimeCounter >= 60) { 
           playTimeCounter = 0;
           updateTaskProgress('play_30_min', 1);
       }
 
-      // Обновление таймера в окне "Нет топлива"
       if (!document.getElementById('noFuelModal').hidden) {
           updateNoFuelTimer();
       }
@@ -1883,7 +1909,8 @@ function scheduleSave() {
             pityLetters: pityLetters,
             pityDigits: pityDigits,
             collectionBonusApplied: collectionBonusApplied,
-            collectionCars: collectionCars // СОХРАНЯЕМ КОЛЛЕКЦИЮ
+            collectionCars: collectionCars,
+            xp: myProfileData ? (myProfileData.gameData.xp || 0) : 0 // Сохраняем опыт
           }
         })
       });
@@ -2088,7 +2115,7 @@ const CASE_RARITY_CHANCES = {
  mythical:    [0,     37.8,  53.9,  7.36,  0.92,  0.02,  0],
  exclusive:   [0,     0,     67,    27.4,  5.47,  0.17,  0],
  secret:      [0,     0,     12.5,  69.4,  17.7,  0.44,  0],
- divine:      [0,     0,     0,     67,    27.4,  5.47,  0.95] // ИСПРАВЛЕНО: 0.95% для Божественной
+ divine:      [0,     0,     0,     67,    27.4,  5.47,  0.95]
 };
 
 const CASE_TYPES={
@@ -2103,7 +2130,6 @@ const CASE_TYPES={
 
 const CASE_RARITIES=["Обычная","Необычная","Редкая","Эпическая","Легендарная","Мифическая","Божественная"];
 
-// ================= НОВАЯ КОНФИГУРАЦИЯ ПУЛОВ КЕЙСОВ =================
 const CASE_POOL_CONFIG = {
   rusty:       { "Обычная": 5, "Необычная": 18, "Эпическая": 19 },
   electronic:  { "Обычная": 9, "Редкая": 18, "Эпическая": 20, "Легендарная": 21 },
@@ -2116,27 +2142,19 @@ const CASE_POOL_CONFIG = {
 
 function buildPools() {
   const pools = {};
-  
   Object.keys(CASE_TYPES).forEach(caseKey => {
     pools[caseKey] = {};
     const config = CASE_POOL_CONFIG[caseKey] || {};
-    
     Object.keys(config).forEach(rarity => {
       const countNeeded = config[rarity];
       const allCarsOfRarity = catalog.filter(c => c.rarity === rarity);
-      
       const shuffled = allCarsOfRarity.sort(() => 0.5 - Math.random());
       const selectedCars = shuffled.slice(0, Math.min(countNeeded, allCarsOfRarity.length));
-      
       if (selectedCars.length > 0) {
-        pools[caseKey][rarity] = selectedCars.map(car => ({
-          id: car.id,
-          weight: 1
-        }));
+        pools[caseKey][rarity] = selectedCars.map(car => ({ id: car.id, weight: 1 }));
       }
     });
   });
-  
   return pools;
 }
 const CASE_POOLS = buildPools();
@@ -2148,10 +2166,9 @@ function getRate(){
   return sum+(item?item.income:0);
  },0);
  
- // Бонус за коллекцию
  let bonus = 1;
  if (collectionBonusApplied) {
-   bonus = 1.02; // +2%
+   bonus = 1.02;
  }
  
  return carIncome * bonus;
@@ -2255,7 +2272,7 @@ function renderGarage(){
           renderGarage();
           scheduleSave();
           showToastNotification('✅ Номер надет!', `Номер <span>${plate.chars} | ${plate.region}</span> установлен на ${item.name}`);
-          updateTaskProgress('put_plate', 1); // Задание
+          updateTaskProgress('put_plate', 1);
           return;
         }
         toggleCarDetails(originalIndex, card);
@@ -2294,15 +2311,21 @@ function renderGarage(){
       card.prepend(lock);
     }
 
-    // Исправление бага с раскрытием всех карточек
-    // Мы применяем класс expanded только к той карточке, чей индекс в expandedCars
+    // ИСПРАВЛЕНИЕ: Применяем класс expanded только к текущей карточке
+    if (isExpanded) {
+        card.classList.add("expanded");
+    } else {
+        card.classList.remove("expanded");
+    }
+
     card.className = "car"+
       (isDivine?" rarity-rainbow":" rarity-glow")+
       (selectMode && !car.locked ? " selectable":"")+
       (isSelected ? " selected":"")+
-      (car.locked ? " locked":"")+
-      (isExpanded ? " expanded":""); // Только эта карточка получит класс expanded
+      (car.locked ? " locked":"");
     
+    if (isExpanded) card.classList.add("expanded"); // Восстанавливаем, так как className перезаписал
+
     card.style.setProperty("--rarity-color",color);
 
     const lockBtn = card.querySelector('.car-lock-corner');
@@ -2517,7 +2540,7 @@ function openPlateSelectForCar(carIndex) {
       scheduleSave();
       closePlateSelectModal();
       showToastNotification('✅ Номер надет!', `Номер <span>${num.chars} | ${num.region}</span> установлен на машину.`);
-      updateTaskProgress('put_plate', 1); // Задание
+      updateTaskProgress('put_plate', 1);
     };
     list.appendChild(el);
   });
@@ -2601,7 +2624,10 @@ function confirmSell(){
     closeSellModal();
     if (cars.length === 0) selectMode = false;
     renderGarage();
-    if(unlocked.length > 0) updateTaskProgress('sell_car', unlocked.length);
+    if(unlocked.length > 0) {
+        updateTaskProgress('sell_car', unlocked.length);
+        addExperience(unlocked.length * 5); // Опыт за продажу
+    }
     return;
   }
 
@@ -2619,7 +2645,10 @@ function confirmSell(){
   closeSellModal();
   if(cars.length===0)selectMode=false;
   renderGarage();
-  if(valid.length > 0) updateTaskProgress('sell_car', valid.length);
+  if(valid.length > 0) {
+      updateTaskProgress('sell_car', valid.length);
+      addExperience(valid.length * 5); // Опыт за продажу
+  }
 }
 
 function collectMoney(){
@@ -2818,6 +2847,7 @@ async function buyCase(){
  balance-=totalPrice;
  triggerBalanceAnimation(totalPrice, false);
  rouletteRunning=true;
+ addExperience(quantity * 10); // Опыт за кейсы
 
  const button=document.getElementById("caseButton");
  button.disabled=true;
@@ -2838,7 +2868,6 @@ async function buyCase(){
  const skip=document.getElementById("skipAnimation").checked;
 
  updateTaskProgress('open_2_cases', quantity);
- // Новые задания на открытие кейсов
  if (selectedCaseType === 'rusty') updateTaskProgress('open_3_rusty', quantity);
  if (selectedCaseType === 'electronic') updateTaskProgress('open_2_electronic', quantity);
  if (selectedCaseType === 'elite') updateTaskProgress('open_3_elite', quantity);
@@ -2846,7 +2875,6 @@ async function buyCase(){
  if(skip){
   winners.forEach((winner,index)=>{
    cars.push({id:winner.id, plate: null});
-   // ДОБАВЛЯЕМ В КОЛЛЕКЦИЮ
    if (!collectionCars.includes(winner.id)) {
      collectionCars.push(winner.id);
    }
@@ -2881,7 +2909,6 @@ async function buyCase(){
  const animations = roulettes.map((r, idx) => animateRoulette(r).then(() => {
    const winner = winners[idx];
    cars.push({ id: winner.id, plate: null });
-   // ДОБАВЛЯЕМ В КОЛЛЕКЦИЮ
    if (!collectionCars.includes(winner.id)) {
      collectionCars.push(winner.id);
    }
@@ -2951,7 +2978,10 @@ function sellDroppedCars() {
 
   renderGarage();
   update();
-  if(count > 0) updateTaskProgress('sell_car', count);
+  if(count > 0) {
+      updateTaskProgress('sell_car', count);
+      addExperience(count * 5);
+  }
 }
 
 // ================= ПРОФИЛЬ =================
@@ -2978,7 +3008,6 @@ async function openMyProfile() {
     document.getElementById("profileActions").style.display = "flex";
     document.getElementById("adminPanelBtnWrap").style.display = (currentUser === ADMIN_LOGIN_ID) ? "block" : "none";
     
-    // Скрываем гараж в своем профиле (он есть во вкладке Гараж)
     document.getElementById("viewProfileGarage").hidden = true;
 
     document.getElementById("profileModal").hidden = false;
@@ -3042,6 +3071,7 @@ async function saveProfile() {
     if (newAvatar.startsWith('data:') && newAvatar !== myProfileData.profile.avatar) {
       updateTaskProgress('change_avatar', 1);
       myProfileData.profile.avatar = newAvatar;
+      addExperience(10);
     }
   } catch (e) { console.error(e); }
 }
@@ -3066,6 +3096,21 @@ async function viewPlayerProfile(login) {
     document.getElementById("profileNameInput").value = p.name || login;
     document.getElementById("profileBioInput").value = p.bio || "Описание отсутствует...";
     document.getElementById("profileIdDisplay").textContent = user.playerId;
+
+    // Показываем точное время последней активности
+    const lastTime = user.gameData.lastTime || Date.now();
+    const date = new Date(lastTime);
+    const formattedTime = date.toLocaleString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    // Добавляем блок с временем в описание или отдельно
+    const bioInput = document.getElementById("profileBioInput");
+    bioInput.value = (p.bio || "Описание отсутствует...") + `\n\nПоследняя активность: ${formattedTime}`;
 
     // Блокируем поля и скрываем действия
     document.getElementById("profileNameInput").disabled = true;
@@ -3568,6 +3613,7 @@ async function spinLetters() {
       btn.textContent = 'БУКВЫ 400К';
 
       updateTaskProgress('spin_numbers', 1);
+      addExperience(2);
 
       if (result.type === 'exclusive' || result.type === 'legendary' || isPity) {
         showRareNumberModal(currentUnconfirmedPlate, () => {});
@@ -3673,6 +3719,7 @@ async function spinDigits() {
       btn.textContent = 'ЦИФРЫ 500К';
 
       updateTaskProgress('spin_numbers', 1);
+      addExperience(2);
 
       if (result.type === 'exclusive' || result.type === 'legendary' || isPity) {
         showRareNumberModal(currentUnconfirmedPlate, () => {});
@@ -3752,6 +3799,7 @@ async function spinRegion() {
       btn.textContent = 'РЕГИОН 300К';
 
       updateTaskProgress('spin_numbers', 1);
+      addExperience(2);
 
       if (result.type === 'exclusive' || result.type === 'legendary') {
         showRareNumberModal(currentUnconfirmedPlate, () => {});
@@ -3996,12 +4044,10 @@ function renderContainers() {
 function openContainer(element, color) {
   if (element.classList.contains('opened')) return;
   
-  // --- ИСПРАВЛЕНИЕ БАГА: ПРОВЕРКА НА СВОБОДНЫЕ МЕСТА ---
   if (cars.length >= garageSlots) {
     showToastNotification('❌ Гараж переполнен!', `У вас нет свободных мест. Продайте машины или купите новую ячейку.`);
     return; 
   }
-  // -----------------------------------------------------
 
   if (balance < CONTAINER_PRICE) {
     showToastNotification('❌ Недостаточно средств', `Для открытия нужно <span>${CONTAINER_PRICE.toLocaleString('ru-RU')} ₽</span>`);
@@ -4011,6 +4057,7 @@ function openContainer(element, color) {
   balance -= CONTAINER_PRICE;
   triggerBalanceAnimation(CONTAINER_PRICE, false);
   update();
+  addExperience(50); // Опыт за контейнер
 
   element.classList.add('opened');
   const img = element.querySelector('img');
@@ -4022,11 +4069,10 @@ function openContainer(element, color) {
   const roll = Math.random();
   let winCar = null;
 
-  updateTaskProgress('open_container', 1); // Новое задание
+  updateTaskProgress('open_container', 1); 
 
   if (roll < 0.25) {
-    // Пусто
-    updateTaskProgress('open_empty_container', 1); // Новое задание
+    updateTaskProgress('open_empty_container', 1); 
   } else if (roll < 0.65) {
     const epics = catalog.filter(c => c.rarity === 'Эпическая' && c.price < 25000000);
     winCar = epics[Math.floor(Math.random() * epics.length)];
@@ -4049,7 +4095,6 @@ function openContainer(element, color) {
   setTimeout(() => {
     if (winCar) {
       cars.push({ id: winCar.id, plate: null });
-      // ДОБАВЛЯЕМ В КОЛЛЕКЦИЮ
       if (!collectionCars.includes(winCar.id)) {
         collectionCars.push(winCar.id);
       }
@@ -4125,6 +4170,7 @@ function playRoulette() {
   const bet = getBet("roulette");
   if (balance < bet) { alert("Недостаточно денег!"); return; }
   balance -= bet; triggerBalanceAnimation(bet, false); update();
+  addExperience(1);
   const visual = document.getElementById("roulette-visual");
   const resultEl = document.getElementById("roulette-result");
   resultEl.textContent = "Крутится..."; resultEl.style.color = "var(--yellow-soft)";
@@ -4141,6 +4187,7 @@ function playRoulette() {
         resultEl.textContent = `Победа! +${winAmount.toLocaleString("ru-RU")} ₽`; resultEl.style.color = "var(--green)";
         visual.innerHTML = '<div class="visual-text" style="color:var(--green)">💎</div>';
         updateTaskProgress('win_casino', 1); 
+        addExperience(10);
       } else {
         resultEl.textContent = `Проигрыш. -${bet.toLocaleString("ru-RU")} ₽`; resultEl.style.color = "var(--red)";
         visual.innerHTML = '<div class="visual-text" style="color:var(--red)">💀</div>';
@@ -4155,6 +4202,7 @@ function playDice() {
   const bet = getBet("dice");
   if (balance < bet) { alert("Недостаточно денег!"); return; }
   balance -= bet; triggerBalanceAnimation(bet, false); update();
+  addExperience(1);
   const d1 = document.getElementById("dice-1"); const d2 = document.getElementById("dice-2");
   const resultEl = document.getElementById("dice-result");
   resultEl.textContent = "Бросаем..."; resultEl.style.color = "var(--yellow-soft)";
@@ -4174,6 +4222,7 @@ function playDice() {
         balance += bet * 2; triggerBalanceAnimation(bet * 2, true);
         resultEl.textContent = `Выпало ${sum}. Победа! +${(bet*2).toLocaleString("ru-RU")} ₽`; resultEl.style.color = "var(--green)";
         updateTaskProgress('win_casino', 1); 
+        addExperience(10);
       } else {
         resultEl.textContent = `Выпало ${sum}. Проигрыш.`; resultEl.style.color = "var(--red)";
         updateTaskProgress('lose_casino', 1); 
@@ -4236,6 +4285,7 @@ function startBlackjack() {
     balance -= bet;
     triggerBalanceAnimation(bet, false);
     update();
+    addExperience(1);
 
     bjDeck = createDeck();
     bjPlayerHand = [bjDeck.pop(), bjDeck.pop()];
@@ -4296,6 +4346,7 @@ function endBlackjack(win, message) {
         triggerBalanceAnimation(bet * 2, true);
         resultEl.style.color = 'var(--green)';
         updateTaskProgress('win_casino', 1); 
+        addExperience(10);
     } else if (win === null) {
         balance += bet;
         triggerBalanceAnimation(bet, true);
@@ -4338,7 +4389,6 @@ function renderRaceCarsGrid() {
   const grid = document.getElementById('raceCarsGrid');
   if (!grid) return;
   
-  // Сохраняем текущий выбор перед перерисовкой
   const currentSelectedId = selectedPlayerCar ? selectedPlayerCar.id : null;
   
   grid.innerHTML = '';
@@ -4364,7 +4414,6 @@ function renderRaceCarsGrid() {
     return;
   }
 
-  // Восстанавливаем выбор или берем первую
   if (currentSelectedId && topCars.some(c => c.id === currentSelectedId)) {
     selectedPlayerCar = topCars.find(c => c.id === currentSelectedId);
   } else {
@@ -4396,7 +4445,6 @@ function renderRaceCarsGrid() {
 }
 
 function initRaces() {
-  // Очищаем состояние гонки при входе
   if (raceInterval) { clearInterval(raceInterval); raceInterval = null; }
   if (botGoTimeout) clearTimeout(botGoTimeout);
   if (greenLightTimeout) clearTimeout(greenLightTimeout);
@@ -4573,7 +4621,6 @@ function closeRaceDetail() {
   if (botGoTimeout) clearTimeout(botGoTimeout);
   if (greenLightTimeout) clearTimeout(greenLightTimeout);
   
-  // Перерисовываем только если мы вернулись на главный экран
   renderRaceCarsGrid();
   renderRaceSlots();
 }
@@ -4591,7 +4638,7 @@ function startRaceSequence() {
   }
 
   if (window._lastFuel < 1) {
-    showNoFuelModal(); // Вызываем красивое окно
+    showNoFuelModal();
     return;
   }
   window._lastFuel -= 1;
@@ -4602,6 +4649,7 @@ function startRaceSequence() {
   balance -= currentRaceData.cost;
   triggerBalanceAnimation(currentRaceData.cost, false);
   update();
+  addExperience(5);
 
   raceState = 'starting';
   playerGoPressed = false;
@@ -4717,11 +4765,13 @@ function startMovement() {
         bLane.classList.add("lose-active");
         endRace(true, "🏆 Вы победили! Выигрыш: " + currentRaceData.reward.toLocaleString("ru-RU") + " ₽");
         updateTaskProgress('win_race', 1); 
+        addExperience(20);
       } else {
         pLane.classList.add("lose-active");
         bLane.classList.add("win-active");
         endRace(false, "Вы проиграли гонку.");
-        updateTaskProgress('lose_race', 1); // Новое задание
+        updateTaskProgress('lose_race', 1); 
+        addExperience(5);
       }
 
       const oppId = currentRaceOpp.id;
@@ -4756,7 +4806,6 @@ function renderTasks() {
 
   const now = Date.now();
   if (now > tasksResetTime) {
-    // Обычное обновление - 10 случайных заданий, исключая одноразовые, если они уже выполнены
     const completedOneTime = tasksData.filter(t => t.claimed && ALL_TASK_TEMPLATES.find(tmpl => tmpl.id === t.id && tmpl.oneTime)).map(t => t.id);
     
     const availableTasks = ALL_TASK_TEMPLATES.filter(t => {
@@ -4875,6 +4924,7 @@ function claimTaskReward(taskId) {
   update();
   renderTasks();
   scheduleSave();
+  addExperience(15);
 
   showToastNotification(
     '✅ Награда получена!',
@@ -4911,7 +4961,6 @@ function renderCollection() {
   grid.innerHTML = '';
   statsContainer.innerHTML = '';
 
-  // Используем collectionCars для проверки
   const ownedCarIds = new Set(collectionCars);
 
   const rarities = ["Обычная", "Необычная", "Редкая", "Эпическая", "Легендарная", "Мифическая", "Божественная"];
@@ -4924,7 +4973,6 @@ function renderCollection() {
     
     const color = getRarityColor(rarity);
 
-    // Отрисовка прогресс-бара редкости
     const statEl = document.createElement('div');
     statEl.className = 'collection-rarity-stat' + (isCompleted ? ' completed' : '');
     const percent = totalOfRarity > 0 ? (collectedOfRarity / totalOfRarity) * 100 : 0;
@@ -4938,7 +4986,6 @@ function renderCollection() {
     `;
     statsContainer.appendChild(statEl);
 
-    // Фильтрация карточек для отрисовки
     carsOfRarity.forEach(car => {
       const isCollected = ownedCarIds.has(car.id);
       
@@ -4949,7 +4996,6 @@ function renderCollection() {
       card.className = `collection-card ${isCollected ? 'collected' : 'missing'}`;
       card.style.setProperty('--rarity-color', color);
       
-      // Задержка для анимации появления
       const delay = Math.random() * 0.2;
       card.style.animationDelay = `${delay}s`;
 
@@ -4975,14 +5021,12 @@ function renderCollection() {
     });
   });
 
-  // Проверка на бонус
   checkCollectionBonus();
 }
 
 function filterCollection(type, btn) {
   collectionFilter = type;
   
-  // Обновляем активную кнопку
   const buttons = btn.parentElement.querySelectorAll('.select-mode-btn');
   buttons.forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -5010,7 +5054,6 @@ function checkCollectionBonus() {
   if (allCompleted) {
     collectionBonusApplied = true;
     
-    // Применяем бонус +2% к доходу
     window._collectionBonus = 1.02; 
     
     showToastNotification(
@@ -5039,7 +5082,6 @@ window.addEventListener('load', async () => {
     const user = await res.json();
     currentUser = active;
     
-    // Восстанавливаем флаг бонуса коллекции
     if (user.gameData.collectionBonusApplied) {
       collectionBonusApplied = true;
       window._collectionBonus = 1.02;
