@@ -148,9 +148,10 @@ body{
 .fuel-count { color: var(--green); }
 .fuel-count.low { color: var(--red); animation: pulseRed 1s infinite; }
 
-header{ padding: 16px 24px; background: linear-gradient(180deg, #0e0e12 0%, #0b0b0f 100%); border-bottom: 1px solid var(--stroke); position: relative; overflow: hidden; display: flex; justify-content: flex-start; align-items: center; min-height: 80px; }
+/* ИСПРАВЛЕНИЕ ШАПКИ ДЛЯ МОБИЛЬНЫХ */
+header{ padding: 16px 24px; background: linear-gradient(180deg, #0e0e12 0%, #0b0b0f 100%); border-bottom: 1px solid var(--stroke); position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; min-height: 80px; gap: 15px; }
 header:before{ content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(600px 160px at 10% 0%, rgba(255,210,26,.15), transparent 70%); pointer-events: none; }
-.header-content { position: relative; z-index: 2; display: flex; flex-direction: row; align-items: center; gap: 20px; width: 100%; }
+.header-content { position: relative; z-index: 2; display: flex; flex-direction: row; align-items: center; gap: 20px; }
 .logo-wrapper { position: relative; display: flex; align-items: center; justify-content: center; padding: 0 10px; }
 .header-logo { max-width: 130px; height: auto; display: block; cursor: pointer; animation: logoFloat 3.5s ease-in-out infinite, logoGlow 2.5s ease-in-out infinite alternate; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s ease; filter: drop-shadow(0 0 10px rgba(255, 210, 26, 0.5)); }
 .header-logo:hover { transform: scale(1.08) rotate(-3deg); filter: drop-shadow(0 0 25px rgba(255, 210, 26, 0.9)); }
@@ -158,6 +159,26 @@ header:before{ content: ""; position: absolute; top: 0; left: 0; right: 0; botto
 @keyframes logoGlow { 0% { filter: drop-shadow(0 0 8px rgba(255, 210, 26, 0.4)); } 100% { filter: drop-shadow(0 0 25px rgba(255, 210, 26, 0.9)); } }
 .header-fallback-text { margin: 0; font-size: clamp(18px, 2.5vw, 26px); font-weight: 900; letter-spacing: 1.5px; background: linear-gradient(180deg, #fff7c2 0%, #ffd21a 45%, #ffb800 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 24px rgba(255,210,26,.25); animation: logoGlow 2.5s ease-in-out infinite alternate; }
 .header-content p { color: var(--muted); margin: 0; font-size: 14px; letter-spacing: 0.5px; text-transform: uppercase; font-weight: 700; opacity: 0.8; border-left: 2px solid var(--yellow); padding-left: 15px; }
+
+.header-widgets { display: flex; align-items: center; gap: 15px; position: relative; z-index: 100; }
+
+@media (max-width: 768px) {
+  header { padding: 12px 16px; flex-direction: column; align-items: center; gap: 10px; min-height: auto; }
+  .header-content { flex-direction: column; gap: 10px; text-align: center; width: 100%; }
+  .header-content p { border-left: none; border-top: 1px solid var(--yellow); padding-left: 0; padding-top: 5px; font-size: 12px; }
+  .header-logo { max-width: 100px; }
+  .header-widgets { width: 100%; justify-content: center; margin-top: 5px; }
+  .fuel-widget { padding: 4px 10px; font-size: 12px; }
+  .user-profile-widget { padding: 4px 10px 4px 4px; }
+  .user-avatar-mini { width: 32px; height: 32px; }
+  .user-name-mini { font-size: 12px; max-width: 80px; }
+  .plate-digit { font-size: 42px; width: 32px; }
+  .plate-region { font-size: 24px; }
+  .plate { padding: 8px 12px; }
+  .plate-divider { height: 40px; margin: 0 8px; }
+  nav { gap: 5px; padding: 10px 5px; }
+  nav button { padding: 8px 10px; font-size: 11px; }
+}
 
 .balance-container { position: relative; max-width: 920px; margin: 12px auto 0; width: calc(100% - 24px); }
 .balance{ text-align:center; padding:12px 16px; background:linear-gradient(180deg, rgba(255,210,26,.10), rgba(255,210,26,.03)); border:1px solid rgba(255,210,26,.28); border-radius:14px; color:var(--yellow-soft); font-size:18px; font-weight:800; letter-spacing:.5px; box-shadow:0 0 30px rgba(255,210,26,.10) inset, 0 8px 24px rgba(0,0,0,.5); transition: color 0.3s, border-color 0.3s; }
@@ -311,7 +332,7 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .roulette-list::-webkit-scrollbar{width:8px}
 .roulette-list::-webkit-scrollbar-thumb{background:#2c2c38;border-radius:4px}
 .roulette-row{ margin:12px 0;padding:14px 14px 12px; background: linear-gradient(180deg, rgba(255,210,26,.08), rgba(255,210,26,0) 40%) padding-box, linear-gradient(180deg,#1c1c24,#111116) padding-box; border:1px solid var(--stroke-2); border-radius:16px; box-shadow:0 14px 40px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.03); position:relative; overflow:hidden; }
-.roulette-row:before{ content:""; position:absolute;top:0;left:0;right:0;height:1px; background:linear-gradient(90deg, transparent, rgba(255,210,26,.55), transparent); }
+.roulette-row:before{ content:"";position:absolute;top:0;left:0;right:0;height:1px; background:linear-gradient(90deg, transparent, rgba(255,210,26,.55), transparent); }
 .roulette-header{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
 .roulette-title{ display:inline-flex; align-items:center; gap:10px; padding:7px 14px 7px 8px; border-radius:999px; background:linear-gradient(180deg, rgba(255,210,26,.18), rgba(255,210,26,.04)); border:1px solid rgba(255,210,26,.4); box-shadow:0 0 0 1px rgba(255,210,26,.10), 0 6px 18px rgba(255,210,26,.10); }
 .roulette-title .icon{ width:26px;height:26px;border-radius:50%; display:inline-flex;align-items:center;justify-content:center; background:linear-gradient(180deg,#ffd21a,#ffb800); color:#15130a; font-size:14px;font-weight:900; box-shadow:0 0 12px rgba(255,210,26,.5); }
@@ -459,10 +480,10 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 
 /* ===== ИСПРАВЛЕНИЕ ДЛЯ ГОНОК (ФИКСИРОВАННЫЕ РАЗМЕРЫ) ===== */
 .race-cars-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 16px; width: 100%; }
-.race-car-card { position: relative; background: linear-gradient(180deg, #1e1e26, #14141a); border: 2px solid var(--stroke-2); border-radius: 12px; padding: 10px 8px; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; overflow: hidden; height: 160px; /* ФИКСИРОВАННАЯ ВЫСОТА */ }
+.race-car-card { position: relative; background: linear-gradient(180deg, #1e1e26, #14141a); border: 2px solid var(--stroke-2); border-radius: 12px; padding: 10px 8px; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; overflow: hidden; height: 160px; }
 .race-car-card:hover { transform: translateY(-3px); border-color: rgba(255,210,26,.55); }
 .race-car-card.selected { border-color: var(--yellow); background: linear-gradient(180deg, rgba(255,210,26,.18), rgba(255,210,26,.04)); box-shadow: 0 0 0 1px var(--yellow), 0 0 20px rgba(255,210,26,.4); }
-.race-car-card .race-car-img { width: 100%; height: 60px; object-fit: contain; background: linear-gradient(180deg, #f4f4f6, #dedee4); border-radius: 8px; margin-bottom: 6px; flex-shrink: 0; /* ФИКСИРУЕМ РАЗМЕР */ }
+.race-car-card .race-car-img { width: 100%; height: 60px; object-fit: contain; background: linear-gradient(180deg, #f4f4f6, #dedee4); border-radius: 8px; margin-bottom: 6px; flex-shrink: 0; }
 .race-car-card .race-car-icon { font-size: 32px; margin-bottom: 6px; flex-shrink: 0; }
 .race-car-card .race-car-name { font-size: 11px; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 26px; }
 .race-car-card .race-car-power { font-size: 11px; color: var(--yellow-soft); font-weight: 700; margin-bottom: 4px; }
@@ -639,7 +660,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   cursor: help;
   animation: cardAppear 0.4s ease-out backwards;
-  height: 140px; /* ФИКСИРОВАННАЯ ВЫСОТА ДЛЯ КАРТОЧЕК КОЛЛЕКЦИИ */
+  height: 140px;
 }
 
 @keyframes cardAppear {
@@ -654,7 +675,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 
 .collection-card .car-img-container {
   width: 100%;
-  height: 70px; /* ФИКСИРОВАННАЯ ВЫСОТА */
+  height: 70px;
   background: linear-gradient(180deg, #f4f4f6, #dedee4);
   border-radius: 8px;
   display: flex;
@@ -689,7 +710,6 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   overflow: hidden;
 }
 
-/* Стили для СОБРАННЫХ машин */
 .collection-card.collected {
   border-color: var(--rarity-color);
   box-shadow: 0 0 15px color-mix(in srgb, var(--rarity-color) 30%, transparent);
@@ -699,7 +719,6 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   text-shadow: 0 0 8px color-mix(in srgb, var(--rarity-color) 50%, transparent);
 }
 
-/* Стили для НЕ СОБРАННЫХ машин */
 .collection-card.missing {
   opacity: 0.6;
   filter: grayscale(1);
@@ -730,7 +749,6 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   filter: drop-shadow(0 0 5px rgba(0,0,0,0.8));
 }
 
-/* Стили для редкости в коллекции */
 .collection-rarity-stat {
   background: linear-gradient(180deg, #1c1c24, #111116);
   border: 1px solid var(--stroke-2);
@@ -956,13 +974,13 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
     </div>
     <p>Создай свою автомобильную империю!</p>
   </div>
-  <div style="display:flex; align-items:center; gap:15px; position:absolute; top:16px; right:24px;">
+  <div class="header-widgets">
     <div class="fuel-widget" id="fuelWidget" style="display:none;">
       <span class="fuel-icon">⛽</span>
       <span class="fuel-count" id="fuelCount">10</span> / 10
       <span id="fuelTimer" style="color:var(--muted); font-size:12px; margin-left:5px;"></span>
     </div>
-    <div class="user-profile-widget" id="userProfileWidget" onclick="openMyProfile()" style="display:none; position:static;">
+    <div class="user-profile-widget" id="userProfileWidget" onclick="openMyProfile()" style="display:none; position:relative;">
       <img id="miniAvatar" class="user-avatar-mini" src="" alt="Ava">
       <span id="miniName" class="user-name-mini">Игрок</span>
     </div>
@@ -1399,6 +1417,7 @@ let selectedPlateIndex = -1;
 const ADMIN_LOGIN_ID = 'Q1wesh';
 
 // --- ЗАДАНИЯ ---
+// Обновленный пул заданий с новыми
 const TASK_TEMPLATES = [
   { id: 'open_2_cases', title: 'Откройте 2 кейса', target: 2, reward: 250000 },
   { id: 'sell_car', title: 'Продайте машину', target: 1, reward: 150000 },
@@ -1409,12 +1428,22 @@ const TASK_TEMPLATES = [
   { id: 'get_mythic_car', title: 'Выбейте мифическую машину', target: 1, reward: 1300000 },
   { id: 'get_divine_car', title: 'Выбейте божественную машину', target: 1, reward: 1400000 },
   { id: 'win_race', title: 'Выиграйте гонку', target: 1, reward: 555000 },
-  { id: 'lose_casino', title: 'Проиграйте в казино', target: 1, reward: 200000 }
+  { id: 'lose_casino', title: 'Проиграйте в казино', target: 1, reward: 200000 },
+  // НОВЫЕ ЗАДАНИЯ
+  { id: 'lose_race', title: 'Проиграть в гонке', target: 1, reward: 200000 },
+  { id: 'open_container', title: 'Открыть контейнер', target: 1, reward: 7000000 },
+  { id: 'open_3_rusty', title: 'Открыть 3 ржавых кейса', target: 3, reward: 300000 },
+  { id: 'open_2_electronic', title: 'Открыть 2 кейса электроника', target: 2, reward: 1000000 },
+  { id: 'open_3_elite', title: 'Открыть 3 кейса элита', target: 3, reward: 4000000 },
+  { id: 'open_empty_container', title: 'Открыть пустой контейнер', target: 1, reward: 4000000 },
+  { id: 'play_30_min', title: 'Отыграть 30 минут', target: 30, reward: 5000000 },
+  { id: 'put_plate', title: 'Установить номерной знак на машину', target: 1, reward: 3000000 }
 ];
 
 let tasksData = [];
 let tasksResetTime = 0;
 let taskTimerInterval = null;
+let playTimeCounter = 0; // Счетчик для задания "Отыграть 30 минут"
 
 // --- КОНТЕЙНЕРЫ ---
 const CONTAINER_PRICE = 3500000; 
@@ -1490,8 +1519,13 @@ function applyServerUser(user) {
   const now = Date.now();
   let needSaveTasks = false;
 
+  // Проверка на обновление заданий (рандомизация)
   if (!user.gameData.tasksData || !user.gameData.tasksResetTime || user.gameData.tasksResetTime < now) {
-    tasksData = TASK_TEMPLATES.map(t => ({ id: t.id, progress: 0, claimed: false }));
+    // Выбираем 5 случайных заданий из пула
+    const shuffled = [...TASK_TEMPLATES].sort(() => 0.5 - Math.random());
+    const selectedTasks = shuffled.slice(0, 5);
+    
+    tasksData = selectedTasks.map(t => ({ id: t.id, progress: 0, claimed: false }));
     tasksResetTime = now + 5 * 60 * 60 * 1000; 
     needSaveTasks = true;
   } else {
@@ -1545,6 +1579,13 @@ function startGameLoop() {
       updateFuelUI();
       scheduleSave();
       updateTaskTimer();
+      
+      // Задание "Отыграть 30 минут" (проверка раз в секунду)
+      playTimeCounter++;
+      if (playTimeCounter >= 60) { // Раз в минуту
+          playTimeCounter = 0;
+          updateTaskProgress('play_30_min', 1);
+      }
     }
   }, 1000);
 }
@@ -1984,6 +2025,7 @@ function renderGarage(){
           renderGarage();
           scheduleSave();
           showToastNotification('✅ Номер надет!', `Номер <span>${plate.chars} | ${plate.region}</span> установлен на ${item.name}`);
+          updateTaskProgress('put_plate', 1); // Задание
           return;
         }
         toggleCarDetails(originalIndex, card);
@@ -2242,6 +2284,7 @@ function openPlateSelectForCar(carIndex) {
       scheduleSave();
       closePlateSelectModal();
       showToastNotification('✅ Номер надет!', `Номер <span>${num.chars} | ${num.region}</span> установлен на машину.`);
+      updateTaskProgress('put_plate', 1); // Задание
     };
     list.appendChild(el);
   });
@@ -2562,6 +2605,10 @@ async function buyCase(){
  const skip=document.getElementById("skipAnimation").checked;
 
  updateTaskProgress('open_2_cases', quantity);
+ // Новые задания на открытие кейсов
+ if (selectedCaseType === 'rusty') updateTaskProgress('open_3_rusty', quantity);
+ if (selectedCaseType === 'electronic') updateTaskProgress('open_2_electronic', quantity);
+ if (selectedCaseType === 'elite') updateTaskProgress('open_3_elite', quantity);
 
  if(skip){
   winners.forEach((winner,index)=>{
@@ -3666,8 +3713,11 @@ function openContainer(element, color) {
   const roll = Math.random();
   let winCar = null;
 
+  updateTaskProgress('open_container', 1); // Новое задание
+
   if (roll < 0.25) {
     // Пусто
+    updateTaskProgress('open_empty_container', 1); // Новое задание
   } else if (roll < 0.65) {
     const epics = catalog.filter(c => c.rarity === 'Эпическая' && c.price < 25000000);
     winCar = epics[Math.floor(Math.random() * epics.length)];
@@ -4362,6 +4412,7 @@ function startMovement() {
         pLane.classList.add("lose-active");
         bLane.classList.add("win-active");
         endRace(false, "Вы проиграли гонку.");
+        updateTaskProgress('lose_race', 1); // Новое задание
       }
 
       const oppId = currentRaceOpp.id;
@@ -4396,7 +4447,11 @@ function renderTasks() {
 
   const now = Date.now();
   if (now > tasksResetTime) {
-    tasksData = TASK_TEMPLATES.map(t => ({ id: t.id, progress: 0, claimed: false }));
+    // Выбираем 5 случайных заданий из пула
+    const shuffled = [...TASK_TEMPLATES].sort(() => 0.5 - Math.random());
+    const selectedTasks = shuffled.slice(0, 5);
+    
+    tasksData = selectedTasks.map(t => ({ id: t.id, progress: 0, claimed: false }));
     tasksResetTime = now + 5 * 60 * 60 * 1000;
     scheduleSave();
   }
