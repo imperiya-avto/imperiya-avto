@@ -1417,19 +1417,18 @@ let selectedPlateIndex = -1;
 const ADMIN_LOGIN_ID = 'Q1wesh';
 
 // --- ЗАДАНИЯ ---
-// Обновленный пул заданий с новыми
-const TASK_TEMPLATES = [
+// Полный пул заданий (используется для рандома при обновлении)
+const ALL_TASK_TEMPLATES = [
   { id: 'open_2_cases', title: 'Откройте 2 кейса', target: 2, reward: 250000 },
   { id: 'sell_car', title: 'Продайте машину', target: 1, reward: 150000 },
   { id: 'win_casino', title: 'Выиграйте в казино', target: 1, reward: 200000 },
-  { id: 'change_avatar', title: 'Измените аватарку', target: 1, reward: 150000 },
+  { id: 'change_avatar', title: 'Измените аватарку', target: 1, reward: 150000, oneTime: true }, // Одноразовое
   { id: 'spin_numbers', title: 'Прокрутите номера', target: 1, reward: 1000000 },
   { id: 'get_legendary_car', title: 'Выбейте легендарную машину', target: 1, reward: 1200000 },
   { id: 'get_mythic_car', title: 'Выбейте мифическую машину', target: 1, reward: 1300000 },
   { id: 'get_divine_car', title: 'Выбейте божественную машину', target: 1, reward: 1400000 },
   { id: 'win_race', title: 'Выиграйте гонку', target: 1, reward: 555000 },
   { id: 'lose_casino', title: 'Проиграйте в казино', target: 1, reward: 200000 },
-  // НОВЫЕ ЗАДАНИЯ
   { id: 'lose_race', title: 'Проиграть в гонке', target: 1, reward: 200000 },
   { id: 'open_container', title: 'Открыть контейнер', target: 1, reward: 7000000 },
   { id: 'open_3_rusty', title: 'Открыть 3 ржавых кейса', target: 3, reward: 300000 },
@@ -1438,6 +1437,18 @@ const TASK_TEMPLATES = [
   { id: 'open_empty_container', title: 'Открыть пустой контейнер', target: 1, reward: 4000000 },
   { id: 'play_30_min', title: 'Отыграть 30 минут', target: 30, reward: 5000000 },
   { id: 'put_plate', title: 'Установить номерной знак на машину', target: 1, reward: 3000000 }
+];
+
+// Базовые задания для новичка (8 штук)
+const STARTER_TASK_IDS = [
+  'open_2_cases',
+  'change_avatar',
+  'sell_car',
+  'win_casino',
+  'lose_casino',
+  'win_race',
+  'lose_race',
+  'get_legendary_car'
 ];
 
 let tasksData = [];
@@ -1521,11 +1532,34 @@ function applyServerUser(user) {
 
   // Проверка на обновление заданий (рандомизация)
   if (!user.gameData.tasksData || !user.gameData.tasksResetTime || user.gameData.tasksResetTime < now) {
-    // Выбираем 5 случайных заданий из пула
-    const shuffled = [...TASK_TEMPLATES].sort(() => 0.5 - Math.random());
-    const selectedTasks = shuffled.slice(0, 5);
+    if (!user.gameData.tasksData) {
+        // Первый запуск (новичок) - даем 8 базовых + 2 случайных
+        let starterTasks = STARTER_TASK_IDS.map(id => {
+            const t = ALL_TASK_TEMPLATES.find(tmpl => tmpl.id === id);
+            return { id: t.id, progress: 0, claimed: false };
+        });
+
+        // Добавляем 2 случайных из оставшихся
+        const availableForRandom = ALL_TASK_TEMPLATES.filter(t => !STARTER_TASK_IDS.includes(t.id) && !t.oneTime);
+        const shuffled = [...availableForRandom].sort(() => 0.5 - Math.random());
+        const randomTasks = shuffled.slice(0, 2).map(t => ({ id: t.id, progress: 0, claimed: false }));
+
+        tasksData = [...starterTasks, ...randomTasks];
+    } else {
+        // Обычное обновление - 10 случайных заданий, исключая одноразовые, если они уже выполнены
+        const completedOneTime = user.gameData.tasksData.filter(t => t.claimed && ALL_TASK_TEMPLATES.find(tmpl => tmpl.id === t.id && tmpl.oneTime)).map(t => t.id);
+        
+        const availableTasks = ALL_TASK_TEMPLATES.filter(t => {
+            if (completedOneTime.includes(t.id)) return false;
+            return true;
+        });
+
+        const shuffled = [...availableTasks].sort(() => 0.5 - Math.random());
+        const selectedTasks = shuffled.slice(0, 10);
+        
+        tasksData = selectedTasks.map(t => ({ id: t.id, progress: 0, claimed: false }));
+    }
     
-    tasksData = selectedTasks.map(t => ({ id: t.id, progress: 0, claimed: false }));
     tasksResetTime = now + 5 * 60 * 60 * 1000; 
     needSaveTasks = true;
   } else {
@@ -4447,9 +4481,16 @@ function renderTasks() {
 
   const now = Date.now();
   if (now > tasksResetTime) {
-    // Выбираем 5 случайных заданий из пула
-    const shuffled = [...TASK_TEMPLATES].sort(() => 0.5 - Math.random());
-    const selectedTasks = shuffled.slice(0, 5);
+    // Обычное обновление - 10 случайных заданий, исключая одноразовые, если они уже выполнены
+    const completedOneTime = tasksData.filter(t => t.claimed && ALL_TASK_TEMPLATES.find(tmpl => tmpl.id === t.id && tmpl.oneTime)).map(t => t.id);
+    
+    const availableTasks = ALL_TASK_TEMPLATES.filter(t => {
+        if (completedOneTime.includes(t.id)) return false;
+        return true;
+    });
+
+    const shuffled = [...availableTasks].sort(() => 0.5 - Math.random());
+    const selectedTasks = shuffled.slice(0, 10);
     
     tasksData = selectedTasks.map(t => ({ id: t.id, progress: 0, claimed: false }));
     tasksResetTime = now + 5 * 60 * 60 * 1000;
@@ -4457,7 +4498,7 @@ function renderTasks() {
   }
 
   tasksData.forEach(task => {
-    const template = TASK_TEMPLATES.find(t => t.id === task.id);
+    const template = ALL_TASK_TEMPLATES.find(t => t.id === task.id);
     if (!template) return;
 
     const completed = task.progress >= template.target;
@@ -4515,7 +4556,7 @@ function updateTaskProgress(taskId, amount) {
   const task = tasksData.find(t => t.id === taskId);
   if (!task || task.claimed) return;
   
-  const template = TASK_TEMPLATES.find(t => t.id === taskId);
+  const template = ALL_TASK_TEMPLATES.find(t => t.id === taskId);
   if (!template) return;
 
   const oldProgress = task.progress;
@@ -4538,7 +4579,7 @@ function updateTaskBadge() {
   const btn = document.getElementById('navTasksBtn');
   if (!btn || !tasksData) return;
   const hasUnclaimed = tasksData.some(t => {
-    const template = TASK_TEMPLATES.find(tmpl => tmpl.id === t.id);
+    const template = ALL_TASK_TEMPLATES.find(tmpl => tmpl.id === t.id);
     return template && t.progress >= template.target && !t.claimed;
   });
   if (hasUnclaimed) {
@@ -4550,7 +4591,7 @@ function updateTaskBadge() {
 
 function claimTaskReward(taskId) {
   const task = tasksData.find(t => t.id === taskId);
-  const template = TASK_TEMPLATES.find(t => t.id === taskId);
+  const template = ALL_TASK_TEMPLATES.find(t => t.id === taskId);
   if (!task || !template || task.claimed || task.progress < template.target) return;
 
   task.claimed = true;
