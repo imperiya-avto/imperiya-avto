@@ -378,6 +378,25 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .car-lock-corner.unlock-car-btn{background:linear-gradient(180deg,#3a3a48,#2a2a34)}
 .car-lock-corner:hover{filter:brightness(1.15);transform:translateY(-1px)}
 
+/* Маленький номерной знак в правом верхнем углу карточки машины */
+.car-plate-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: 'Arial Black', Impact, sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  color: #111;
+  background: #fff;
+  border: 2px solid #222;
+  box-shadow: 0 0 8px currentColor;
+  pointer-events: none;
+  letter-spacing: 0.3px;
+}
+
 .car-income-line{ text-align:center; color:var(--yellow); font-size:14px; font-weight:900; margin-top:8px;margin-bottom:2px; letter-spacing:.3px; text-shadow:0 0 12px rgba(255,210,26,.35); position:relative;z-index:1; }
 .car .car-hint{ color:#6f6f80; font-size:11px; margin-top:4px;text-align:center; position:relative;z-index:1; }
 
@@ -393,6 +412,24 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .car-sell-inline{ display:block;width:100%;margin-top:10px; background:linear-gradient(180deg, #ff4d5e, #c8323f); color:#fff;border:0;border-radius:9px; padding:9px 10px;font-size:12px;font-weight:800; letter-spacing:.3px; box-shadow:0 8px 18px rgba(255,77,94,.28); cursor:pointer;}
 .car-sell-inline:hover{filter:brightness(1.08)}
 .car-sell-inline:active{transform:scale(.98)}
+
+.car-put-plate-btn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  background: linear-gradient(180deg, #4aa8ff, #2978c9);
+  color: #fff;
+  border: 0;
+  border-radius: 9px;
+  padding: 9px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .3px;
+  box-shadow: 0 8px 18px rgba(74,168,255,.28);
+  cursor: pointer;
+}
+.car-put-plate-btn:hover { filter: brightness(1.08); }
+.car-put-plate-btn:active { transform: scale(.98); }
 
 .case-area{text-align:center;padding:8px 3px 18px; position: relative;}
 .case-selected{ margin:6px auto 4px; display:inline-flex; align-items:center; gap:8px; padding:8px 16px; border-radius:999px; background:linear-gradient(180deg, rgba(255,210,26,.14), rgba(255,210,26,.04)); border:1px solid rgba(255,210,26,.35); color:#e8e8f0; font-size:14px; font-weight:600; letter-spacing:.3px; box-shadow:0 0 22px rgba(255,210,26,.12), inset 0 0 10px rgba(255,210,26,.05); }
@@ -889,6 +926,78 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   font-weight: 900;
 }
 
+/* ===== МОДАЛКА ВЫБОРА НОМЕРА ДЛЯ МАШИНЫ ===== */
+.plate-select-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 15px;
+  padding-right: 5px;
+}
+.plate-select-item {
+  background: #fff;
+  color: #111;
+  border-radius: 6px;
+  border: 2px solid #222;
+  padding: 8px 12px;
+  font-family: 'Arial Black', Impact, sans-serif;
+  font-weight: 900;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+.plate-select-item:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 15px var(--yellow);
+}
+.plate-select-item span {
+  border-top: 1px solid #ccc;
+  padding-top: 4px;
+  font-size: 12px;
+  color: #555;
+  width: 100%;
+  text-align: center;
+}
+.plate-select-item.empty-option {
+  background: rgba(0,0,0,0.3);
+  color: var(--muted);
+  border: 2px dashed var(--stroke-2);
+  font-family: inherit;
+  font-size: 13px;
+  justify-content: center;
+}
+
+/* ===== МОДАЛКА ВЫБОРА ДЕЙСТВИЯ С НОМЕРОМ ===== */
+.plate-action-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.plate-action-btn.sell {
+  background: linear-gradient(180deg, #ff4d5e, #c8323f);
+  color: #fff;
+}
+.plate-action-btn.sell:hover { filter: brightness(1.1); }
+.plate-action-btn.put {
+  background: linear-gradient(180deg, #4aa8ff, #2978c9);
+  color: #fff;
+}
+.plate-action-btn.put:hover { filter: brightness(1.1); }
+
 @media(max-width: 600px) {
   .user-profile-widget { top: 10px; right: 10px; padding: 4px 8px 4px 4px; }
   .user-avatar-mini { width: 32px; height: 32px; }
@@ -961,6 +1070,8 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   .numbers-grid { grid-template-columns: 1fr 1fr; }
   .toast-notification { right: 10px; left: 10px; max-width: none; transform: translateY(-200%); }
   .toast-notification.show { transform: translateY(0); }
+  .plate-select-list { grid-template-columns: 1fr; }
+  .car-plate-badge { font-size: 9px; padding: 2px 5px; }
 }
 </style>
 </head>
@@ -1096,6 +1207,30 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
     <div class="rare-plate-preview" id="rareNumberPreview">А 000 АА | 777</div>
     <p style="margin-bottom: 20px;">Вы уверены, что хотите продолжить?<br>Не пропустите такую редкость!</p>
     <button class="rare-btn-continue" onclick="continueAfterRareNumber()">Продолжить</button>
+  </div>
+</div>
+
+<!-- МОДАЛКА ВЫБОРА ДЕЙСТВИЯ С НОМЕРОМ -->
+<div class="modal" id="plateActionModal" hidden style="z-index: 100011;">
+  <div class="modal-box">
+    <h2 id="plateActionTitle">🔢 Номер</h2>
+    <div style="font-size: 22px; font-weight: 900; font-family: 'Arial Black', Impact, sans-serif; margin: 20px 0; background: #fff; color: #111; padding: 10px 20px; border-radius: 8px; border: 2px solid #333; display: inline-block;" id="plateActionPreview">А 000 АА | 777</div>
+    <p id="plateActionDesc" style="color: var(--muted); font-size: 13px; margin-bottom: 20px;"></p>
+    <button class="plate-action-btn sell" onclick="sellNumberFromModal()">💰 Продать</button>
+    <button class="plate-action-btn put" onclick="putNumberFromModal()">🚗 Надеть на машину</button>
+    <button class="cancel-btn" style="width:100%; margin-top:10px; background:linear-gradient(180deg,#3a3a48,#2a2a34); border:0; border-radius:10px; padding:12px; font-weight:800; color:#fff; cursor:pointer;" onclick="closePlateActionModal()">Закрыть</button>
+  </div>
+</div>
+
+<!-- МОДАЛКА ВЫБОРА НОМЕРА ДЛЯ МАШИНЫ -->
+<div class="modal" id="plateSelectModal" hidden style="z-index: 100012;">
+  <div class="modal-box">
+    <h2 id="plateSelectTitle">🚗 Выберите номерной знак</h2>
+    <p id="plateSelectDesc" style="color: var(--muted); font-size: 13px; margin-bottom: 10px;"></p>
+    <div class="plate-select-list" id="plateSelectList">
+      <!-- Сюда рендерятся номера -->
+    </div>
+    <button class="cancel-btn" style="width:100%; margin-top:15px; background:linear-gradient(180deg,#3a3a48,#2a2a34); border:0; border-radius:10px; padding:12px; font-weight:800; color:#fff; cursor:pointer;" onclick="closePlateSelectModal()">Отмена</button>
   </div>
 </div>
 
@@ -1512,6 +1647,10 @@ let pityLetters = 0;
 let pityDigits = 0;
 const PITY_THRESHOLD = 30;
 
+// --- ВЫБОР НОМЕРА ---
+let selectedCarIndexForPlate = -1; // индекс машины, для которой выбираем номер
+let selectedPlateIndex = -1; // индекс номера в myNumbers, который выбрали для действия
+
 const ADMIN_LOGIN_ID = 'Q1wesh';
 
 // --- ЗАДАНИЯ ---
@@ -1612,7 +1751,7 @@ function applyServerUser(user) {
 
   const elapsed = Math.max(0, (Date.now() - (user.gameData.lastTime || Date.now())) / 1000);
   
-  // Пересчет дохода с учетом машин и номеров
+  // Пересчет дохода с учетом машин и номеров (номера больше не дают доход)
   income += elapsed * getRate();
 
   updateProfileUIFromServer(user);
@@ -1975,21 +2114,13 @@ const CASE_POOLS = buildPools();
 
 // ================= ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =================
 function getRate(){
- // Доход от машин
+ // Доход только от машин, номера больше не приносят доход
  const carIncome = cars.reduce((sum,car)=>{
   const item=catalog.find(c=>c.id===car.id);
   return sum+(item?item.income:0);
  },0);
  
- // Доход от номеров (от 50 до 5000 в сек)
- const numberIncome = myNumbers.reduce((sum, num)=>{
-   if (num.type === 'exclusive') return sum + 5000;
-   if (num.type === 'legendary') return sum + 1500;
-   if (num.type === 'rare') return sum + 300;
-   return sum + 50; // common
- },0);
-
- return carIncome + numberIncome;
+ return carIncome;
 }
 
 function getRarityColor(rarity){
@@ -2081,6 +2212,19 @@ function renderGarage(){
        if(!car.locked) toggleCarSelection(originalIndex);
        return;
      }
+     // Если мы ждем клик по машине для надевания номера
+     if (window._pendingPlateForCar) {
+       const plate = window._pendingPlateForCar;
+       // Снимаем номер с других машин
+       cars.forEach(c => { if (c.plate === plate.chars + '|' + plate.region) c.plate = null; });
+       // Надеваем на эту
+       cars[originalIndex].plate = plate.chars + '|' + plate.region;
+       window._pendingPlateForCar = null;
+       renderGarage();
+       scheduleSave();
+       showToastNotification('✅ Номер надет!', `Номер <span>${plate.chars} | ${plate.region}</span> установлен на ${item.name}`);
+       return;
+     }
      toggleCarDetails(originalIndex, card);
    };
 
@@ -2089,6 +2233,21 @@ function renderGarage(){
     mark.className="car-select-mark";
     mark.textContent=isSelected ? "✓" : "";
     card.append(mark);
+   }
+
+   // Если у машины есть номер - показываем его в правом верхнем углу
+   if (car.plate && !selectMode) {
+     const plateData = myNumbers.find(n => (n.chars + '|' + n.region) === car.plate);
+     if (plateData) {
+       const plateColor = getPlateColor(plateData.type);
+       const badge = document.createElement("div");
+       badge.className = "car-plate-badge";
+       badge.style.borderColor = plateColor;
+       badge.style.color = plateColor;
+       badge.style.textShadow = `0 0 6px ${plateColor}`;
+       badge.textContent = plateData.chars;
+       card.append(badge);
+     }
    }
 
    const lock=document.createElement("button");
@@ -2110,14 +2269,32 @@ function renderGarage(){
 
    const details=document.createElement("div");
    details.className="car-details";
+   
+   // Определяем, есть ли номер на машине
+   let plateInfoHtml = "";
+   if (car.plate) {
+     const plateData = myNumbers.find(n => (n.chars + '|' + n.region) === car.plate);
+     if (plateData) {
+       const plateColor = getPlateColor(plateData.type);
+       plateInfoHtml = `<div class="stat-row"><span class="stat-label">🔢 Номер</span> <span class="stat-value" style="color:${plateColor}">${plateData.chars} | ${plateData.region}</span></div>`;
+     }
+   }
+
    details.innerHTML = `
      <div class="car-stats">
        <div class="stat-row"><span class="stat-label">✨ Редкость</span> <span class="stat-value rarity" style="color:${color}">${item.rarity}</span></div>
        <div class="stat-row"><span class="stat-label">⚡ Мощность</span> <span class="stat-value">${item.power} л.с.</span></div>
        <div class="stat-row"><span class="stat-label">💵 Продажа</span> <span class="stat-value" style="color:var(--green)">${Math.floor(item.price*0.15).toLocaleString("ru-RU")} ₽</span></div>
        <div class="stat-row"><span class="stat-label">📈 Доход</span> <span class="stat-value" style="color:var(--yellow)">${item.income.toLocaleString("ru-RU")} ₽/сек</span></div>
+       ${plateInfoHtml}
      </div>
    `;
+
+   const putPlateBtn = document.createElement("button");
+   putPlateBtn.className = "car-put-plate-btn";
+   putPlateBtn.textContent = "🔢 Надеть номерной знак";
+   putPlateBtn.onclick = (e) => { e.stopPropagation(); openPlateSelectForCar(originalIndex); };
+   details.append(putPlateBtn);
 
    const sellBtn=document.createElement("button");
    sellBtn.className="car-sell-inline";
@@ -2149,6 +2326,13 @@ function renderGarage(){
   scheduleSave();
 }
 
+function getPlateColor(type) {
+  if (type === 'rare') return '#00e5ff';
+  if (type === 'legendary') return '#ffd21a';
+  if (type === 'exclusive') return '#ff00cc';
+  return '#3ddc84';
+}
+
 function toggleCarDetails(index, cardEl){
   if(selectMode) return;
   const card = cardEl || document.querySelector('.car[data-car-index="'+index+'"]');
@@ -2163,6 +2347,7 @@ function toggleCarDetails(index, cardEl){
 function toggleSelectMode(){
   selectMode=!selectMode;
   selectedCars=[];
+  window._pendingPlateForCar = null;
   renderGarage();
 }
 
@@ -2218,6 +2403,67 @@ function buyGarageSlot(){
  triggerBalanceAnimation(price, false);
  garageSlots++;
  renderGarage();
+}
+
+// ================= МОДАЛКА ВЫБОРА НОМЕРА ДЛЯ МАШИНЫ =================
+function openPlateSelectForCar(carIndex) {
+  if (carIndex < 0 || carIndex >= cars.length) return;
+  selectedCarIndexForPlate = carIndex;
+  const car = cars[carIndex];
+  const item = catalog.find(c => c.id === car.id);
+  
+  const modal = document.getElementById('plateSelectModal');
+  const list = document.getElementById('plateSelectList');
+  const title = document.getElementById('plateSelectTitle');
+  const desc = document.getElementById('plateSelectDesc');
+  
+  title.textContent = `🔢 Номер для ${item ? item.name : 'машины'}`;
+  desc.textContent = myNumbers.length === 0 ? 'У вас нет номеров. Прокрутите их во вкладке «Номера».' : 'Выберите номер, чтобы надеть его, или снимите текущий.';
+  
+  list.innerHTML = '';
+  
+  // Опция "Снять номер"
+  if (car.plate) {
+    const emptyOption = document.createElement('div');
+    emptyOption.className = 'plate-select-item empty-option';
+    emptyOption.textContent = '❌ Снять номер';
+    emptyOption.onclick = () => {
+      car.plate = null;
+      renderGarage();
+      scheduleSave();
+      closePlateSelectModal();
+      showToastNotification('✅ Номер снят', 'Номерной знак удалён с машины.');
+    };
+    list.appendChild(emptyOption);
+  }
+  
+  myNumbers.forEach(num => {
+    const el = document.createElement('div');
+    el.className = 'plate-select-item';
+    const color = getPlateColor(num.type);
+    el.style.borderColor = color;
+    el.style.boxShadow = `0 0 8px ${color}`;
+    el.innerHTML = `${num.chars} <span>${num.region}</span>`;
+    el.onclick = () => {
+      // Снимаем этот номер со всех остальных машин
+      const key = num.chars + '|' + num.region;
+      cars.forEach(c => { if (c.plate === key) c.plate = null; });
+      // Надеваем на выбранную
+      cars[selectedCarIndexForPlate].plate = key;
+      renderGarage();
+      scheduleSave();
+      closePlateSelectModal();
+      showToastNotification('✅ Номер надет!', `Номер <span>${num.chars} | ${num.region}</span> установлен на машину.`);
+    };
+    list.appendChild(el);
+  });
+  
+  modal.hidden = false;
+}
+
+function closePlateSelectModal() {
+  document.getElementById('plateSelectModal').hidden = true;
+  selectedCarIndexForPlate = -1;
 }
 
 // ================= ПРОДАЖА МАШИН =================
@@ -2533,7 +2779,7 @@ async function buyCase(){
 
  if(skip){
   winners.forEach((winner,index)=>{
-   cars.push({id:winner.id});
+   cars.push({id:winner.id, plate: null});
    lastCarsFromCase.push(winner);
    const row=document.createElement("div");
    row.className="roulette-row";
@@ -2564,7 +2810,7 @@ async function buyCase(){
 
  const animations = roulettes.map((r, idx) => animateRoulette(r).then(() => {
    const winner = winners[idx];
-   cars.push({ id: winner.id });
+   cars.push({ id: winner.id, plate: null });
    lastCarsFromCase.push(winner);
    r.result.textContent = "🎉 " + winner.name + " — " + winner.rarity;
    showCaseDrop(winner);
@@ -2862,6 +3108,11 @@ function openTab(tab,button){
    if (sellBtn) sellBtn.style.display = 'none';
  }
 
+ // Сбрасываем ожидание клика по машине для номера
+ if (tab !== 'garage') {
+   window._pendingPlateForCar = null;
+ }
+
  document.querySelectorAll("main section").forEach(s=>{ s.hidden=true; });
  const section = document.getElementById(tab);
  if (section) section.hidden = false;
@@ -2879,6 +3130,9 @@ function openTab(tab,button){
  }
  if (tab === "tasks") {
    renderTasks();
+ }
+ if (tab === "garage") {
+   renderGarage();
  }
 }
 
@@ -3428,16 +3682,12 @@ function renderMyNumbers() {
     const el = document.createElement('div');
     el.className = 'saved-plate';
     
-    let glowColor = '#3ddc84'; // common
-    if (num.type === 'rare') glowColor = '#00e5ff';
-    if (num.type === 'legendary') glowColor = '#ffd21a';
-    if (num.type === 'exclusive') glowColor = '#ff00cc';
-    
-    el.style.boxShadow = `0 0 10px ${glowColor}`;
-    el.style.borderColor = glowColor;
+    const color = getPlateColor(num.type);
+    el.style.boxShadow = `0 0 10px ${color}`;
+    el.style.borderColor = color;
     
     el.innerHTML = `${num.chars} <span>${num.region}</span>`;
-    el.onclick = () => openSellNumberModal(index);
+    el.onclick = () => openPlateActionModal(index);
     grid.appendChild(el);
   });
 
@@ -3487,42 +3737,43 @@ function buyNumberSlot() {
   scheduleSave();
 }
 
-// ================= ПРОДАЖА НОМЕРА =================
-function openSellNumberModal(index) {
+// ================= ДЕЙСТВИЯ С НОМЕРОМ ИЗ ИНВЕНТАРЯ =================
+function openPlateActionModal(index) {
   const num = myNumbers[index];
   if (!num) return;
+  selectedPlateIndex = index;
+  const modal = document.getElementById('plateActionModal');
+  const title = document.getElementById('plateActionTitle');
+  const preview = document.getElementById('plateActionPreview');
+  const desc = document.getElementById('plateActionDesc');
   
-  sellNumberIndex = index;
+  const typeNames = { common: 'Обычный', rare: 'Редкий', legendary: 'Легендарный', exclusive: 'Эксклюзивный' };
+  const color = getPlateColor(num.type);
   
-  let price = 300000; // common
+  title.textContent = `🔢 ${typeNames[num.type]} номер`;
+  title.style.color = color;
+  preview.textContent = `${num.chars} | ${num.region}`;
+  preview.style.borderColor = color;
+  preview.style.boxShadow = `0 0 15px ${color}`;
+  
+  let price = 300000;
   if (num.type === 'rare') price = 500000;
   if (num.type === 'legendary') price = 1000000;
   if (num.type === 'exclusive') price = 2500000;
   
-  const typeName = {
-    'common': 'Обычный',
-    'rare': 'Редкий',
-    'legendary': 'Легендарный',
-    'exclusive': 'Эксклюзивный'
-  }[num.type];
-
-  document.getElementById('sellNumberModalTitle').textContent = `🔢 Продажа номера`;
-  document.getElementById('sellNumberText').innerHTML = `
-    Вы уверены, что хотите продать номер <b>${num.chars} | ${num.region}</b> (${typeName})?<br><br>
-    Вы получите: <b style="color:var(--green)">${price.toLocaleString('ru-RU')} ₽</b>
-  `;
+  desc.textContent = `Вы можете продать этот номер за ${price.toLocaleString('ru-RU')} ₽ или надеть его на машину.`;
   
-  document.getElementById('sellNumberModal').hidden = false;
+  modal.hidden = false;
 }
 
-function closeSellNumberModal() {
-  document.getElementById('sellNumberModal').hidden = true;
-  sellNumberIndex = -1;
+function closePlateActionModal() {
+  document.getElementById('plateActionModal').hidden = true;
+  selectedPlateIndex = -1;
 }
 
-function confirmSellNumber() {
-  if (sellNumberIndex === -1) return;
-  const num = myNumbers[sellNumberIndex];
+function sellNumberFromModal() {
+  if (selectedPlateIndex === -1) return;
+  const num = myNumbers[selectedPlateIndex];
   if (!num) return;
   
   let price = 300000;
@@ -3533,11 +3784,50 @@ function confirmSellNumber() {
   balance += price;
   triggerBalanceAnimation(price, true);
   
-  myNumbers.splice(sellNumberIndex, 1);
+  // Снимаем номер со всех машин
+  const key = num.chars + '|' + num.region;
+  cars.forEach(c => { if (c.plate === key) c.plate = null; });
+  
+  myNumbers.splice(selectedPlateIndex, 1);
   renderMyNumbers();
+  renderGarage();
   update();
   scheduleSave();
-  closeSellNumberModal();
+  closePlateActionModal();
+  showToastNotification('💰 Номер продан!', `Вы получили <span>${price.toLocaleString('ru-RU')} ₽</span> за номер ${num.chars} | ${num.region}`);
+}
+
+function putNumberFromModal() {
+  if (selectedPlateIndex === -1) return;
+  const num = myNumbers[selectedPlateIndex];
+  if (!num) return;
+  
+  // Закрываем модалку действия
+  closePlateActionModal();
+  
+  // Сохраняем номер для надевания и переключаемся на вкладку гаража
+  window._pendingPlateForCar = { chars: num.chars, region: num.region, type: num.type };
+  
+  // Переключаемся на вкладку гаража
+  const garageBtn = Array.from(document.querySelectorAll('nav button')).find(b => b.textContent.includes('Мой гараж'));
+  openTab('garage', garageBtn);
+  
+  // Показываем подсказку
+  showToastNotification('🚗 Выберите машину', 'Нажмите на любую машину в гараже, чтобы надеть на неё номер <span>' + num.chars + ' | ' + num.region + '</span>');
+}
+
+// ================= ПРОДАЖА НОМЕРА (СТАРАЯ МОДАЛКА, ОСТАВЛЕНА ДЛЯ СОВМЕСТИМОСТИ) =================
+function openSellNumberModal(index) {
+  // Перенаправляем на новую модалку действия
+  openPlateActionModal(index);
+}
+
+function closeSellNumberModal() {
+  // Ничего
+}
+
+function confirmSellNumber() {
+  // Ничего
 }
 
 // ================= КАЗИНО =================
