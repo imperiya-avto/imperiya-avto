@@ -1661,6 +1661,7 @@ let myNumbers = []; // Массив объектов { chars: 'А000АА', regio
 let numbersSlots = 10; // Всего ячеек
 let currentUnconfirmedPlate = null;
 let sellNumberIndex = -1;
+let isNumbersTabInitialized = false; // Флаг для предотвращения бесплатной прокрутки
 
 // --- PITY SYSTEM ---
 let pityLetters = 0;
@@ -2193,12 +2194,10 @@ function renderGarage(){
   const container=document.getElementById("garageCars");
   if(!container) return;
 
-  // Если контейнер уже содержит карточки, мы не удаляем их полностью, а обновляем,
-  // чтобы избежать мигания белых иконок. Если карточек нет - создаем.
-  const existingCards = Array.from(container.querySelectorAll('.car[data-car-index]'));
-  const existingIndices = new Set(existingCards.map(c => c.dataset.carIndex));
+  // Синхронизируем стейт с текущим массивом cars
+  expandedCars = new Set([...expandedCars].filter(i=>i>=0&&i<cars.length));
+  selectedCars = selectedCars.filter(i => i >= 0 && i < cars.length && !cars[i].locked);
 
-  // Собираем актуальные индексы
   const refs = cars.map((car, originalIndex)=>{
     const item = catalog.find(c=>c.id===car.id);
     return {car, item, originalIndex};
@@ -2213,149 +2212,179 @@ function renderGarage(){
     return b.item.income - a.item.income;
   });
 
-  // Очищаем контейнер от пустых ячеек и старых карточек
-  container.innerHTML = "";
-  expandedCars = new Set([...expandedCars].filter(i=>i>=0&&i<cars.length));
-  selectedCars = selectedCars.filter(i => i >= 0 && i < cars.length && !cars[i].locked);
-
-  // Создаем карточки заново (это проще и надежнее, но мы добавим лоадер для картинок)
-  refs.forEach(({car, item, originalIndex})=>{
-   const card=document.createElement("div");
-   const isExpanded = expandedCars.has(originalIndex);
-   const isDivine = item.rarity==="Божественная";
-   const isSelected = selectedCars.includes(originalIndex);
-
-   card.className="car"+
-     (isDivine?" rarity-rainbow":" rarity-glow")+
-     (selectMode && !car.locked ? " selectable":"")+
-     (isSelected ? " selected":"")+
-     (car.locked ? " locked":"")+
-     (isExpanded ? " expanded":"");
-
-   card.dataset.carIndex=String(originalIndex);
-   const color=getRarityColor(item.rarity);
-   card.style.setProperty("--rarity-color",color);
-
-   card.onclick = (e)=>{
-     if(selectMode){
-       if(!car.locked) toggleCarSelection(originalIndex);
-       return;
-     }
-     // Если мы ждем клик по машине для надевания номера
-     if (window._pendingPlateForCar) {
-       const plate = window._pendingPlateForCar;
-       // Снимаем номер с других машин
-       cars.forEach(c => { if (c.plate === plate.chars + '|' + plate.region) c.plate = null; });
-       // Надеваем на эту
-       cars[originalIndex].plate = plate.chars + '|' + plate.region;
-       window._pendingPlateForCar = null;
-       renderGarage();
-       scheduleSave();
-       showToastNotification('✅ Номер надет!', `Номер <span>${plate.chars} | ${plate.region}</span> установлен на ${item.name}`);
-       return;
-     }
-     toggleCarDetails(originalIndex, card);
-   };
-
-   if(selectMode && !car.locked){
-    const mark=document.createElement("div");
-    mark.className="car-select-mark";
-    mark.textContent=isSelected ? "✓" : "";
-    card.append(mark);
-   }
-
-   // Маленький номерной знак
-   if (car.plate && !selectMode) {
-     const plateData = myNumbers.find(n => (n.chars + '|' + n.region) === car.plate);
-     if (plateData) {
-       const plateColor = getPlateColor(plateData.type);
-       const badge = document.createElement("div");
-       badge.className = "car-plate-badge";
-       badge.style.borderColor = plateColor;
-       badge.style.boxShadow = `0 4px 10px rgba(0,0,0,0.6), 0 0 8px ${plateColor}`;
-       
-       const textSpan = document.createElement('span');
-       textSpan.className = 'plate-text';
-       textSpan.textContent = plateData.chars;
-       
-       const regionSpan = document.createElement('span');
-       regionSpan.className = 'plate-region-mini';
-       regionSpan.textContent = plateData.region;
-       
-       badge.append(textSpan, regionSpan);
-       card.append(badge);
-     }
-   }
-
-   const lock=document.createElement("button");
-   lock.className="car-lock-corner "+(car.locked?"unlock-car-btn":"lock-car-btn");
-   lock.textContent=car.locked?"🔓":"🔒";
-   lock.onclick=(e)=>{ e.stopPropagation(); toggleCarLock(originalIndex); };
-   card.append(lock);
-
-   const img=document.createElement("img");
-   // Кэшируем картинку: если она уже есть в DOM, браузер не будет её перезагружать
-   img.src="images/"+item.id+".png";
-   img.onerror=()=>{img.style.display="none"};
-
-   const icon=document.createElement("div");
-   icon.className="car-icon-badge";
-   icon.textContent="🚘";
-
-   const title=document.createElement("h3");
-   title.textContent=item.name;
-
-   const details=document.createElement("div");
-   details.className="car-details";
-   
-   let plateInfoHtml = "";
-   if (car.plate) {
-     const plateData = myNumbers.find(n => (n.chars + '|' + n.region) === car.plate);
-     if (plateData) {
-       const plateColor = getPlateColor(plateData.type);
-       plateInfoHtml = `<div class="stat-row"><span class="stat-label">🔢 Номер</span> <span class="stat-value" style="color:${plateColor}">${plateData.chars} | ${plateData.region}</span></div>`;
-     }
-   }
-
-   details.innerHTML = `
-     <div class="car-stats">
-       <div class="stat-row"><span class="stat-label">✨ Редкость</span> <span class="stat-value rarity" style="color:${color}">${item.rarity}</span></div>
-       <div class="stat-row"><span class="stat-label">⚡ Мощность</span> <span class="stat-value">${item.power} л.с.</span></div>
-       <div class="stat-row"><span class="stat-label">💵 Продажа</span> <span class="stat-value" style="color:var(--green)">${Math.floor(item.price*0.15).toLocaleString("ru-RU")} ₽</span></div>
-       <div class="stat-row"><span class="stat-label">📈 Доход</span> <span class="stat-value" style="color:var(--yellow)">${item.income.toLocaleString("ru-RU")} ₽/сек</span></div>
-       ${plateInfoHtml}
-     </div>
-   `;
-
-   const putPlateBtn = document.createElement("button");
-   putPlateBtn.className = "car-put-plate-btn";
-   putPlateBtn.textContent = "🔢 Надеть номерной знак";
-   putPlateBtn.onclick = (e) => { e.stopPropagation(); openPlateSelectForCar(originalIndex); };
-   details.append(putPlateBtn);
-
-   const sellBtn=document.createElement("button");
-   sellBtn.className="car-sell-inline";
-   sellBtn.textContent="Продать за "+Math.floor(item.price*0.15).toLocaleString("ru-RU")+" ₽";
-   sellBtn.onclick=(e)=>{ e.stopPropagation(); openSellModal(originalIndex); };
-   details.append(sellBtn);
-
-   const incomeLine=document.createElement("div");
-   incomeLine.className="car-income-line";
-   incomeLine.textContent="+"+item.income.toLocaleString("ru-RU")+" ₽/сек";
-
-   const hint=document.createElement("div");
-   hint.className="car-hint";
-   hint.textContent=isExpanded?"Нажми, чтобы скрыть":"Показать характеристики";
-
-   card.append(img,icon,title,details,incomeLine,hint);
-   container.append(card);
+  // Удаляем пустые ячейки и лишние карточки (если машин стало меньше)
+  const existingCards = Array.from(container.querySelectorAll('.car'));
+  existingCards.forEach(card => {
+    if (!card.dataset.carIndex || Number(card.dataset.carIndex) >= cars.length) {
+      card.remove();
+    }
   });
 
-  for(let i=cars.length;i<garageSlots;i++){
-   const empty=document.createElement("div");
-   empty.className="car empty";
-   empty.textContent="🔒 Пустая ячейка";
-   container.append(empty);
+  const existingEmpty = Array.from(container.querySelectorAll('.car.empty'));
+  
+  // Проходимся по отсортированным машинам и обновляем/создаем карточки
+  refs.forEach(({car, item, originalIndex}, position) => {
+    let card = container.querySelector(`.car[data-car-index="${originalIndex}"]`);
+    const isExpanded = expandedCars.has(originalIndex);
+    const isDivine = item.rarity==="Божественная";
+    const isSelected = selectedCars.includes(originalIndex);
+    const color=getRarityColor(item.rarity);
+
+    if (!card) {
+      // Создаем карточку, если её нет
+      card=document.createElement("div");
+      card.dataset.carIndex=String(originalIndex);
+      card.onclick = (e)=>{
+        if(selectMode){
+          if(!cars[originalIndex].locked) toggleCarSelection(originalIndex);
+          return;
+        }
+        if (window._pendingPlateForCar) {
+          const plate = window._pendingPlateForCar;
+          cars.forEach(c => { if (c.plate === plate.chars + '|' + plate.region) c.plate = null; });
+          cars[originalIndex].plate = plate.chars + '|' + plate.region;
+          window._pendingPlateForCar = null;
+          renderGarage();
+          scheduleSave();
+          showToastNotification('✅ Номер надет!', `Номер <span>${plate.chars} | ${plate.region}</span> установлен на ${item.name}`);
+          return;
+        }
+        toggleCarDetails(originalIndex, card);
+      };
+
+      // Создаем базовую структуру
+      card.innerHTML = `
+        <img src="images/${item.id}.png" onerror="this.style.display='none'">
+        <div class="car-icon-badge">🚘</div>
+        <h3>${item.name}</h3>
+        <div class="car-details">
+          <div class="car-stats">
+            <div class="stat-row"><span class="stat-label">✨ Редкость</span> <span class="stat-value rarity" style="color:${color}">${item.rarity}</span></div>
+            <div class="stat-row"><span class="stat-label">⚡ Мощность</span> <span class="stat-value">${item.power} л.с.</span></div>
+            <div class="stat-row"><span class="stat-label">💵 Продажа</span> <span class="stat-value" style="color:var(--green)">${Math.floor(item.price*0.15).toLocaleString("ru-RU")} ₽</span></div>
+            <div class="stat-row"><span class="stat-label">📈 Доход</span> <span class="stat-value" style="color:var(--yellow)">${item.income.toLocaleString("ru-RU")} ₽/сек</span></div>
+          </div>
+          <button class="car-sell-inline">Продать за ${Math.floor(item.price*0.15).toLocaleString("ru-RU")} ₽</button>
+        </div>
+        <div class="car-income-line">+${item.income.toLocaleString("ru-RU")} ₽/сек</div>
+        <div class="car-hint">Нажми, чтобы скрыть</div>
+      `;
+      
+      // Добавляем кнопки, требующие динамики
+      const details = card.querySelector('.car-details');
+      
+      const putPlateBtn = document.createElement("button");
+      putPlateBtn.className = "car-put-plate-btn";
+      putPlateBtn.textContent = "🔢 Надеть номерной знак";
+      putPlateBtn.onclick = (e) => { e.stopPropagation(); openPlateSelectForCar(originalIndex); };
+      details.insertBefore(putPlateBtn, details.querySelector('.car-sell-inline'));
+
+      // Обработчик для продажи
+      card.querySelector('.car-sell-inline').onclick=(e)=>{ e.stopPropagation(); openSellModal(originalIndex); };
+
+      // Замок
+      const lock=document.createElement("button");
+      lock.className="car-lock-corner";
+      lock.onclick=(e)=>{ e.stopPropagation(); toggleCarLock(originalIndex); };
+      card.prepend(lock);
+    }
+
+    // Обновляем классы и динамические элементы
+    card.className = "car"+
+      (isDivine?" rarity-rainbow":" rarity-glow")+
+      (selectMode && !car.locked ? " selectable":"")+
+      (isSelected ? " selected":"")+
+      (car.locked ? " locked":"")+
+      (isExpanded ? " expanded":"");
+    card.style.setProperty("--rarity-color",color);
+
+    // Обновляем кнопку замка
+    const lockBtn = card.querySelector('.car-lock-corner');
+    if (lockBtn) {
+      lockBtn.className = "car-lock-corner " + (car.locked ? "unlock-car-btn" : "lock-car-btn");
+      lockBtn.textContent = car.locked ? "🔓" : "🔒";
+    }
+
+    // Обновляем галочку выбора
+    let mark = card.querySelector('.car-select-mark');
+    if (selectMode && !car.locked) {
+      if (!mark) {
+        mark = document.createElement('div');
+        mark.className = "car-select-mark";
+        card.append(mark);
+      }
+      mark.textContent = isSelected ? "✓" : "";
+    } else if (mark) {
+      mark.remove();
+    }
+
+    // Обновляем бейдж номера
+    let plateBadge = card.querySelector('.car-plate-badge');
+    if (car.plate && !selectMode) {
+      const plateData = myNumbers.find(n => (n.chars + '|' + n.region) === car.plate);
+      if (plateData) {
+        const plateColor = getPlateColor(plateData.type);
+        if (!plateBadge) {
+          plateBadge = document.createElement("div");
+          plateBadge.className = "car-plate-badge";
+          card.append(plateBadge);
+        }
+        plateBadge.style.borderColor = plateColor;
+        plateBadge.style.boxShadow = `0 4px 10px rgba(0,0,0,0.6), 0 0 8px ${plateColor}`;
+        plateBadge.innerHTML = `<span class="plate-text">${plateData.chars}</span><span class="plate-region-mini">${plateData.region}</span>`;
+      } else if (plateBadge) {
+        plateBadge.remove();
+      }
+    } else if (plateBadge) {
+      plateBadge.remove();
+    }
+
+    // Обновляем информацию о номере в статах
+    let plateStatRow = card.querySelector('.plate-stat-row');
+    if (car.plate) {
+      const plateData = myNumbers.find(n => (n.chars + '|' + n.region) === car.plate);
+      if (plateData) {
+        const plateColor = getPlateColor(plateData.type);
+        if (!plateStatRow) {
+          plateStatRow = document.createElement('div');
+          plateStatRow.className = "stat-row plate-stat-row";
+          card.querySelector('.car-stats').append(plateStatRow);
+        }
+        plateStatRow.innerHTML = `<span class="stat-label">🔢 Номер</span> <span class="stat-value" style="color:${plateColor}">${plateData.chars} | ${plateData.region}</span>`;
+      } else if (plateStatRow) {
+        plateStatRow.remove();
+      }
+    } else if (plateStatRow) {
+      plateStatRow.remove();
+    }
+
+    // Обновляем подсказку
+    const hint = card.querySelector('.car-hint');
+    if(hint) hint.textContent = isExpanded ? "Нажми, чтобы скрыть" : "Показать характеристики";
+
+    // Перемещаем карточку на нужную позицию (это предотвратит дергание)
+    const currentPosition = Array.from(container.children).indexOf(card);
+    if (currentPosition !== position) {
+      container.insertBefore(card, container.children[position] || null);
+    }
+  });
+
+  // Обновляем пустые ячейки
+  const existingEmptyCount = container.querySelectorAll('.car.empty').length;
+  const neededEmptyCount = garageSlots - cars.length;
+  
+  if (existingEmptyCount < neededEmptyCount) {
+    for (let i = existingEmptyCount; i < neededEmptyCount; i++) {
+      const empty = document.createElement('div');
+      empty.className = "car empty";
+      empty.textContent = "🔒 Пустая ячейка";
+      container.append(empty);
+    }
+  } else if (existingEmptyCount > neededEmptyCount) {
+    const empties = Array.from(container.querySelectorAll('.car.empty'));
+    for (let i = neededEmptyCount; i < existingEmptyCount; i++) {
+      if (empties[i]) empties[i].remove();
+    }
   }
 
   updateGarageSelectionUI();
@@ -3303,6 +3332,13 @@ function updateNeonGlow(type) {
 
 // Инициализация вкладки (случайный номер)
 function initNumbersTab() {
+  // Если вкладка уже инициализирована, ничего не делаем
+  if (isNumbersTabInitialized) {
+    renderMyNumbers();
+    return;
+  }
+  isNumbersTabInitialized = true;
+
   const randomChars = getRandomPlateChars();
   const randomRegion = getRandomPlateRegion();
   
