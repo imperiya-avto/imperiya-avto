@@ -2600,27 +2600,41 @@ function finishOpening(quantity){
 
 function sellDroppedCars() {
   if (lastCarsFromCase.length === 0) return;
+  
+  // Проверяем, что машины действительно есть в гараже
+  const carsInGarage = lastCarsFromCase.filter(c => 
+    cars.some(garageCar => garageCar.id === c.id)
+  );
+
+  if (carsInGarage.length === 0) {
+    // Если машин нет — скрываем кнопку и очищаем список
+    lastCarsFromCase = [];
+    document.getElementById('sellDroppedBtn').style.display = 'none';
+    return;
+  }
+
   let total = 0;
-  lastCarsFromCase.forEach(car => {
+  carsInGarage.forEach(car => {
     total += Math.floor(car.price * 0.15);
   });
 
+  // Удаляем только те машины, которые реально есть в гараже
   for (let i = cars.length - 1; i >= 0; i--) {
-    if (lastCarsFromCase.some(c => c.id === cars[i].id)) {
+    if (carsInGarage.some(c => c.id === cars[i].id)) {
       cars.splice(i, 1);
     }
   }
 
   balance += total;
   triggerBalanceAnimation(total, true);
-  const count = lastCarsFromCase.length;
+  const count = carsInGarage.length;
   lastCarsFromCase = [];
   document.getElementById('sellDroppedBtn').style.display = 'none';
   document.getElementById('caseMessage').textContent = `✅ Выпавшие машины проданы за ${total.toLocaleString('ru-RU')} ₽!`;
 
   renderGarage();
   update();
-  if(count > 0) updateTaskProgress('sell_car', count); // Задание на продажу
+  if(count > 0) updateTaskProgress('sell_car', count);
 }
 
 // ================= ПРОФИЛЬ =================
@@ -2840,6 +2854,14 @@ function openTab(tab,button){
  if(rouletteRunning)return;
  if(tab !== "casino") closeCasinoGame();
  if(tab !== "races") closeRaceDetail();
+ 
+ // Очищаем список выпавших машин при смене вкладки
+ if (tab !== "cars") {
+   lastCarsFromCase = [];
+   const sellBtn = document.getElementById('sellDroppedBtn');
+   if (sellBtn) sellBtn.style.display = 'none';
+ }
+
  document.querySelectorAll("main section").forEach(s=>{ s.hidden=true; });
  const section = document.getElementById(tab);
  if (section) section.hidden = false;
