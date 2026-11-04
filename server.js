@@ -56,7 +56,9 @@ app.post('/api/register', async (req, res) => {
       lastFuelTime: Date.now(),
       lastTime: Date.now(),
       myNumbers: [],
-      numbersSlots: 10 // Добавлено поле для ячеек номеров
+      numbersSlots: 10,
+      collectionCars: [], // НОВОЕ ПОЛЕ: Машины для коллекции
+      collectionBonusApplied: false // НОВОЕ ПОЛЕ: Флаг бонуса коллекции
     },
     friends: [],
     friendRequests: []
