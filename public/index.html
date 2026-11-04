@@ -378,23 +378,42 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .car-lock-corner.unlock-car-btn{background:linear-gradient(180deg,#3a3a48,#2a2a34)}
 .car-lock-corner:hover{filter:brightness(1.15);transform:translateY(-1px)}
 
-/* Маленький номерной знак в правом верхнем углу карточки машины */
+/* МАЛЕНЬКИЙ НОМЕРНОЙ ЗНАК НА МАШИНЕ */
 .car-plate-badge {
   position: absolute;
   top: 8px;
   right: 8px;
   z-index: 5;
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-family: 'Arial Black', Impact, sans-serif;
-  font-size: 11px;
-  font-weight: 900;
-  color: #111;
+  display: flex;
+  align-items: center;
   background: #fff;
-  border: 2px solid #222;
-  box-shadow: 0 0 8px currentColor;
+  border-radius: 4px;
+  padding: 2px 6px;
+  border: 1.5px solid #111;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.6), inset 0 0 5px rgba(0,0,0,0.1);
+  font-family: 'Arial Black', Impact, sans-serif;
+  font-size: 13px;
+  font-weight: 900;
+  color: #000;
   pointer-events: none;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.5px;
+  animation: plateDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transform-origin: top center;
+}
+.car-plate-badge .plate-text {
+  color: #000;
+}
+.car-plate-badge .plate-region-mini {
+  font-size: 9px;
+  margin-left: 4px;
+  padding-left: 4px;
+  border-left: 1px solid #111;
+  color: #000;
+  font-family: 'Arial', sans-serif;
+}
+@keyframes plateDropIn {
+  0% { transform: translateY(-20px) scale(0.8); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
 .car-income-line{ text-align:center; color:var(--yellow); font-size:14px; font-weight:900; margin-top:8px;margin-bottom:2px; letter-spacing:.3px; text-shadow:0 0 12px rgba(255,210,26,.35); position:relative;z-index:1; }
@@ -1071,7 +1090,8 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   .toast-notification { right: 10px; left: 10px; max-width: none; transform: translateY(-200%); }
   .toast-notification.show { transform: translateY(0); }
   .plate-select-list { grid-template-columns: 1fr; }
-  .car-plate-badge { font-size: 9px; padding: 2px 5px; }
+  .car-plate-badge { font-size: 10px; padding: 1px 4px; }
+  .car-plate-badge .plate-region-mini { font-size: 7px; }
 }
 </style>
 </head>
@@ -1751,7 +1771,7 @@ function applyServerUser(user) {
 
   const elapsed = Math.max(0, (Date.now() - (user.gameData.lastTime || Date.now())) / 1000);
   
-  // Пересчет дохода с учетом машин и номеров (номера больше не дают доход)
+  // Пересчет дохода (номера больше не дают доход)
   income += elapsed * getRate();
 
   updateProfileUIFromServer(user);
@@ -2114,7 +2134,7 @@ const CASE_POOLS = buildPools();
 
 // ================= ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =================
 function getRate(){
- // Доход только от машин, номера больше не приносят доход
+ // Доход только от машин
  const carIncome = cars.reduce((sum,car)=>{
   const item=catalog.find(c=>c.id===car.id);
   return sum+(item?item.income:0);
@@ -2173,15 +2193,18 @@ function renderGarage(){
   const container=document.getElementById("garageCars");
   if(!container) return;
 
-  container.innerHTML="";
-  expandedCars = new Set([...expandedCars].filter(i=>i>=0&&i<cars.length));
-  selectedCars = selectedCars.filter(i => i >= 0 && i < cars.length && !cars[i].locked);
+  // Если контейнер уже содержит карточки, мы не удаляем их полностью, а обновляем,
+  // чтобы избежать мигания белых иконок. Если карточек нет - создаем.
+  const existingCards = Array.from(container.querySelectorAll('.car[data-car-index]'));
+  const existingIndices = new Set(existingCards.map(c => c.dataset.carIndex));
 
+  // Собираем актуальные индексы
   const refs = cars.map((car, originalIndex)=>{
     const item = catalog.find(c=>c.id===car.id);
     return {car, item, originalIndex};
   }).filter(r=>r.item);
 
+  // Сортируем
   refs.sort((a,b)=>{
     const rankA = getRarityRank(a.item.rarity);
     const rankB = getRarityRank(b.item.rarity);
@@ -2190,6 +2213,12 @@ function renderGarage(){
     return b.item.income - a.item.income;
   });
 
+  // Очищаем контейнер от пустых ячеек и старых карточек
+  container.innerHTML = "";
+  expandedCars = new Set([...expandedCars].filter(i=>i>=0&&i<cars.length));
+  selectedCars = selectedCars.filter(i => i >= 0 && i < cars.length && !cars[i].locked);
+
+  // Создаем карточки заново (это проще и надежнее, но мы добавим лоадер для картинок)
   refs.forEach(({car, item, originalIndex})=>{
    const card=document.createElement("div");
    const isExpanded = expandedCars.has(originalIndex);
@@ -2235,7 +2264,7 @@ function renderGarage(){
     card.append(mark);
    }
 
-   // Если у машины есть номер - показываем его в правом верхнем углу
+   // Маленький номерной знак
    if (car.plate && !selectMode) {
      const plateData = myNumbers.find(n => (n.chars + '|' + n.region) === car.plate);
      if (plateData) {
@@ -2243,9 +2272,17 @@ function renderGarage(){
        const badge = document.createElement("div");
        badge.className = "car-plate-badge";
        badge.style.borderColor = plateColor;
-       badge.style.color = plateColor;
-       badge.style.textShadow = `0 0 6px ${plateColor}`;
-       badge.textContent = plateData.chars;
+       badge.style.boxShadow = `0 4px 10px rgba(0,0,0,0.6), 0 0 8px ${plateColor}`;
+       
+       const textSpan = document.createElement('span');
+       textSpan.className = 'plate-text';
+       textSpan.textContent = plateData.chars;
+       
+       const regionSpan = document.createElement('span');
+       regionSpan.className = 'plate-region-mini';
+       regionSpan.textContent = plateData.region;
+       
+       badge.append(textSpan, regionSpan);
        card.append(badge);
      }
    }
@@ -2257,6 +2294,7 @@ function renderGarage(){
    card.append(lock);
 
    const img=document.createElement("img");
+   // Кэшируем картинку: если она уже есть в DOM, браузер не будет её перезагружать
    img.src="images/"+item.id+".png";
    img.onerror=()=>{img.style.display="none"};
 
@@ -2270,7 +2308,6 @@ function renderGarage(){
    const details=document.createElement("div");
    details.className="car-details";
    
-   // Определяем, есть ли номер на машине
    let plateInfoHtml = "";
    if (car.plate) {
      const plateData = myNumbers.find(n => (n.chars + '|' + n.region) === car.plate);
@@ -2445,10 +2482,8 @@ function openPlateSelectForCar(carIndex) {
     el.style.boxShadow = `0 0 8px ${color}`;
     el.innerHTML = `${num.chars} <span>${num.region}</span>`;
     el.onclick = () => {
-      // Снимаем этот номер со всех остальных машин
       const key = num.chars + '|' + num.region;
       cars.forEach(c => { if (c.plate === key) c.plate = null; });
-      // Надеваем на выбранную
       cars[selectedCarIndexForPlate].plate = key;
       renderGarage();
       scheduleSave();
@@ -2853,7 +2888,6 @@ function sellDroppedCars() {
   );
 
   if (carsInGarage.length === 0) {
-    // Если машин нет — скрываем кнопку и очищаем список
     lastCarsFromCase = [];
     document.getElementById('sellDroppedBtn').style.display = 'none';
     return;
@@ -2864,7 +2898,6 @@ function sellDroppedCars() {
     total += Math.floor(car.price * 0.15);
   });
 
-  // Удаляем только те машины, которые реально есть в гараже
   for (let i = cars.length - 1; i >= 0; i--) {
     if (carsInGarage.some(c => c.id === cars[i].id)) {
       cars.splice(i, 1);
@@ -3108,7 +3141,6 @@ function openTab(tab,button){
    if (sellBtn) sellBtn.style.display = 'none';
  }
 
- // Сбрасываем ожидание клика по машине для номера
  if (tab !== 'garage') {
    window._pendingPlateForCar = null;
  }
@@ -3818,7 +3850,6 @@ function putNumberFromModal() {
 
 // ================= ПРОДАЖА НОМЕРА (СТАРАЯ МОДАЛКА, ОСТАВЛЕНА ДЛЯ СОВМЕСТИМОСТИ) =================
 function openSellNumberModal(index) {
-  // Перенаправляем на новую модалку действия
   openPlateActionModal(index);
 }
 
