@@ -1017,81 +1017,98 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 }
 .plate-action-btn.put:hover { filter: brightness(1.1); }
 
-@media(max-width: 600px) {
-  .user-profile-widget { top: 10px; right: 10px; padding: 4px 8px 4px 4px; }
-  .user-avatar-mini { width: 32px; height: 32px; }
-  .user-name-mini { font-size: 12px; max-width: 80px; }
-  .game-window { padding: 20px 15px; }
-  .game-window-title { font-size: 18px; }
-  .casino-visual { height: 90px; }
-  .visual-text { font-size: 40px; }
-  .casino-visual .card { width: 45px; height: 65px; font-size: 20px; }
-  .casino-visual .dice { width: 45px; height: 45px; font-size: 26px; }
-  .bet-quick-buttons { grid-template-columns: repeat(4, 1fr); }
-  .bet-quick-btn { font-size: 10px; padding: 7px 2px; }
-  .bet-input { font-size: 16px; padding: 10px; }
-  header { padding: 12px 16px; flex-direction: column; align-items: flex-start; gap: 10px; min-height: 60px; }
-  .header-content { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .header-logo { max-width: 90px; }
-  .header-content p { border-left: none; padding-left: 0; font-size: 12px; }
-  nav{gap:6px;padding:10px 8px}
-  nav button{flex:1 1 30%;padding:9px 6px;font-size:12px;border-radius:12px}
-  main{padding:0 8px 30px;margin:12px auto}
-  .panel{padding:12px;border-radius:14px}
-  .panel h2{font-size:18px}
-  .cars{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .car{padding:10px;border-radius:12px}
-  .car img{height:88px}
-  .car p{font-size:11px}
-  .car-income-line{font-size:13px}
-  .quantity-button{flex:1}
-  .garage-tools{padding:10px}
-  .car-lock-corner{width:28px;height:28px;line-height:28px;font-size:14px}
-  .balance{font-size:16px}
-  .green{font-size:20px}
-  .price-row{padding:8px 12px}
-  .price-value{font-size:15px}
-  .roulette-item{flex-basis:88px;width:88px;height:76px}
-  .roulette-item .car-icon{font-size:20px}
-  .roulette-item .car-name{font-size:10px}
-  .case-drop-overlay .drop-name { font-size: 15px; }
-  .case-drop-overlay .drop-icon { font-size: 28px; }
-  .auction-card { flex-direction: column; align-items: center; text-align: center; }
-  .auction-car-img-wrap { width: 100%; flex: none; }
-  .auction-car-stats { justify-content: center; }
-  .auction-bid-panel { width: 100%; }
-  .auction-actions { flex-direction: column; }
-  .auction-bid-input { width: 100%; }
-  .auction-btn { width: 100%; }
-  .auction-toast { right: 10px; left: 10px; max-width: none; transform: translateY(-200%); }
-  .auction-toast.show { transform: translateY(0); }
-  .race-cars-grid { grid-template-columns: repeat(2, 1fr); }
-  .race-window { padding: 15px; }
-  .race-window-title { font-size: 16px; }
-  .track-lane { height: 50px; }
-  .track-car { font-size: 26px; }
-  .light { width: 24px; height: 24px; }
-  .traffic-light { gap: 8px; padding: 8px 12px; }
-  .race-actions { flex-direction: column; }
-  .car-select-list { grid-template-columns: 1fr; }
-  .top-row { padding: 10px; gap: 10px; flex-wrap: wrap; }
-  .top-rank { font-size: 14px; width: 25px; }
-  .top-avatar { width: 35px; height: 35px; }
-  .top-name { font-size: 14px; }
-  .top-id { font-size: 10px; }
-  .top-balance { font-size: 15px; }
-  .plate-digit { font-size: 40px; width: 30px; }
-  .plate-region { font-size: 20px; }
-  .plate-divider { height: 40px; margin: 0 10px; }
-  .plate-right { padding-left: 10px; }
-  .plate-country { font-size: 10px; }
-  .spin-btn { min-width: 100%; }
-  .numbers-grid { grid-template-columns: 1fr 1fr; }
-  .toast-notification { right: 10px; left: 10px; max-width: none; transform: translateY(-200%); }
-  .toast-notification.show { transform: translateY(0); }
-  .plate-select-list { grid-template-columns: 1fr; }
-  .car-plate-badge { font-size: 10px; padding: 1px 4px; }
-  .car-plate-badge .plate-region-mini { font-size: 7px; }
+/* ===== КОНТЕЙНЕРЫ ===== */
+.containers-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+  margin-top: 20px;
+  justify-items: center;
+}
+@media (max-width: 900px) {
+  .containers-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 700px) {
+  .containers-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+}
+@media (max-width: 500px) {
+  .containers-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.container-item {
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s ease, filter 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+.container-item:hover {
+  transform: translateY(-5px) scale(1.05);
+  filter: drop-shadow(0 0 15px rgba(255,210,26,0.4));
+}
+.container-item img {
+  width: 100%;
+  max-width: 150px;
+  aspect-ratio: 1;
+  object-fit: contain;
+  border-radius: 12px;
+  transition: transform 0.3s;
+}
+.container-item.opened img {
+  animation: containerPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+@keyframes containerPop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.container-item.disabled {
+  pointer-events: none;
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+.container-item.opened::after {
+  content: "ОТКРЫТ";
+  position: absolute;
+  bottom: 10px;
+  background: rgba(0,0,0,0.7);
+  color: #ff4d5e;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+.container-timer-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  background: linear-gradient(180deg, rgba(255,210,26,.1), rgba(255,210,26,.02));
+  border: 1px solid rgba(255,210,26,.3);
+  border-radius: 14px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+}
+.container-timer-label {
+  font-size: 15px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+.container-timer {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--yellow);
+  text-shadow: 0 0 15px rgba(255,210,26,.6);
+  font-variant-numeric: tabular-nums;
+}
+.container-timer.urgent {
+  color: var(--red);
+  text-shadow: 0 0 20px rgba(255,77,94,.8);
+  animation: pulseRed 1s infinite;
 }
 </style>
 </head>
@@ -1292,6 +1309,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  <button class="active" onclick="openTab('garage',this)">Мой гараж</button>
  <button onclick="openTab('cars',this)">Кейс машин</button>
  <button onclick="openTab('numbers',this)">Номера</button>
+ <button onclick="openTab('containers',this)">📦 Контейнеры</button>
  <button onclick="openTab('casino',this)">Казино</button>
  <button onclick="openTab('races',this)">Гонки</button>
  <button id="navTasksBtn" onclick="openTab('tasks',this)">Задания</button>
@@ -1437,6 +1455,21 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
      </div>
    </div>
  </div>
+</section>
+
+<!-- НОВАЯ ВКЛАДКА КОНТЕЙНЕРЫ -->
+<section id="containers" class="panel" hidden>
+  <h2>📦 Контейнеры</h2>
+  <p style="color:var(--muted); font-size:14px; margin-bottom:15px;">Открывайте контейнеры и получайте редкие тачки! Каждые 2 минуты ассортимент обновляется.</p>
+  
+  <div class="container-timer-wrap">
+    <span class="container-timer-label">Обновление через:</span>
+    <span class="container-timer" id="containerTimer">02:00</span>
+  </div>
+
+  <div class="containers-grid" id="containersGrid">
+    <!-- Контейнеры рендерятся скриптом -->
+  </div>
 </section>
 
 <section id="casino" class="panel" hidden>
@@ -1691,6 +1724,12 @@ const TASK_TEMPLATES = [
 let tasksData = [];
 let tasksResetTime = 0;
 let taskTimerInterval = null;
+
+// --- КОНТЕЙНЕРЫ ---
+const CONTAINER_PRICE = 500000;
+let containerTimerInterval = null;
+let containerEndTime = 0;
+const CONTAINER_COLORS = ['red', 'green', 'blue'];
 
 // ================= АВТОРИЗАЦИЯ =================
 function toggleAuthMode() {
@@ -3195,6 +3234,9 @@ function openTab(tab,button){
  if (tab === "garage") {
    renderGarage();
  }
+ if (tab === "containers") {
+   initContainers();
+ }
 }
 
 // ================= АНИМАЦИИ =================
@@ -3884,17 +3926,117 @@ function putNumberFromModal() {
   showToastNotification('🚗 Выберите машину', 'Нажмите на любую машину в гараже, чтобы надеть на неё номер <span>' + num.chars + ' | ' + num.region + '</span>');
 }
 
-// ================= ПРОДАЖА НОМЕРА (СТАРАЯ МОДАЛКА, ОСТАВЛЕНА ДЛЯ СОВМЕСТИМОСТИ) =================
-function openSellNumberModal(index) {
-  openPlateActionModal(index);
+// ================= КОНТЕЙНЕРЫ =================
+function initContainers() {
+  if (!containerEndTime || containerEndTime < Date.now()) {
+    containerEndTime = Date.now() + 120000; // 2 минуты
+    generateContainers();
+  } else {
+    renderContainers();
+  }
+  
+  if (!containerTimerInterval) {
+    containerTimerInterval = setInterval(() => {
+      const now = Date.now();
+      const diff = containerEndTime - now;
+      
+      if (diff <= 0) {
+        containerEndTime = now + 120000;
+        generateContainers();
+      } else {
+        const mins = Math.floor(diff / 60000);
+        const secs = Math.floor((diff % 60000) / 1000);
+        const timerEl = document.getElementById('containerTimer');
+        if (timerEl) {
+          timerEl.textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+          if (diff < 15000) {
+            timerEl.classList.add('urgent');
+          } else {
+            timerEl.classList.remove('urgent');
+          }
+        }
+      }
+    }, 1000);
+  }
 }
 
-function closeSellNumberModal() {
-  // Ничего
+function generateContainers() {
+  const grid = document.getElementById('containersGrid');
+  if (!grid) return;
+  
+  // 10 контейнеров. Случайные цвета.
+  let html = '';
+  for (let i = 0; i < 10; i++) {
+    const color = CONTAINER_COLORS[Math.floor(Math.random() * CONTAINER_COLORS.length)];
+    html += `
+      <div class="container-item" onclick="openContainer(this, '${color}')">
+        <img src="images/${color}_con.png" alt="${color} container" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'><rect fill=\\'%23222\\' width=\\'100\\' height=\\'100\\'/><text x=\\'50\\' y=\\'50\\' font-size=\\'30\\' text-anchor=\\'middle\\' dominant-baseline=\\'central\\' fill=\\'%23ffd21a\\'>📦</text></svg>'">
+      </div>
+    `;
+  }
+  grid.innerHTML = html;
 }
 
-function confirmSellNumber() {
-  // Ничего
+function openContainer(element, color) {
+  if (element.classList.contains('opened') || element.classList.contains('disabled')) return;
+  
+  if (balance < CONTAINER_PRICE) {
+    showToastNotification('❌ Недостаточно средств', `Для открытия нужно <span>${CONTAINER_PRICE.toLocaleString('ru-RU')} ₽</span>`);
+    return;
+  }
+
+  balance -= CONTAINER_PRICE;
+  triggerBalanceAnimation(CONTAINER_PRICE, false);
+  update();
+
+  element.classList.add('opened');
+  const img = element.querySelector('img');
+  img.src = `images/${color}_conopn.png`;
+  img.onerror = () => { img.src = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect fill=\'%23222\' width=\'100\' height=\'100\'/><text x=\'50\' y=\'50\' font-size=\'30\' text-anchor=\'middle\' dominant-baseline=\'central\' fill=\'%23fff\'>🎁</text></svg>'; };
+
+  // Логика выпадения
+  const roll = Math.random();
+  let dropText = '';
+  let winCar = null;
+  let winAmount = 0;
+
+  // Настраиваем шансы для контейнера (цена 500к)
+  // Ожидаемый возврат должен быть около 400-600к, чтобы был и плюс, и минус
+  if (roll < 0.30) {
+    // 30% - Пусто
+    dropText = 'Пусто';
+    winAmount = 0;
+  } else if (roll < 0.75) {
+    // 45% - Эпическая (средняя стоимость ~25 млн)
+    const epics = catalog.filter(c => c.rarity === 'Эпическая');
+    winCar = epics[Math.floor(Math.random() * epics.length)];
+  } else if (roll < 0.95) {
+    // 20% - Легендарная (средняя стоимость ~140 млн)
+    const legendaries = catalog.filter(c => c.rarity === 'Легендарная');
+    winCar = legendaries[Math.floor(Math.random() * legendaries.length)];
+  } else {
+    // 5% - Мифическая (средняя стоимость ~600 млн)
+    const mythics = catalog.filter(c => c.rarity === 'Мифическая');
+    winCar = mythics[Math.floor(Math.random() * mythics.length)];
+  }
+
+  setTimeout(() => {
+    if (winCar) {
+      cars.push({ id: winCar.id, plate: null });
+      renderGarage();
+      update();
+      scheduleSave();
+      showToastNotification('🎉 ВЫПАЛА МАШИНА!', `<span>${winCar.name}</span> (${winCar.rarity}) добавлена в гараж.`);
+    } else {
+      showToastNotification('📦 Пусто', 'В контейнере ничего не оказалось. Повезет в следующий раз!');
+    }
+    
+    // Проверка, что все контейнеры открыты
+    const allOpened = Array.from(document.querySelectorAll('.container-item')).every(el => el.classList.contains('opened'));
+    if (allOpened) {
+      // Если все открыты, можно добавить плашку или просто ждать таймер
+    }
+  }, 600); // Небольшая задержка для анимации
 }
 
 // ================= КАЗИНО =================
