@@ -294,10 +294,27 @@ header:before{ content: ""; position: absolute; top: 0; left: 0; right: 0; botto
 .balance{ text-align:center; padding:12px 16px; background:linear-gradient(180deg, rgba(255,210,26,.10), rgba(255,210,26,.03)); border:1px solid rgba(255,210,26,.28); border-radius:14px; color:var(--yellow-soft); font-size:18px; font-weight:800; letter-spacing:.5px; box-shadow:0 0 30px rgba(255,210,26,.10) inset, 0 8px 24px rgba(0,0,0,.5); transition: color 0.3s, border-color 0.3s; }
 .balance #balance{ color:var(--yellow); text-shadow:0 0 14px rgba(255,210,26,.5); display: inline-block; transition: color 0.3s; }
 
-nav{ display:flex; justify-content:center; flex-wrap:wrap; gap:8px; padding:14px 10px; max-width:1250px; margin:0 auto; position:sticky; top:0; z-index:100; background:rgba(10,10,12,.78); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-bottom:1px solid var(--stroke); }
-nav button{ padding:10px 16px; border:1px solid var(--stroke-2); border-radius:999px; background:linear-gradient(180deg, #1c1c23, #14141a); color:#d9d9e2; font-size:13px; font-weight:700; letter-spacing:.3px; transition:all .18s ease; cursor:pointer; }
+nav{ display:flex; justify-content:center; flex-wrap:wrap; gap:8px; padding:14px 10px; max-width:1250px; margin:0 auto; position:sticky; top:0; z-index:100; background:rgba(10,10,12,.78); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-bottom:1px solid var(--stroke); position: relative; }
+nav button{ padding:10px 16px; border:1px solid var(--stroke-2); border-radius:999px; background:linear-gradient(180deg, #1c1c23, #14141a); color:#d9d9e2; font-size:13px; font-weight:700; letter-spacing:.3px; transition:all .18s ease; cursor:pointer; position: relative; }
 nav button:hover:not(:disabled){ transform:translateY(-2px); border-color:rgba(255,210,26,.55); color:var(--yellow-soft); box-shadow:0 0 0 1px rgba(255,210,26,.25), 0 8px 20px rgba(255,210,26,.10); }
 nav button.active{ background:linear-gradient(180deg, #ffd21a, #ffb800); color:#15130a; border-color:#ffd21a; box-shadow:0 0 0 1px rgba(255,210,26,.6), 0 8px 22px rgba(255,210,26,.35); }
+
+/* Красная точка на кнопке "Задания" */
+#navTasksBtn::after {
+  content: "";
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  background-color: #ff4d5e;
+  border-radius: 50%;
+  box-shadow: 0 0 6px #ff4d5e;
+  display: none; /* по умолчанию скрыта */
+}
+#navTasksBtn.has-unclaimed::after {
+  display: block;
+}
 
 main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .panel{ background:linear-gradient(180deg, rgba(28,28,35,.85), rgba(18,18,24,.9)); border:1px solid var(--stroke); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); position:relative; overflow:hidden; }
@@ -828,6 +845,50 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   box-shadow: none;
 }
 
+/* ===== УВЕДОМЛЕНИЕ (ТОСТ) ===== */
+.toast-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #1c1c24, #0e0e12);
+  border: 2px solid var(--yellow);
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: 0 10px 40px rgba(255,210,26,.4);
+  z-index: 999999;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transform: translateX(120%);
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  max-width: 400px;
+}
+.toast-notification.show {
+  transform: translateX(0);
+}
+.toast-icon {
+  font-size: 32px;
+  filter: drop-shadow(0 0 10px rgba(255,210,26,.8));
+}
+.toast-content h4 {
+  margin: 0 0 5px;
+  color: var(--yellow);
+  font-size: 16px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.toast-content p {
+  margin: 0;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+.toast-content p span {
+  color: var(--yellow-soft);
+  font-weight: 900;
+}
+
 @media(max-width: 600px) {
   .user-profile-widget { top: 10px; right: 10px; padding: 4px 8px 4px 4px; }
   .user-avatar-mini { width: 32px; height: 32px; }
@@ -898,6 +959,8 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   .plate-country { font-size: 10px; }
   .spin-btn { min-width: 100%; }
   .numbers-grid { grid-template-columns: 1fr 1fr; }
+  .toast-notification { right: 10px; left: 10px; max-width: none; transform: translateY(-200%); }
+  .toast-notification.show { transform: translateY(0); }
 }
 </style>
 </head>
@@ -1036,6 +1099,15 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   </div>
 </div>
 
+<!-- УВЕДОМЛЕНИЕ (ТОСТ) -->
+<div class="toast-notification" id="toastNotification">
+  <div class="toast-icon" id="toastIcon">🎉</div>
+  <div class="toast-content">
+    <h4 id="toastTitle">Задание выполнено!</h4>
+    <p id="toastText">Награда: <span>250 000 ₽</span></p>
+  </div>
+</div>
+
 <header>
   <div class="header-content">
     <div class="logo-wrapper">
@@ -1067,7 +1139,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  <button onclick="openTab('numbers',this)">Номера</button>
  <button onclick="openTab('casino',this)">Казино</button>
  <button onclick="openTab('races',this)">Гонки</button>
- <button onclick="openTab('tasks',this)">Задания</button>
+ <button id="navTasksBtn" onclick="openTab('tasks',this)">Задания</button>
  <button onclick="openTab('tops',this)">🏆 Топы</button>
 </nav>
 
@@ -1538,6 +1610,7 @@ function applyServerUser(user) {
   renderGarage();
   renderMyNumbers(); // Рендер номеров
   renderTasks(); // Рендер заданий
+  updateTaskBadge(); // Обновляем красную точку
   update();
 
   if (needSaveTasks) scheduleSave();
@@ -2206,7 +2279,7 @@ function confirmSell(){
     closeSellModal();
     if (cars.length === 0) selectMode = false;
     renderGarage();
-    updateTaskProgress('sell_car', 1); // Задание на продажу
+    if(unlocked.length > 0) updateTaskProgress('sell_car', unlocked.length);
     return;
   }
 
@@ -2224,7 +2297,7 @@ function confirmSell(){
   closeSellModal();
   if(cars.length===0)selectMode=false;
   renderGarage();
-  if(valid.length > 0) updateTaskProgress('sell_car', valid.length); // Задание на продажу
+  if(valid.length > 0) updateTaskProgress('sell_car', valid.length);
 }
 
 function collectMoney(){
@@ -2619,7 +2692,6 @@ async function saveProfile() {
     updateProfileUIFromServer(user);
 
     closeProfile();
-    alert("Профиль сохранен!");
     
     // Задание на изменение аватарки
     if (newAvatar.startsWith('data:') && newAvatar !== myProfileData.profile.avatar) {
@@ -3980,6 +4052,7 @@ function renderTasks() {
     list.appendChild(item);
   });
 
+  updateTaskBadge();
   updateTaskTimer();
 }
 
@@ -4017,6 +4090,28 @@ function updateTaskProgress(taskId, amount) {
   if (task.progress > oldProgress) {
     renderTasks();
     scheduleSave();
+
+    // Показываем уведомление, если задание только что выполнилось
+    if (task.progress >= template.target && oldProgress < template.target) {
+      showToastNotification(
+        '🎉 Задание выполнено!',
+        `"${template.title}" — заберите награду <span>${template.reward.toLocaleString('ru-RU')} ₽</span>`
+      );
+    }
+  }
+}
+
+function updateTaskBadge() {
+  const btn = document.getElementById('navTasksBtn');
+  if (!btn || !tasksData) return;
+  const hasUnclaimed = tasksData.some(t => {
+    const template = TASK_TEMPLATES.find(tmpl => tmpl.id === t.id);
+    return template && t.progress >= template.target && !t.claimed;
+  });
+  if (hasUnclaimed) {
+    btn.classList.add('has-unclaimed');
+  } else {
+    btn.classList.remove('has-unclaimed');
   }
 }
 
@@ -4031,7 +4126,32 @@ function claimTaskReward(taskId) {
   update();
   renderTasks();
   scheduleSave();
-  alert(`✅ Награда ${template.reward.toLocaleString('ru-RU')} ₽ получена!`);
+
+  // Всплывающее уведомление вместо alert
+  showToastNotification(
+    '✅ Награда получена!',
+    `Вы получили <span>${template.reward.toLocaleString('ru-RU')} ₽</span> за задание "${template.title}"`
+  );
+}
+
+// ================= УВЕДОМЛЕНИЯ (ТОСТЫ) =================
+let toastTimeout = null;
+function showToastNotification(title, text) {
+  const toast = document.getElementById('toastNotification');
+  const toastTitle = document.getElementById('toastTitle');
+  const toastText = document.getElementById('toastText');
+  
+  if (!toast) return;
+  
+  toastTitle.textContent = title;
+  toastText.innerHTML = text;
+  
+  toast.classList.add('show');
+  
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 4000);
 }
 
 // ================= АВТОВХОД =================
