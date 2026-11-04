@@ -1021,65 +1021,124 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 .containers-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 15px;
+  gap: 20px;
   margin-top: 20px;
   justify-items: center;
 }
 @media (max-width: 900px) {
-  .containers-grid { grid-template-columns: repeat(4, 1fr); }
+  .containers-grid { grid-template-columns: repeat(4, 1fr); gap: 15px; }
 }
 @media (max-width: 700px) {
-  .containers-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .containers-grid { grid-template-columns: repeat(3, 1fr); gap: 12px; }
 }
 @media (max-width: 500px) {
-  .containers-grid { grid-template-columns: repeat(2, 1fr); }
+  .containers-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
 }
+
+/* ОБЕРТКА И СВЕЧЕНИЕ */
+.container-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 0;
+}
+
+.neon-glow-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -60%);
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  filter: blur(25px);
+  z-index: 0;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+.container-wrapper:hover .neon-glow-box { opacity: 1; filter: blur(35px); width: 120px; height: 120px; }
+
+.neon-glow-box.red { background: #ff3333; box-shadow: 0 0 40px #ff3333; }
+.neon-glow-box.green { background: #33ff66; box-shadow: 0 0 40px #33ff66; }
+.neon-glow-box.blue { background: #33aaff; box-shadow: 0 0 40px #33aaff; }
+
+/* САМ КОНТЕЙНЕР */
 .container-item {
   position: relative;
+  z-index: 1;
   cursor: pointer;
-  transition: transform 0.3s ease, filter 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
   width: 100%;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  animation: floatAnimation 3s ease-in-out infinite;
 }
-.container-item:hover {
-  transform: translateY(-5px) scale(1.05);
-  filter: drop-shadow(0 0 15px rgba(255,210,26,0.4));
+.container-item:hover { transform: scale(1.1) translateY(-5px); }
+
+@keyframes floatAnimation {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
 }
+
 .container-item img {
   width: 100%;
-  max-width: 150px;
+  max-width: 120px;
   aspect-ratio: 1;
   object-fit: contain;
+  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.7));
+  transition: filter 0.3s ease;
+}
+.container-wrapper:hover .container-item img {
+  filter: drop-shadow(0 15px 25px rgba(255,255,255,0.1)) brightness(1.1);
+}
+
+/* КНОПКА-ЦЕНА ПОД КОНТЕЙНЕРОМ */
+.container-price-btn {
+  background: linear-gradient(180deg, rgba(28,28,35,1), rgba(18,18,24,1));
+  border: 1px solid var(--stroke-2);
   border-radius: 12px;
-  transition: transform 0.3s;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--yellow);
+  text-shadow: 0 0 10px rgba(255,210,26,0.5);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+  transition: all 0.2s;
+  white-space: nowrap;
+  z-index: 2;
+  position: relative;
 }
-.container-item.opened img {
-  animation: containerPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+.container-item:hover ~ .container-price-btn,
+.container-wrapper:hover .container-price-btn {
+  border-color: var(--yellow);
+  box-shadow: 0 0 15px rgba(255,210,26,0.3);
+  transform: scale(1.05);
 }
-@keyframes containerPop {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.15); }
-  100% { transform: scale(1); }
+
+/* ВСКРЫТЫЙ КОНТЕЙНЕР */
+.container-item.opened { pointer-events: none; animation: none; transform: scale(1); }
+.container-item.opened img { opacity: 0.4; filter: grayscale(1); transform: scale(0.9); }
+.container-item.opened ~ .container-price-btn { opacity: 0.3; pointer-events: none; }
+
+/* ЭФФЕКТ ВЗРЫВА ПРИ ОТКРЫТИИ */
+@keyframes particleBurst {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
 }
-.container-item.disabled {
-  pointer-events: none;
-  opacity: 0.4;
-  filter: grayscale(1);
-}
-.container-item.opened::after {
-  content: "ОТКРЫТ";
+.particle {
   position: absolute;
-  bottom: 10px;
-  background: rgba(0,0,0,0.7);
-  color: #ff4d5e;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 1px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  z-index: 10;
+  pointer-events: none;
+  animation: particleBurst 0.8s ease-out forwards;
 }
+
 .container-timer-wrap {
   display: flex;
   justify-content: center;
@@ -1090,6 +1149,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   border-radius: 14px;
   padding: 15px 20px;
   margin-bottom: 20px;
+  box-shadow: 0 0 25px rgba(255,210,26,0.1);
 }
 .container-timer-label {
   font-size: 15px;
@@ -1102,12 +1162,13 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   font-size: 32px;
   font-weight: 900;
   color: var(--yellow);
-  text-shadow: 0 0 15px rgba(255,210,26,.6);
+  text-shadow: 0 0 20px rgba(255,210,26,.8);
   font-variant-numeric: tabular-nums;
+  transition: color 0.3s;
 }
 .container-timer.urgent {
   color: var(--red);
-  text-shadow: 0 0 20px rgba(255,77,94,.8);
+  text-shadow: 0 0 25px rgba(255,77,94,.9);
   animation: pulseRed 1s infinite;
 }
 </style>
@@ -1726,7 +1787,7 @@ let tasksResetTime = 0;
 let taskTimerInterval = null;
 
 // --- КОНТЕЙНЕРЫ ---
-const CONTAINER_PRICE = 500000;
+const CONTAINER_PRICE = 3500000; // Цена контейнера (3.5 млн)
 let containerTimerInterval = null;
 let containerEndTime = 0;
 const CONTAINER_COLORS = ['red', 'green', 'blue'];
@@ -3964,21 +4025,34 @@ function generateContainers() {
   const grid = document.getElementById('containersGrid');
   if (!grid) return;
   
-  // 10 контейнеров. Случайные цвета.
   let html = '';
   for (let i = 0; i < 10; i++) {
     const color = CONTAINER_COLORS[Math.floor(Math.random() * CONTAINER_COLORS.length)];
     html += `
-      <div class="container-item" onclick="openContainer(this, '${color}')">
-        <img src="images/${color}_con.png" alt="${color} container" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'><rect fill=\\'%23222\\' width=\\'100\\' height=\\'100\\'/><text x=\\'50\\' y=\\'50\\' font-size=\\'30\\' text-anchor=\\'middle\\' dominant-baseline=\\'central\\' fill=\\'%23ffd21a\\'>📦</text></svg>'">
+      <div class="container-wrapper">
+        <div class="neon-glow-box ${color}"></div>
+        <div class="container-item" onclick="openContainer(this, '${color}')">
+          <img src="images/${color}_con.png" alt="${color} container" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' viewBox=\\'0 0 100 100\\'><rect fill=\\'%23222\\' width=\\'100\\' height=\\'100\\'/><text x=\\'50\\' y=\\'50\\' font-size=\\'30\\' text-anchor=\\'middle\\' dominant-baseline=\\'central\\' fill=\\'%23ffd21a\\'>📦</text></svg>'">
+        </div>
+        <button class="container-price-btn">${(CONTAINER_PRICE / 1000000).toFixed(1)}M ₽</button>
       </div>
     `;
   }
   grid.innerHTML = html;
 }
 
+function renderContainers() {
+  const grid = document.getElementById('containersGrid');
+  if (!grid) return;
+  
+  // Проверяем, есть ли уже контейнеры. Если да - ничего не делаем, чтобы не сбрасывать прогресс.
+  if (grid.children.length > 0) return;
+  
+  generateContainers();
+}
+
 function openContainer(element, color) {
-  if (element.classList.contains('opened') || element.classList.contains('disabled')) return;
+  if (element.classList.contains('opened')) return;
   
   if (balance < CONTAINER_PRICE) {
     showToastNotification('❌ Недостаточно средств', `Для открытия нужно <span>${CONTAINER_PRICE.toLocaleString('ru-RU')} ₽</span>`);
@@ -3994,28 +4068,35 @@ function openContainer(element, color) {
   img.src = `images/${color}_conopn.png`;
   img.onerror = () => { img.src = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 100\'><rect fill=\'%23222\' width=\'100\' height=\'100\'/><text x=\'50\' y=\'50\' font-size=\'30\' text-anchor=\'middle\' dominant-baseline=\'central\' fill=\'%23fff\'>🎁</text></svg>'; };
 
+  // Создаем взрыв искр
+  createContainerParticles(element, color);
+
   // Логика выпадения
   const roll = Math.random();
-  let dropText = '';
   let winCar = null;
-  let winAmount = 0;
 
-  // Настраиваем шансы для контейнера (цена 500к)
-  // Ожидаемый возврат должен быть около 400-600к, чтобы был и плюс, и минус
-  if (roll < 0.30) {
-    // 30% - Пусто
-    dropText = 'Пусто';
-    winAmount = 0;
-  } else if (roll < 0.75) {
-    // 45% - Эпическая (средняя стоимость ~25 млн)
-    const epics = catalog.filter(c => c.rarity === 'Эпическая');
+  // Настраиваем шансы (25% пусто, 40% дешевая эпическая, 25% дорогая эпическая/легендарная, 8% легендарная, 2% мифическая)
+  if (roll < 0.25) {
+    // 25% - Пусто
+  } else if (roll < 0.65) {
+    // 40% - Дешевая эпическая (средняя цена ~15 млн)
+    const epics = catalog.filter(c => c.rarity === 'Эпическая' && c.price < 25000000);
     winCar = epics[Math.floor(Math.random() * epics.length)];
-  } else if (roll < 0.95) {
-    // 20% - Легендарная (средняя стоимость ~140 млн)
-    const legendaries = catalog.filter(c => c.rarity === 'Легендарная');
+  } else if (roll < 0.90) {
+    // 25% - Дорогая эпическая (30-40 млн) или дешевая легендарная (~80 млн)
+    if (Math.random() < 0.5) {
+      const epics = catalog.filter(c => c.rarity === 'Эпическая' && c.price >= 25000000);
+      winCar = epics[Math.floor(Math.random() * epics.length)];
+    } else {
+      const legendaries = catalog.filter(c => c.rarity === 'Легендарная' && c.price < 120000000);
+      winCar = legendaries[Math.floor(Math.random() * legendaries.length)];
+    }
+  } else if (roll < 0.98) {
+    // 8% - Дорогая легендарная (~150-200 млн)
+    const legendaries = catalog.filter(c => c.rarity === 'Легендарная' && c.price >= 120000000);
     winCar = legendaries[Math.floor(Math.random() * legendaries.length)];
   } else {
-    // 5% - Мифическая (средняя стоимость ~600 млн)
+    // 2% - Мифическая (средняя цена ~600 млн) - ДЖЕКПОТ
     const mythics = catalog.filter(c => c.rarity === 'Мифическая');
     winCar = mythics[Math.floor(Math.random() * mythics.length)];
   }
@@ -4026,17 +4107,33 @@ function openContainer(element, color) {
       renderGarage();
       update();
       scheduleSave();
-      showToastNotification('🎉 ВЫПАЛА МАШИНА!', `<span>${winCar.name}</span> (${winCar.rarity}) добавлена в гараж.`);
+      showToastNotification('🎉 ДЖЕКПОТ! ВЫПАЛА МАШИНА!', `<span>${winCar.name}</span> (${winCar.rarity}) добавлена в гараж.`);
     } else {
       showToastNotification('📦 Пусто', 'В контейнере ничего не оказалось. Повезет в следующий раз!');
     }
+  }, 600);
+}
+
+function createContainerParticles(container, color) {
+  let particleColor = '#fff';
+  if (color === 'red') particleColor = '#ff3333';
+  if (color === 'green') particleColor = '#33ff66';
+  if (color === 'blue') particleColor = '#33aaff';
+
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.background = particleColor;
+    p.style.boxShadow = `0 0 10px ${particleColor}`;
     
-    // Проверка, что все контейнеры открыты
-    const allOpened = Array.from(document.querySelectorAll('.container-item')).every(el => el.classList.contains('opened'));
-    if (allOpened) {
-      // Если все открыты, можно добавить плашку или просто ждать таймер
-    }
-  }, 600); // Небольшая задержка для анимации
+    const angle = (Math.PI * 2) / 12 * i;
+    const dist = 40 + Math.random() * 40;
+    p.style.setProperty('--tx', `${Math.cos(angle) * dist}px`);
+    p.style.setProperty('--ty', `${Math.sin(angle) * dist}px`);
+
+    container.appendChild(p);
+    setTimeout(() => p.remove(), 800);
+  }
 }
 
 // ================= КАЗИНО =================
