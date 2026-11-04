@@ -710,6 +710,124 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   box-shadow: 0 12px 25px rgba(61,220,132,0.6);
 }
 
+/* ===== СТИЛИ ДЛЯ ЗАДАНИЙ ===== */
+.tasks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(180deg, rgba(255,210,26,.1), rgba(255,210,26,.02));
+  border: 1px solid rgba(255,210,26,.3);
+  border-radius: 14px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.tasks-timer {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--yellow-soft);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tasks-timer span {
+  font-size: 20px;
+  color: var(--yellow);
+  text-shadow: 0 0 10px rgba(255,210,26,.5);
+}
+.tasks-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+}
+@media (min-width: 768px) {
+  .tasks-list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.task-item {
+  background: linear-gradient(180deg, #1c1c24, #121217);
+  border: 1px solid var(--stroke-2);
+  border-radius: 16px;
+  padding: 15px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+.task-item.completed {
+  border-color: var(--green);
+  box-shadow: 0 0 20px rgba(61,220,132,.15);
+}
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+.task-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+}
+.task-reward {
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--yellow);
+  white-space: nowrap;
+  text-shadow: 0 0 10px rgba(255,210,26,.3);
+}
+.task-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(0,0,0,0.5);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+.task-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd21a, #ffb800);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 10px rgba(255,210,26,.5);
+}
+.task-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.task-progress-text {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 700;
+}
+.task-claim-btn {
+  padding: 8px 16px;
+  background: linear-gradient(180deg, #3ddc84, #28a862);
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(61,220,132,.3);
+  transition: all 0.2s;
+}
+.task-claim-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px rgba(61,220,132,.5);
+}
+.task-claim-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 @media(max-width: 600px) {
   .user-profile-widget { top: 10px; right: 10px; padding: 4px 8px 4px 4px; }
   .user-avatar-mini { width: 32px; height: 32px; }
@@ -949,6 +1067,7 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  <button onclick="openTab('numbers',this)">Номера</button>
  <button onclick="openTab('casino',this)">Казино</button>
  <button onclick="openTab('races',this)">Гонки</button>
+ <button onclick="openTab('tasks',this)">Задания</button>
  <button onclick="openTab('tops',this)">🏆 Топы</button>
 </nav>
 
@@ -1260,6 +1379,19 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  </div>
 </section>
 
+<!-- НОВАЯ ВКЛАДКА ЗАДАНИЯ -->
+<section id="tasks" class="panel" hidden>
+  <h2>📋 Задания</h2>
+  <div class="tasks-header">
+    <div class="tasks-timer">
+      Обновление через: <span id="taskTimer">05:00:00</span>
+    </div>
+  </div>
+  <div class="tasks-list" id="tasksList">
+    <!-- Задания будут рендериться здесь -->
+  </div>
+</section>
+
 <section id="tops" class="panel" hidden>
  <h2>🏆 Топ игроков</h2>
  <div class="top-container" id="topContainer"></div>
@@ -1301,6 +1433,24 @@ let currentUnconfirmedPlate = null;
 let sellNumberIndex = -1;
 
 const ADMIN_LOGIN_ID = 'Q1wesh';
+
+// --- ЗАДАНИЯ ---
+const TASK_TEMPLATES = [
+  { id: 'open_2_cases', title: 'Откройте 2 кейса', target: 2, reward: 250000 },
+  { id: 'sell_car', title: 'Продайте машину', target: 1, reward: 150000 },
+  { id: 'win_casino', title: 'Выиграйте в казино', target: 1, reward: 200000 },
+  { id: 'change_avatar', title: 'Измените аватарку', target: 1, reward: 150000 },
+  { id: 'spin_numbers', title: 'Прокрутите номера', target: 1, reward: 1000000 },
+  { id: 'get_legendary_car', title: 'Выбейте легендарную машину', target: 1, reward: 1200000 },
+  { id: 'get_mythic_car', title: 'Выбейте мифическую машину', target: 1, reward: 1300000 },
+  { id: 'get_divine_car', title: 'Выбейте божественную машину', target: 1, reward: 1400000 },
+  { id: 'win_race', title: 'Выиграйте гонку', target: 1, reward: 555000 },
+  { id: 'lose_casino', title: 'Проиграйте в казино', target: 1, reward: 200000 }
+];
+
+let tasksData = [];
+let tasksResetTime = 0;
+let taskTimerInterval = null;
 
 // ================= АВТОРИЗАЦИЯ =================
 function toggleAuthMode() {
@@ -1359,6 +1509,19 @@ function applyServerUser(user) {
   myNumbers = user.gameData.myNumbers || [];
   numbersSlots = user.gameData.numbersSlots || 10;
 
+  // Загрузка заданий
+  const now = Date.now();
+  let needSaveTasks = false;
+
+  if (!user.gameData.tasksData || !user.gameData.tasksResetTime || user.gameData.tasksResetTime < now) {
+    tasksData = TASK_TEMPLATES.map(t => ({ id: t.id, progress: 0, claimed: false }));
+    tasksResetTime = now + 5 * 60 * 60 * 1000; // 5 часов
+    needSaveTasks = true;
+  } else {
+    tasksData = user.gameData.tasksData;
+    tasksResetTime = user.gameData.tasksResetTime;
+  }
+
   if (typeof window._lastFuel === 'undefined') {
     window._lastFuel = user.gameData.fuel !== undefined ? user.gameData.fuel : MAX_FUEL;
     window._lastFuelTime = user.gameData.lastFuelTime || Date.now();
@@ -1374,7 +1537,10 @@ function applyServerUser(user) {
   updateFuelUI();
   renderGarage();
   renderMyNumbers(); // Рендер номеров
+  renderTasks(); // Рендер заданий
   update();
+
+  if (needSaveTasks) scheduleSave();
 
   document.getElementById("authScreen").style.display = "none";
   document.getElementById("userProfileWidget").style.display = "flex";
@@ -1399,6 +1565,7 @@ function startGameLoop() {
       update();
       updateFuelUI();
       scheduleSave();
+      updateTaskTimer();
     }
   }, 1000);
 }
@@ -1460,7 +1627,9 @@ function scheduleSave() {
             lastFuelTime: window._lastFuelTime,
             lastTime: Date.now(),
             myNumbers: myNumbers,
-            numbersSlots: numbersSlots
+            numbersSlots: numbersSlots,
+            tasksData: tasksData,
+            tasksResetTime: tasksResetTime
           }
         })
       });
@@ -2037,6 +2206,7 @@ function confirmSell(){
     closeSellModal();
     if (cars.length === 0) selectMode = false;
     renderGarage();
+    updateTaskProgress('sell_car', 1); // Задание на продажу
     return;
   }
 
@@ -2054,6 +2224,7 @@ function confirmSell(){
   closeSellModal();
   if(cars.length===0)selectMode=false;
   renderGarage();
+  if(valid.length > 0) updateTaskProgress('sell_car', valid.length); // Задание на продажу
 }
 
 function collectMoney(){
@@ -2272,6 +2443,9 @@ async function buyCase(){
  for(let i=0;i<quantity;i++) winners.push(getRandomCar());
  const skip=document.getElementById("skipAnimation").checked;
 
+ // Обновляем задание на открытие кейсов
+ updateTaskProgress('open_2_cases', quantity);
+
  if(skip){
   winners.forEach((winner,index)=>{
    cars.push({id:winner.id});
@@ -2293,6 +2467,9 @@ async function buyCase(){
    row.append(header,result);
    list.append(row);
    showCaseDrop(winner);
+   if(winner.rarity === 'Легендарная') updateTaskProgress('get_legendary_car', 1);
+   if(winner.rarity === 'Мифическая') updateTaskProgress('get_mythic_car', 1);
+   if(winner.rarity === 'Божественная') updateTaskProgress('get_divine_car', 1);
   });
   finishOpening(quantity);
   return;
@@ -2306,6 +2483,9 @@ async function buyCase(){
    lastCarsFromCase.push(winner);
    r.result.textContent = "🎉 " + winner.name + " — " + winner.rarity;
    showCaseDrop(winner);
+   if(winner.rarity === 'Легендарная') updateTaskProgress('get_legendary_car', 1);
+   if(winner.rarity === 'Мифическая') updateTaskProgress('get_mythic_car', 1);
+   if(winner.rarity === 'Божественная') updateTaskProgress('get_divine_car', 1);
  }));
 
  await Promise.all(animations);
@@ -2348,12 +2528,14 @@ function sellDroppedCars() {
 
   balance += total;
   triggerBalanceAnimation(total, true);
+  const count = lastCarsFromCase.length;
   lastCarsFromCase = [];
   document.getElementById('sellDroppedBtn').style.display = 'none';
   document.getElementById('caseMessage').textContent = `✅ Выпавшие машины проданы за ${total.toLocaleString('ru-RU')} ₽!`;
 
   renderGarage();
   update();
+  if(count > 0) updateTaskProgress('sell_car', count); // Задание на продажу
 }
 
 // ================= ПРОФИЛЬ =================
@@ -2438,6 +2620,12 @@ async function saveProfile() {
 
     closeProfile();
     alert("Профиль сохранен!");
+    
+    // Задание на изменение аватарки
+    if (newAvatar.startsWith('data:') && newAvatar !== myProfileData.profile.avatar) {
+      updateTaskProgress('change_avatar', 1);
+      myProfileData.profile.avatar = newAvatar;
+    }
   } catch (e) { console.error(e); }
 }
 
@@ -2582,6 +2770,9 @@ function openTab(tab,button){
  }
  if (tab === "numbers") {
    initNumbersTab();
+ }
+ if (tab === "tasks") {
+   renderTasks();
  }
 }
 
@@ -2843,6 +3034,9 @@ async function spinChars() {
       btn.disabled = false;
       btn.textContent = 'ЦИФРЫ 500К';
 
+      // Задание на прокрутку номеров
+      updateTaskProgress('spin_numbers', 1);
+
       // Если выпал редкий номер - показываем модалку!
       if (result.type === 'exclusive' || result.type === 'legendary') {
         showRareNumberModal(currentUnconfirmedPlate, () => {
@@ -2922,6 +3116,9 @@ async function spinRegion() {
       isSpinningRegion = false;
       btn.disabled = false;
       btn.textContent = 'РЕГИОН 300К';
+
+      // Задание на прокрутку номеров
+      updateTaskProgress('spin_numbers', 1);
 
       // Если выпал редкий номер - показываем модалку!
       if (result.type === 'exclusive' || result.type === 'legendary') {
@@ -3148,9 +3345,11 @@ function playRoulette() {
         balance += winAmount; triggerBalanceAnimation(winAmount, true);
         resultEl.textContent = `Победа! +${winAmount.toLocaleString("ru-RU")} ₽`; resultEl.style.color = "var(--green)";
         visual.innerHTML = '<div class="visual-text" style="color:var(--green)">💎</div>';
+        updateTaskProgress('win_casino', 1); // Задание на выигрыш
       } else {
         resultEl.textContent = `Проигрыш. -${bet.toLocaleString("ru-RU")} ₽`; resultEl.style.color = "var(--red)";
         visual.innerHTML = '<div class="visual-text" style="color:var(--red)">💀</div>';
+        updateTaskProgress('lose_casino', 1); // Задание на проигрыш
       }
       update();
     }
@@ -3179,8 +3378,10 @@ function playDice() {
       if (sum === 7 || sum === 11) {
         balance += bet * 2; triggerBalanceAnimation(bet * 2, true);
         resultEl.textContent = `Выпало ${sum}. Победа! +${(bet*2).toLocaleString("ru-RU")} ₽`; resultEl.style.color = "var(--green)";
+        updateTaskProgress('win_casino', 1); // Задание на выигрыш
       } else {
         resultEl.textContent = `Выпало ${sum}. Проигрыш.`; resultEl.style.color = "var(--red)";
+        updateTaskProgress('lose_casino', 1); // Задание на проигрыш
       }
       update();
     }
@@ -3299,12 +3500,14 @@ function endBlackjack(win, message) {
         balance += bet * 2;
         triggerBalanceAnimation(bet * 2, true);
         resultEl.style.color = 'var(--green)';
+        updateTaskProgress('win_casino', 1); // Задание на выигрыш
     } else if (win === null) {
         balance += bet;
         triggerBalanceAnimation(bet, true);
         resultEl.style.color = 'var(--yellow-soft)';
     } else {
         resultEl.style.color = 'var(--red)';
+        updateTaskProgress('lose_casino', 1); // Задание на проигрыш
     }
 
     document.getElementById('bj-btn-start').style.display = 'block';
@@ -3703,6 +3906,7 @@ function startMovement() {
         pLane.classList.add("win-active");
         bLane.classList.add("lose-active");
         endRace(true, "🏆 Вы победили! Выигрыш: " + currentRaceData.reward.toLocaleString("ru-RU") + " ₽");
+        updateTaskProgress('win_race', 1); // Задание на победу в гонке
       } else {
         pLane.classList.add("lose-active");
         bLane.classList.add("win-active");
@@ -3731,6 +3935,103 @@ function endRace(win, message) {
       resetRaceUI();
     }
   }, 4000);
+}
+
+// ================= ЗАДАНИЯ =================
+function renderTasks() {
+  const list = document.getElementById('tasksList');
+  if (!list) return;
+  list.innerHTML = '';
+
+  const now = Date.now();
+  if (now > tasksResetTime) {
+    tasksData = TASK_TEMPLATES.map(t => ({ id: t.id, progress: 0, claimed: false }));
+    tasksResetTime = now + 5 * 60 * 60 * 1000;
+    scheduleSave();
+  }
+
+  tasksData.forEach(task => {
+    const template = TASK_TEMPLATES.find(t => t.id === task.id);
+    if (!template) return;
+
+    const completed = task.progress >= template.target;
+    const claimed = task.claimed;
+
+    const item = document.createElement('div');
+    item.className = 'task-item' + (completed && !claimed ? ' completed' : '');
+    
+    const progressPercent = Math.min(100, (task.progress / template.target) * 100);
+    
+    item.innerHTML = `
+      <div class="task-header">
+        <div class="task-title">${template.title}</div>
+        <div class="task-reward">${template.reward.toLocaleString('ru-RU')} ₽</div>
+      </div>
+      <div class="task-progress-bar">
+        <div class="task-progress-fill" style="width: ${progressPercent}%"></div>
+      </div>
+      <div class="task-footer">
+        <div class="task-progress-text">${Math.min(task.progress, template.target)} / ${template.target}</div>
+        <button class="task-claim-btn" ${(!completed || claimed) ? 'disabled' : ''} onclick="claimTaskReward('${task.id}')">
+          ${claimed ? 'Получено' : 'Забрать'}
+        </button>
+      </div>
+    `;
+    list.appendChild(item);
+  });
+
+  updateTaskTimer();
+}
+
+function updateTaskTimer() {
+  const el = document.getElementById('taskTimer');
+  if (!el) return;
+  const now = Date.now();
+  let diff = Math.max(0, tasksResetTime - now);
+  
+  if (diff === 0) {
+    renderTasks();
+    return;
+  }
+
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  diff -= hours * 1000 * 60 * 60;
+  const minutes = Math.floor(diff / (1000 * 60));
+  diff -= minutes * 1000 * 60;
+  const seconds = Math.floor(diff / 1000);
+
+  el.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+function updateTaskProgress(taskId, amount) {
+  if (!tasksData) return;
+  const task = tasksData.find(t => t.id === taskId);
+  if (!task || task.claimed) return;
+  
+  const template = TASK_TEMPLATES.find(t => t.id === taskId);
+  if (!template) return;
+
+  const oldProgress = task.progress;
+  task.progress = Math.min(template.target, task.progress + amount);
+  
+  if (task.progress > oldProgress) {
+    renderTasks();
+    scheduleSave();
+  }
+}
+
+function claimTaskReward(taskId) {
+  const task = tasksData.find(t => t.id === taskId);
+  const template = TASK_TEMPLATES.find(t => t.id === taskId);
+  if (!task || !template || task.claimed || task.progress < template.target) return;
+
+  task.claimed = true;
+  balance += template.reward;
+  triggerBalanceAnimation(template.reward, true);
+  update();
+  renderTasks();
+  scheduleSave();
+  alert(`✅ Награда ${template.reward.toLocaleString('ru-RU')} ₽ получена!`);
 }
 
 // ================= АВТОВХОД =================
