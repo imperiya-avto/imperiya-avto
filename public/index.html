@@ -20,11 +20,64 @@
 html,body{height:100%}
 body{
   margin:0;
-  background: radial-gradient(1200px 600px at 50% -10%, rgba(255,210,26,.10), transparent 60%),
-    radial-gradient(900px 500px at 100% 100%, rgba(255,184,0,.06), transparent 60%),
-    linear-gradient(180deg, #0a0a0c 0%, #0e0e12 100%);
+  /* Базовый фон остается темным, свечения добавляются через отдельный слой */
+  background: #08080a; 
   color:var(--text); font-family:'Segoe UI', Roboto, Arial, sans-serif;
   overflow-anchor:none; min-height:100vh;
+  position: relative;
+}
+
+/* ================= АНИМИРОВАННЫЙ ФОН (СВЕЧЕНИЯ) ================= */
+.bg-lights-container {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: -2; /* Самый задний план */
+  overflow: hidden;
+  pointer-events: none;
+  background: #08080a;
+}
+
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.4;
+  animation: floatOrb 12s ease-in-out infinite alternate, pulseOrb 8s ease-in-out infinite alternate;
+}
+
+.bg-orb-1 {
+  width: 60vw; height: 60vw;
+  background: radial-gradient(circle, rgba(255, 210, 26, 0.6), transparent 70%);
+  top: -20vh; left: -10vw;
+  animation-delay: 0s, 2s;
+}
+.bg-orb-2 {
+  width: 50vw; height: 50vw;
+  background: radial-gradient(circle, rgba(255, 120, 0, 0.5), transparent 70%);
+  bottom: -10vh; right: -10vw;
+  animation-delay: -5s, -3s;
+}
+.bg-orb-3 {
+  width: 40vw; height: 40vw;
+  background: radial-gradient(circle, rgba(255, 180, 0, 0.4), transparent 70%);
+  top: 40vh; left: 30vw;
+  animation-delay: -10s, -7s;
+}
+
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(5vw, 10vh) scale(1.1); }
+  100% { transform: translate(-5vw, -5vh) scale(0.9); }
+}
+
+@keyframes pulseOrb {
+  0% { opacity: 0.3; }
+  100% { opacity: 0.6; }
+}
+
+/* Остальные слои должны быть выше фона */
+header, nav, main, footer, .balance-container, .modal, .profile-modal, .auth-box, .bg-lights-container {
+  /* Уже заданы или не требуют изменений */
 }
 
 [hidden] { display: none !important; }
@@ -92,7 +145,7 @@ body{
 .anim-shake { animation: shake 0.4s ease-in-out; }
 
 #authScreen { position: fixed; inset: 0; background: rgba(5,5,8,.95); backdrop-filter: blur(10px); display: flex; align-items: center; justify-content: center; z-index: 99999; padding: 16px; }
-.auth-box { background: linear-gradient(180deg,#1c1c24,#121217); border: 2px solid var(--stroke-2); border-radius: 20px; padding: 30px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.9), 0 0 0 1px rgba(255,210,26,.1); animation: popIn .3s ease; }
+.auth-box { background: linear-gradient(180deg,#1c1c24,#121217); border: 2px solid var(--stroke-2); border-radius: 20px; padding: 30px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.9), 0 0 0 1px rgba(255,210,26,.1); animation: popIn .3s ease; position: relative; z-index: 2; }
 .auth-box h2 { color: var(--yellow); margin: 0 0 20px; font-size: 26px; text-shadow: 0 0 15px rgba(255,210,26,.4); }
 .auth-input { width: 100%; padding: 14px; margin-bottom: 12px; background: #0a0a0c; border: 2px solid var(--stroke-2); border-radius: 12px; color: #fff; font-size: 16px; outline: none; transition: border-color .2s; }
 .auth-input:focus { border-color: var(--yellow); box-shadow: 0 0 15px rgba(255,210,26,.2); }
@@ -109,7 +162,7 @@ body{
 .user-name-mini { font-size: 14px; font-weight: 800; color: #fff; max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .profile-modal { position: fixed; inset: 0; background: rgba(5,5,8,.9); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 100000; padding: 16px; }
-.profile-box { background: linear-gradient(180deg,#1c1c24,#121217); border: 2px solid var(--stroke-2); border-radius: 20px; padding: 25px; width: 100%; max-width: 450px; position: relative; box-shadow: 0 30px 80px rgba(0,0,0,.9); }
+.profile-box { background: linear-gradient(180deg,#1c1c24,#121217); border: 2px solid var(--stroke-2); border-radius: 20px; padding: 25px; width: 100%; max-width: 450px; position: relative; box-shadow: 0 30px 80px rgba(0,0,0,.9); z-index: 2; }
 .profile-close { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--muted); font-size: 24px; cursor: pointer; transition: color .2s; }
 .profile-close:hover { color: var(--red); }
 .profile-header { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; }
@@ -163,7 +216,7 @@ body{
 .fuel-count.low { color: var(--red); animation: pulseRed 1s infinite; }
 
 /* ИСПРАВЛЕНИЕ ШАПКИ ДЛЯ МОБИЛЬНЫХ */
-header{ padding: 16px 24px; background: linear-gradient(180deg, #0e0e12 0%, #0b0b0f 100%); border-bottom: 1px solid var(--stroke); position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; min-height: 80px; gap: 15px; }
+header{ padding: 16px 24px; background: linear-gradient(180deg, #0e0e12 0%, #0b0b0f 100%); border-bottom: 1px solid var(--stroke); position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; min-height: 80px; gap: 15px; z-index: 2; }
 header:before{ content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: radial-gradient(600px 160px at 10% 0%, rgba(255,210,26,.15), transparent 70%); pointer-events: none; }
 .header-content { position: relative; z-index: 2; display: flex; flex-direction: row; align-items: center; gap: 20px; }
 .logo-wrapper { position: relative; display: flex; align-items: center; justify-content: center; padding: 0 10px; }
@@ -194,7 +247,7 @@ header:before{ content: ""; position: absolute; top: 0; left: 0; right: 0; botto
   nav button { padding: 8px 10px; font-size: 11px; }
 }
 
-.balance-container { position: relative; max-width: 920px; margin: 12px auto 0; width: calc(100% - 24px); }
+.balance-container { position: relative; max-width: 920px; margin: 12px auto 0; width: calc(100% - 24px); z-index: 2; }
 .balance{ text-align:center; padding:12px 16px; background:linear-gradient(180deg, rgba(255,210,26,.10), rgba(255,210,26,.03)); border:1px solid rgba(255,210,26,.28); border-radius:14px; color:var(--yellow-soft); font-size:18px; font-weight:800; letter-spacing:.5px; box-shadow:0 0 30px rgba(255,210,26,.10) inset, 0 8px 24px rgba(0,0,0,.5); transition: color 0.3s, border-color 0.3s; }
 .balance #balance{ color:var(--yellow); text-shadow:0 0 14px rgba(255,210,26,.5); display: inline-block; transition: color 0.3s; }
 
@@ -202,11 +255,18 @@ nav{ display:flex; justify-content:center; flex-wrap:wrap; gap:8px; padding:14px
 nav button{ padding:10px 16px; border:1px solid var(--stroke-2); border-radius:999px; background:linear-gradient(180deg, #1c1c23, #14141a); color:#d9d9e2; font-size:13px; font-weight:700; letter-spacing:.3px; transition:all .18s ease; cursor:pointer; position: relative; }
 nav button:hover:not(:disabled){ transform:translateY(-2px); border-color:rgba(255,210,26,.55); color:var(--yellow-soft); box-shadow:0 0 0 1px rgba(255,210,26,.25), 0 8px 20px rgba(255,210,26,.10); }
 nav button.active{ background:linear-gradient(180deg, #ffd21a, #ffb800); color:#15130a; border-color:#ffd21a; box-shadow:0 0 0 1px rgba(255,210,26,.6), 0 8px 22px rgba(255,210,26,.35); }
+/* Анимация при нажатии на кнопку навигации */
+nav button:active {
+  transform: scale(0.92) translateY(0);
+  box-shadow: 0 0 10px rgba(255,210,26,0.2);
+  transition: transform 0.1s ease;
+}
+
 #navTasksBtn::after { content: ""; position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; background-color: #ff4d5e; border-radius: 50%; box-shadow: 0 0 6px #ff4d5e; display: none; }
 #navTasksBtn.has-unclaimed::after { display: block; }
 
-main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
-.panel{ background:linear-gradient(180deg, rgba(28,28,35,.85), rgba(18,18,24,.9)); border:1px solid var(--stroke); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); position:relative; overflow:hidden; }
+main{max-width:1250px;margin:16px auto;padding:0 12px 40px; position: relative; z-index: 2;}
+.panel{ background:linear-gradient(180deg, rgba(28,28,35,.85), rgba(18,18,24,.9)); border:1px solid var(--stroke); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow); position:relative; overflow:hidden; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
 .panel:before{ content:"";position:absolute;top:0;left:0;right:0;height:1px; background:linear-gradient(90deg, transparent, rgba(255,210,26,.5), transparent); }
 .panel h2{ margin:0 0 14px; font-size:22px; font-weight:800; letter-spacing:.4px; color:#fff; display:flex;align-items:center;gap:10px; }
 .panel h2:after{ content:""; flex:1; height:1px; background:linear-gradient(90deg, rgba(255,210,26,.35), transparent); }
@@ -372,7 +432,7 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .modal,.tutorial{ position:fixed;inset:0; background:rgba(5,5,8,.88); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); display:flex;align-items:center;justify-content:center; padding:16px;z-index:10000; animation:fadeIn .2s ease; }
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .modal[hidden],.tutorial[hidden]{display:none}
-.modal-box,.tutorial-box{ background:linear-gradient(180deg,#1c1c24,#121217); border:1px solid var(--stroke-2); border-radius:18px; padding:26px; width:100%;max-width:440px;text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.8), 0 0 0 1px rgba(255,210,26,.08); position:relative; animation:popIn .22s ease; }
+.modal-box,.tutorial-box{ background:linear-gradient(180deg,#1c1c24,#121217); border:1px solid var(--stroke-2); border-radius:18px; padding:26px; width:100%;max-width:440px;text-align:center; box-shadow:0 30px 80px rgba(0,0,0,.8), 0 0 0 1px rgba(255,210,26,.08); position:relative; animation:popIn .22s ease; z-index: 2; }
 @keyframes popIn{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
 .modal-box h2,.tutorial-box h2{ color:var(--yellow);margin:0 0 10px; font-size:22px;letter-spacing:.5px; text-shadow:0 0 18px rgba(255,210,26,.3); }
 .modal-box p{color:#c9c9d6;line-height:1.5;font-size:14px}
@@ -559,7 +619,7 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 
 .car-select-modal { position: fixed; inset: 0; background: rgba(5,5,8,.9); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; z-index: 10001; padding: 16px; }
 .car-select-modal[hidden] { display: none !important; }
-.car-select-box { background: linear-gradient(180deg, #1c1c24, #121217); border: 1px solid var(--stroke-2); border-radius: 18px; padding: 20px; width: 100%; max-width: 600px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 30px 80px rgba(0,0,0,.8); animation: popIn .22s ease; }
+.car-select-box { background: linear-gradient(180deg, #1c1c24, #121217); border: 1px solid var(--stroke-2); border-radius: 18px; padding: 20px; width: 100%; max-width: 600px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 30px 80px rgba(0,0,0,.8); animation: popIn .22s ease; z-index: 2; }
 .car-select-box h3 { color: var(--yellow); margin: 0 0 15px; text-align: center; font-size: 20px; }
 .car-select-list { overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-right: 5px; }
 .car-select-item { background: #1e1e26; border: 2px solid var(--stroke-2); border-radius: 12px; padding: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
@@ -570,7 +630,7 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px}
 .car-select-item-power { font-size: 11px; color: var(--yellow-soft); font-weight: 700; }
 .car-select-close { background: linear-gradient(180deg, #3a3a48, #2a2a34); color: #e8e8f0; border: 0; border-radius: 10px; padding: 12px 22px; margin-top: 15px; font-weight: 800; cursor: pointer; align-self: center; }
 
-footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spacing:.5px; border-top:1px solid var(--stroke); margin-top:20px; }
+footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spacing:.5px; border-top:1px solid var(--stroke); margin-top:20px; position: relative; z-index: 2;}
 ::-webkit-scrollbar{width:10px;height:10px}
 ::-webkit-scrollbar-thumb{background:#2c2c38;border-radius:6px}
 ::-webkit-scrollbar-thumb:hover{background:#3a3a48}
@@ -870,6 +930,13 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 </head>
 <body>
 
+<!-- АНИМИРОВАННЫЙ ФОН (СВЕЧЕНИЯ) -->
+<div class="bg-lights-container">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+</div>
+
 <!-- ЭКРАН АВТОРИЗАЦИИ -->
 <div id="authScreen">
   <div class="auth-box">
@@ -1084,14 +1151,14 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 </div>
 
 <nav>
- <button class="active" onclick="openTab('garage',this)">Мой гараж</button>
- <button onclick="openTab('cars',this)">Кейс машин</button>
- <button onclick="openTab('numbers',this)">Номера</button>
+ <button class="active" onclick="openTab('garage',this)">🏎️ Мой гараж</button>
+ <button onclick="openTab('cars',this)">🎁 Кейс машин</button>
+ <button onclick="openTab('numbers',this)">🔢 Номера</button>
  <button onclick="openTab('containers',this)">📦 Контейнеры</button>
- <button onclick="openTab('casino',this)">Казино</button>
- <button onclick="openTab('races',this)">Гонки</button>
- <button id="navTasksBtn" onclick="openTab('tasks',this)">Задания</button>
- <button onclick="openTab('collection',this)">📚 Коллекция</button> <!-- НОВАЯ КНОПКА -->
+ <button onclick="openTab('casino',this)">🎰 Казино</button>
+ <button onclick="openTab('races',this)">🏁 Гонки</button>
+ <button id="navTasksBtn" onclick="openTab('tasks',this)">📋 Задания</button>
+ <button onclick="openTab('collection',this)">📚 Коллекция</button>
  <button onclick="openTab('tops',this)">🏆 Топы</button>
 </nav>
 
@@ -2021,7 +2088,7 @@ const CASE_RARITY_CHANCES = {
  mythical:    [0,     37.8,  53.9,  7.36,  0.92,  0.02,  0],
  exclusive:   [0,     0,     67,    27.4,  5.47,  0.17,  0],
  secret:      [0,     0,     12.5,  69.4,  17.7,  0.44,  0],
- divine:      [0,     0,     0,     67,    27.4,  5.47,  0.17]
+ divine:      [0,     0,     0,     67,    27.4,  5.47,  0.95] // ИСПРАВЛЕНО: 0.95% для Божественной
 };
 
 const CASE_TYPES={
@@ -2227,12 +2294,15 @@ function renderGarage(){
       card.prepend(lock);
     }
 
+    // Исправление бага с раскрытием всех карточек
+    // Мы применяем класс expanded только к той карточке, чей индекс в expandedCars
     card.className = "car"+
       (isDivine?" rarity-rainbow":" rarity-glow")+
       (selectMode && !car.locked ? " selectable":"")+
       (isSelected ? " selected":"")+
       (car.locked ? " locked":"")+
-      (isExpanded ? " expanded":"");
+      (isExpanded ? " expanded":""); // Только эта карточка получит класс expanded
+    
     card.style.setProperty("--rarity-color",color);
 
     const lockBtn = card.querySelector('.car-lock-corner');
