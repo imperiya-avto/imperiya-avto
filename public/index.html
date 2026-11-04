@@ -1504,6 +1504,10 @@ let numbersSlots = 10; // Всего ячеек
 let currentUnconfirmedPlate = null;
 let sellNumberIndex = -1;
 
+// --- PITY SYSTEM ---
+let pityCounter = 0;
+const PITY_THRESHOLD = 30;
+
 const ADMIN_LOGIN_ID = 'Q1wesh';
 
 // --- ЗАДАНИЯ ---
@@ -1580,6 +1584,7 @@ function applyServerUser(user) {
   // Загрузка номеров
   myNumbers = user.gameData.myNumbers || [];
   numbersSlots = user.gameData.numbersSlots || 10;
+  pityCounter = user.gameData.pityCounter || 0;
 
   // Загрузка заданий
   const now = Date.now();
@@ -1702,7 +1707,8 @@ function scheduleSave() {
             myNumbers: myNumbers,
             numbersSlots: numbersSlots,
             tasksData: tasksData,
-            tasksResetTime: tasksResetTime
+            tasksResetTime: tasksResetTime,
+            pityCounter: pityCounter
           }
         })
       });
@@ -2908,8 +2914,8 @@ function getRandomPlateRegion() {
   return ALLOWED_REGIONS[Math.floor(Math.random() * ALLOWED_REGIONS.length)];
 }
 
-// Оценка "красоты" номера (Улучшенные шансы)
-function evaluatePlate(charsArr, regionStr) {
+// Оценка "красоты" номера (Только по цифрам и буквам, регион не влияет)
+function evaluatePlate(charsArr) {
   const chars = charsArr;
   const digits = chars.filter(c => !isNaN(c));
   const letters = chars.filter(c => isNaN(c));
@@ -2924,17 +2930,13 @@ function evaluatePlate(charsArr, regionStr) {
   const hasThreeLetters = maxLetterCount >= 3;
   const hasTwoDigits = maxDigitCount === 2;
   const hasTwoLetters = maxLetterCount === 2;
-  
-  // Бонус за крутой регион
-  const isCoolRegion = ['777', '799', '197', '99', '97', '177'].includes(regionStr);
 
-  // Увеличенные шансы:
-  // Эксклюзив: 3 одинаковые цифры И 3 одинаковые буквы (А 777 АА)
-  if (hasThreeDigits && hasThreeLetters) {
+  // Эксклюзив: 3 одинаковые цифры И 3 одинаковые буквы (А 777 АА) или 4 одинаковые (А 1111)
+  if ((hasThreeDigits && hasThreeLetters) || maxDigitCount >= 4) {
     return { type: 'exclusive', label: '💎 ЭКСКЛЮЗИВНЫЙ НОМЕР!', color: '#ff00cc' };
   } 
-  // Легендарный: 3 одинаковые цифры ИЛИ 3 одинаковые буквы ИЛИ (крутой регион + 2 одинаковые цифры/буквы)
-  else if (hasThreeDigits || hasThreeLetters || (isCoolRegion && (hasTwoDigits || hasTwoLetters))) {
+  // Легендарный: 3 одинаковые цифры ИЛИ 3 одинаковые буквы
+  else if (hasThreeDigits || hasThreeLetters) {
     return { type: 'legendary', label: '🔥 ЛЕГЕНДАРНЫЙ НОМЕР!', color: '#ffd21a' };
   } 
   // Редкий: 2 одинаковые цифры ИЛИ 2 одинаковые буквы
@@ -2990,7 +2992,7 @@ function initNumbersTab() {
   document.getElementById('digit6').textContent = randomChars[5];
   document.getElementById('regionText').textContent = randomRegion;
   
-  const result = evaluatePlate(randomChars, randomRegion);
+  const result = evaluatePlate(randomChars);
   updateNeonGlow(result.type);
   
   document.getElementById('saveNumberBtn').classList.remove('show');
@@ -3027,6 +3029,14 @@ function continueAfterRareNumber() {
     window._rareNumberCallback();
     window._rareNumberCallback = null;
   }
+}
+
+// Проверка на гарантированный эксклюзив
+function forceExclusiveChars() {
+  const letter = ALLOWED_LETTERS[Math.floor(Math.random() * ALLOWED_LETTERS.length)];
+  const digit = Math.floor(Math.random() * 10);
+  // Формат: А 777 АА
+  return [letter, digit, digit, digit, letter, letter];
 }
 
 async function spinChars() {
@@ -3077,22 +3087,40 @@ async function spinChars() {
       charsEls.forEach(id => document.getElementById(id).classList.remove('spin'));
       plateEl.classList.remove('shaking');
 
-      const finalChars = getRandomPlateChars();
+      // Проверка на Pity System
+      pityCounter++;
+      let finalChars;
+      let isPity = false;
+
+      if (pityCounter >= PITY_THRESHOLD) {
+        // Гарантированный эксклюзив
+        finalChars = forceExclusiveChars();
+        pityCounter = 0; // Сброс
+        isPity = true;
+      } else {
+        finalChars = getRandomPlateChars();
+      }
+
       currentPlate.chars = finalChars;
       
       charsEls.forEach((id, idx) => {
         document.getElementById(id).textContent = finalChars[idx];
       });
 
-      const result = evaluatePlate(finalChars, currentPlate.region);
+      const result = evaluatePlate(finalChars);
       updateNeonGlow(result.type);
       
       if (result.type === 'exclusive' || result.type === 'legendary') {
         createSparkles(document.getElementById('numberPlate'));
       }
 
-      msgEl.textContent = result.label;
-      msgEl.style.color = result.color;
+      if (isPity) {
+        msgEl.textContent = '💎 ГАРАНТИРОВАННЫЙ ЭКСКЛЮЗИВНЫЙ НОМЕР!';
+        msgEl.style.color = '#ff00cc';
+      } else {
+        msgEl.textContent = result.label;
+        msgEl.style.color = result.color;
+      }
 
       currentUnconfirmedPlate = {
         chars: finalChars.join(''),
@@ -3110,7 +3138,7 @@ async function spinChars() {
       updateTaskProgress('spin_numbers', 1);
 
       // Если выпал редкий номер - показываем модалку!
-      if (result.type === 'exclusive' || result.type === 'legendary') {
+      if (result.type === 'exclusive' || result.type === 'legendary' || isPity) {
         showRareNumberModal(currentUnconfirmedPlate, () => {
            // Ничего делать не надо, просто даем посмотреть
         });
@@ -3168,7 +3196,8 @@ async function spinRegion() {
       currentPlate.region = finalRegion;
       regionEl.textContent = finalRegion;
 
-      const result = evaluatePlate(currentPlate.chars, finalRegion);
+      // Оценка только по символам, регион не влияет на редкость
+      const result = evaluatePlate(currentPlate.chars);
       updateNeonGlow(result.type);
       
       if (result.type === 'exclusive' || result.type === 'legendary') {
