@@ -39,7 +39,7 @@ body{
 .bg-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(120px);
+  filter: blur(70px);
   opacity: 0.4;
   animation: floatOrb 12s ease-in-out infinite alternate, pulseOrb 8s ease-in-out infinite alternate;
 }
@@ -200,7 +200,7 @@ body{
 .view-profile-grid::-webkit-scrollbar { width: 6px; }
 .view-profile-grid::-webkit-scrollbar-thumb { background: var(--stroke-2); border-radius: 3px; }
 .view-car-item { background: rgba(0,0,0,0.3); border: 1px solid var(--stroke-2); border-radius: 8px; padding: 8px; display: flex; align-items: center; gap: 8px; }
-.view-car-item img { width: 40px; height: 30px; object-fit: contain; background: #f4f4f6; border-radius: 4px; }
+.view-car-item img { width: 40px; height: 30px; object-fit: contain; background: #22222a; border-radius: 4px; }
 .view-car-info { display: flex; flex-direction: column; }
 .view-car-name { font-size: 11px; font-weight: 800; color: #fff; line-height: 1.1; }
 .view-car-stat { font-size: 10px; color: var(--yellow-soft); }
@@ -314,7 +314,7 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px; position: relative; 
 .car:before{ content:"";position:absolute;inset:0; background:radial-gradient(140px 90px at 50% 0%, color-mix(in srgb, var(--rarity-color, #444) 22%, transparent), transparent 70%); pointer-events:none; opacity:.7; }
 .car:hover{transform:translateY(-3px);filter:brightness(1.06)}
 .car:active{transform:scale(.99);filter:brightness(.98)}
-.car img{ width:100%;height:110px;object-fit:contain; background:linear-gradient(180deg, #f4f4f6, #dedee4); border-radius:10px; position:relative;z-index:1; }
+.car img{ width:100%;height:110px;object-fit:contain; background:linear-gradient(180deg, #25252e, #17171d); border-radius:10px; position:relative;z-index:1; }
 .car h3{ font-size:16px;margin:10px 0 4px; position:relative;z-index:1; color:#fff;letter-spacing:.2px; }
 .car p{ color:#b9b9c7;font-size:12px;line-height:1.45;margin:5px 0; white-space:pre-line; position:relative;z-index:1; }
 .car-icon-badge{ text-align:center;font-size:26px;line-height:1;margin:2px 0 6px; position:relative;z-index:1; }
@@ -339,7 +339,7 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px; position: relative; 
 .car-lock-corner.unlock-car-btn{background:linear-gradient(180deg,#3a3a48,#2a2a34)}
 .car-lock-corner:hover{filter:brightness(1.15);transform:translateY(-1px)}
 
-.car-plate-badge { position: absolute; top: 8px; right: 8px; z-index: 5; display: flex; align-items: center; background: #fff; border-radius: 4px; padding: 2px 6px; border: 1.5px solid #111; box-shadow: 0 4px 10px rgba(0,0,0,0.6), inset 0 0 5px rgba(0,0,0,0.1); font-family: 'Arial Black', Impact, sans-serif; font-size: 13px; font-weight: 900; color: #000; pointer-events: none; letter-spacing: 0.5px; animation: plateDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; transform-origin: top center; }
+.car-plate-badge { position: absolute; top: 8px; right: 8px; z-index: 5; display: flex; align-items: center; background: #fff; border-radius: 4px; padding: 2px 6px; border: 1.5px solid #111; box-shadow: 0 4px 10px rgba(0,0,0,0.6), inset 0 0 5px rgba(0,0,0,0.1); font-family: 'Arial Black', Impact, sans-serif; font-size: 13px; font-weight: 900; color: #000; pointer-events: none; letter-spacing: 0.5px; animation: none; transform-origin: top center; }
 .car-plate-badge .plate-text { color: #000; }
 .car-plate-badge .plate-region-mini { font-size: 9px; margin-left: 4px; padding-left: 4px; border-left: 1px solid #111; color: #000; font-family: 'Arial', sans-serif; }
 @keyframes plateDropIn { 0% { transform: translateY(-20px) scale(0.8); opacity: 0; } 100% { transform: translateY(0) scale(1); opacity: 1; } }
@@ -636,7 +636,7 @@ main{max-width:1250px;margin:16px auto;padding:0 12px 40px; position: relative; 
 .car-select-list { overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding-right: 5px; }
 .car-select-item { background: #1e1e26; border: 2px solid var(--stroke-2); border-radius: 12px; padding: 10px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
 .car-select-item:hover { border-color: rgba(255,210,26,.5); background: #252530; }
-.car-select-item img { width: 60px; height: 40px; object-fit: contain; background: #f4f4f6; border-radius: 6px; }
+.car-select-item img { width: 60px; height: 40px; object-fit: contain; background: #22222a; border-radius: 6px; }
 .car-select-item-info { display: flex; flex-direction: column; }
 .car-select-item-name { font-size: 13px; font-weight: 800; color: #fff; }
 .car-select-item-power { font-size: 11px; color: var(--yellow-soft); font-weight: 700; }
@@ -948,6 +948,16 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
   font-weight: 600;
   letter-spacing: 0.5px;
 }
+
+/* Тюнинг */
+.tuning-box{margin-top:12px;padding:12px;border:1px solid #454552;border-radius:12px;background:linear-gradient(180deg,#171720,#111116);}
+.tuning-title{display:flex;justify-content:space-between;align-items:center;color:var(--yellow);font-weight:900;margin-bottom:8px;}
+.tuning-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:7px 0;font-size:12px;color:#ddd;}
+.tuning-row button{border:1px solid #4c4c5a;background:#252530;color:#fff;border-radius:8px;padding:7px 10px;font-weight:800;cursor:pointer;white-space:nowrap;}
+.tuning-row button:disabled{opacity:.4;cursor:not-allowed;}
+.tuning-progress{height:5px;background:#2a2a34;border-radius:99px;overflow:hidden;margin-top:5px;}
+.tuning-progress span{display:block;height:100%;background:linear-gradient(90deg,#ffb800,#ffe680);}
+.tuning-note{font-size:10px;color:#999;margin-top:7px;line-height:1.4;}
 </style>
 </head>
 <body>
@@ -1570,6 +1580,8 @@ let isRegisterMode = false;
 let selectedCaseType = 'rusty';
 let selectedQuantity = 1;
 let rouletteRunning = false;
+let rouletteGameBusy = false;
+let diceGameBusy = false;
 let sellIndices = [];
 let selectMode = false;
 let selectedCars = [];
@@ -1602,7 +1614,7 @@ const PITY_THRESHOLD = 30;
 let selectedCarIndexForPlate = -1; 
 let selectedPlateIndex = -1; 
 
-const ADMIN_LOGIN_ID = 'Q1wesh';
+const ADMIN_LOGIN_ID = 'Q1wesh'; // Только старый UI fallback; фактические права проверяются сервером.
 
 // --- ЗАДАНИЯ ---
 const ALL_TASK_TEMPLATES = [
@@ -2229,6 +2241,17 @@ function updateCaseOdds(){
  });
 }
 
+function upgradeCarTuning(index,key){
+  const car=cars[index];if(!car)return;const item=catalog.find(c=>c.id===car.id);if(!item)return;
+  const max={engine:5,turbo:4,suspension:3};if(!Object.prototype.hasOwnProperty.call(max,key))return;
+  car.tuning=car.tuning&&typeof car.tuning==='object'?car.tuning:{engine:0,turbo:0,suspension:0};
+  const level=Math.max(0,Number(car.tuning[key])||0);if(level>=max[key])return;
+  const rates={engine:[.08,.07],turbo:[.15,.12],suspension:[.10,.08]};const cost=Math.round(item.price*(rates[key][0]+level*rates[key][1]));
+  if(!Number.isFinite(cost)||balance<cost){showToastNotification('💸','Недостаточно денег для улучшения');return;}
+  balance-=cost;car.tuning[key]=level+1;triggerBalanceAnimation(cost,false);update();renderGarage();scheduleSave();
+  showToastNotification('🔧 Тюнинг установлен',`${item.name}: ${key==='engine'?'двигатель':key==='turbo'?'турбо':'подвеска'} ${level+1} уровня`);
+}
+
 // ================= ГАРАЖ =================
 function renderGarage(){
   if (!currentUser) return;
@@ -2315,6 +2338,11 @@ function renderGarage(){
       putPlateBtn.textContent = "🔢 Надеть номерной знак";
       putPlateBtn.onclick = (e) => { e.stopPropagation(); openPlateSelectForCar(originalIndex); };
       details.insertBefore(putPlateBtn, details.querySelector('.car-sell-inline'));
+      const tuningBox=document.createElement('div');
+      tuningBox.className='tuning-box';
+      tuningBox.innerHTML='<div class="tuning-title"><span>🔧 Тюнинг</span><span class="tuning-level">0/12</span></div><div class="tuning-controls"></div><div class="tuning-note">Улучшения сохраняются на этой машине. Уровни не сбрасываются при перезагрузке.</div>';
+      tuningBox.onclick=e=>e.stopPropagation();
+      details.insertBefore(tuningBox, details.querySelector('.car-sell-inline'));
 
       card.querySelector('.car-sell-inline').onclick=(e)=>{ e.stopPropagation(); openSellModal(originalIndex); };
 
@@ -2395,6 +2423,15 @@ function renderGarage(){
       }
     } else if (plateStatRow) {
       plateStatRow.remove();
+    }
+
+    car.tuning = car.tuning && typeof car.tuning==='object' ? car.tuning : {engine:0,turbo:0,suspension:0};
+    const tuningBox=card.querySelector('.tuning-box');
+    if(tuningBox){
+      const tun=car.tuning; const levels=(tun.engine||0)+(tun.turbo||0)+(tun.suspension||0);
+      tuningBox.querySelector('.tuning-level').textContent=levels+'/12';
+      const specs=[{key:'engine',name:'Двигатель',max:5,cost:l=>Math.round(item.price*(.08+l*.07)),effect:'Мощность +4%/ур.'},{key:'turbo',name:'Турбонаддув',max:4,cost:l=>Math.round(item.price*(.15+l*.12)),effect:'Мощность +7%/ур.'},{key:'suspension',name:'Подвеска',max:3,cost:l=>Math.round(item.price*(.10+l*.08)),effect:'Управляемость +5%/ур.'}];
+      tuningBox.querySelector('.tuning-controls').innerHTML=specs.map(spec=>{const level=Number(tun[spec.key]||0),cost=spec.cost(level);return `<div class="tuning-row"><div><b>${spec.name} ${level}/${spec.max}</b><div>${spec.effect}</div><div class="tuning-progress"><span style="width:${level/spec.max*100}%"></span></div></div><button ${level>=spec.max||balance<cost?'disabled':''} onclick="event.stopPropagation();upgradeCarTuning(${originalIndex},'${spec.key}')">${level>=spec.max?'MAX':cost.toLocaleString('ru-RU')+' ₽'}</button></div>`}).join('');
     }
 
     const hint = card.querySelector('.car-hint');
@@ -3012,7 +3049,7 @@ async function openMyProfile() {
     document.getElementById("profileBioInput").disabled = false;
     document.getElementById("avatarUploadLabel").style.display = "inline-block";
     document.getElementById("profileActions").style.display = "flex";
-    document.getElementById("adminPanelBtnWrap").style.display = (currentUser === ADMIN_LOGIN_ID) ? "block" : "none";
+    document.getElementById("adminPanelBtnWrap").style.display = (myProfileData && myProfileData.isAdmin) ? "block" : "none";
     
     document.getElementById("viewProfileGarage").hidden = true;
 
@@ -3188,7 +3225,7 @@ function closeAdminPanel() {
 
 async function adminAdjust(action) {
   const adminLogin = currentUser;
-  if (adminLogin !== ADMIN_LOGIN_ID) {
+  if (!(myProfileData && myProfileData.isAdmin)) {
     document.getElementById('adminMsg').textContent = '⛔ Нет доступа';
     document.getElementById('adminMsg').style.color = 'var(--red)';
     return;
@@ -4184,8 +4221,10 @@ function allInBet(gameName) { const input = document.getElementById(gameName + "
 function getBet(gameName) { const input = document.getElementById(gameName + "-input"); if (!input) return 1000; return clampBet(parseInt(input.value)); }
 
 function playRoulette() {
+  if (rouletteGameBusy) return;
   const bet = getBet("roulette");
   if (balance < bet) { alert("Недостаточно денег!"); return; }
+  rouletteGameBusy = true;
   balance -= bet; triggerBalanceAnimation(bet, false); update();
   addExperience(1);
   const visual = document.getElementById("roulette-visual");
@@ -4211,13 +4250,16 @@ function playRoulette() {
         updateTaskProgress('lose_casino', 1); 
       }
       update();
+      rouletteGameBusy = false;
     }
   }, 100);
 }
 
 function playDice() {
+  if (diceGameBusy) return;
   const bet = getBet("dice");
   if (balance < bet) { alert("Недостаточно денег!"); return; }
+  diceGameBusy = true;
   balance -= bet; triggerBalanceAnimation(bet, false); update();
   addExperience(1);
   const d1 = document.getElementById("dice-1"); const d2 = document.getElementById("dice-2");
@@ -4245,6 +4287,7 @@ function playDice() {
         updateTaskProgress('lose_casino', 1); 
       }
       update();
+      diceGameBusy = false;
     }
   }, 100);
 }
@@ -4254,6 +4297,7 @@ let bjDeck = [];
 let bjPlayerHand = [];
 let bjDealerHand = [];
 let bjGameActive = false;
+let bjLockedBet = 0;
 
 function createDeck() {
     const suits = ['♠', '♥', '♦', '♣'];
@@ -4300,6 +4344,7 @@ function startBlackjack() {
     if (balance < bet) { alert('Недостаточно денег!'); return; }
 
     balance -= bet;
+    bjLockedBet = bet;
     triggerBalanceAnimation(bet, false);
     update();
     addExperience(1);
@@ -4354,7 +4399,8 @@ function bjStand() {
 function endBlackjack(win, message) {
     bjGameActive = false;
 
-    const bet = getBet('blackjack');
+    const bet = bjLockedBet;
+    bjLockedBet = 0;
     const resultEl = document.getElementById('bj-result');
     resultEl.textContent = message;
 
@@ -4406,20 +4452,15 @@ function renderRaceCarsGrid() {
   const grid = document.getElementById('raceCarsGrid');
   if (!grid) return;
   
-  const currentSelectedId = selectedPlayerCar ? selectedPlayerCar.id : null;
+  const currentSelectedId = selectedPlayerCar ? (selectedPlayerCar.id+'#'+(selectedPlayerCar.ownedIndex ?? -1)) : null;
   
   grid.innerHTML = '';
 
   const uniqueCars = [];
-  const seen = new Set();
-  cars.forEach(c => {
-    const item = catalog.find(x => x.id === c.id);
-    if (item && !seen.has(item.id)) {
-      seen.add(item.id);
-      uniqueCars.push(item);
-    }
+  cars.forEach((owned, ownedIndex) => {
+    const base = catalog.find(x => x.id === owned.id);
+    if (base) { const t=owned.tuning||{}; const power=Math.round(base.power*(1+Math.max(0,Number(t.engine)||0)*.04+Math.max(0,Number(t.turbo)||0)*.07)); uniqueCars.push({...base,power,ownedIndex,ownedCar:owned}); }
   });
-
   uniqueCars.sort((a, b) => b.power - a.power);
   const topCars = uniqueCars.slice(0, 4);
 
@@ -4431,8 +4472,8 @@ function renderRaceCarsGrid() {
     return;
   }
 
-  if (currentSelectedId && topCars.some(c => c.id === currentSelectedId)) {
-    selectedPlayerCar = topCars.find(c => c.id === currentSelectedId);
+  if (currentSelectedId && topCars.some(c => c.id+'#'+(c.ownedIndex ?? -1) === currentSelectedId)) {
+    selectedPlayerCar = topCars.find(c => c.id+'#'+(c.ownedIndex ?? -1) === currentSelectedId);
   } else {
     selectedPlayerCar = topCars[0];
   }
@@ -4443,7 +4484,7 @@ function renderRaceCarsGrid() {
   topCars.forEach(car => {
     const chance = Math.min(95, Math.max(5, Math.round((car.power / (car.power + avgOppPower)) * 100)));
     const card = document.createElement('div');
-    card.className = 'race-car-card' + (selectedPlayerCar && selectedPlayerCar.id === car.id ? ' selected' : '');
+    card.className = 'race-car-card' + (selectedPlayerCar && selectedPlayerCar.id === car.id && selectedPlayerCar.ownedIndex === car.ownedIndex ? ' selected' : '');
     const color = getRarityColor(car.rarity);
     card.style.borderColor = color;
     card.onclick = () => {
@@ -4546,7 +4587,7 @@ function openCarSelect() {
       const el = document.createElement("div");
       el.className = "car-select-item";
       el.onclick = () => {
-        selectedPlayerCar = item;
+        const t=c.tuning||{}; selectedPlayerCar={...item,ownedIndex:cars.indexOf(c),power:Math.round(item.power*(1+(Number(t.engine)||0)*.04+(Number(t.turbo)||0)*.07)),ownedCar:c};
         closeCarSelect();
         updateRaceUI();
         renderRaceCarsGrid();
@@ -4709,7 +4750,7 @@ function playerGo() {
 
 function startMovement() {
   if (raceInterval) clearInterval(raceInterval);
-  const laneWidth = document.getElementById("lanePlayer").offsetWidth - 50;
+  const laneWidth = Math.max(0, document.getElementById("lanePlayer").clientWidth - 50);
 
   playerPower = selectedPlayerCar ? selectedPlayerCar.power : 100;
   botPower = currentRaceOpp.power;
@@ -4717,7 +4758,8 @@ function startMovement() {
   const pBaseSpeed = playerPower / 150;
   const bBaseSpeed = botPower / 150;
 
-  const pRandom = 0.9 + Math.random() * 0.2;
+  const suspensionLevel = Math.max(0, Math.min(3, Number(selectedPlayerCar && selectedPlayerCar.ownedCar && selectedPlayerCar.ownedCar.tuning && selectedPlayerCar.ownedCar.tuning.suspension) || 0));
+  const pRandom = 1 + (Math.random() * 0.2 - 0.1) * (1 - suspensionLevel * 0.25); // Подвеска стабилизирует разброс скорости
   const bRandom = 0.9 + Math.random() * 0.2;
 
   const pSpeed = pBaseSpeed * pRandom;
@@ -4764,7 +4806,7 @@ function startMovement() {
       }
     }
 
-    if (playerFinished || botFinished) {
+    if (playerFinished && botFinished) {
       clearInterval(raceInterval);
       clearTimeout(botTimeoutId);
       raceInterval = null;
