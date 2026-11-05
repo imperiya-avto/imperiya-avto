@@ -971,6 +971,41 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  .car-details{box-sizing:border-box;max-width:100%;overflow:hidden;}
 }
 </style>
+
+<style>
+/* Telegram/mobile layout fixes */
+html,body{overflow-x:hidden;overflow-anchor:none;scroll-behavior:auto}
+#garageCars,.garage-grid,.car-grid,.tuning-box,.tuning-row{overflow-anchor:none}
+.tuning-box{width:100%;max-width:100%;box-sizing:border-box}
+.tuning-row{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(96px,auto);align-items:center;gap:6px}
+.tuning-row button{white-space:normal!important;overflow-wrap:anywhere;max-width:100%!important;min-width:0;font-size:11px;padding:7px 5px!important;line-height:1.15}
+.clan-card,.reward-card{background:linear-gradient(145deg,#1c1c28,#101016);border:1px solid #383847;border-radius:16px;padding:14px;margin:12px 0;color:#f4f4f7}
+.clan-actions{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.clan-actions button,.clan-btn{background:#292938;border:1px solid #4b4b60;border-radius:10px;padding:10px 12px;color:#fff;font-weight:800}
+.clan-btn.primary{background:linear-gradient(135deg,#f0b900,#ff7b24);color:#151515;border:0}
+.clan-list{display:grid;gap:8px}
+.clan-member,.clan-request,.clan-invite{padding:9px;border-radius:9px;background:#20202a;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.clan-chat{height:260px;overflow:auto;background:#0c0c12;border:1px solid #343442;border-radius:12px;padding:10px;margin:8px 0;overflow-anchor:none}
+.clan-message{margin:5px 0;padding:7px 9px;background:#1d1d28;border-radius:8px;overflow-wrap:anywhere}
+.clan-message b{color:#ffd21a}.clan-chat-form{display:flex;gap:7px}.clan-chat-form input{flex:1;min-width:0}
+.clan-avatar{width:64px;height:64px;object-fit:cover;border-radius:14px;border:1px solid #555}
+#clanNoticeDot,#rewardNoticeDot{display:inline-block;background:#ff3030;width:9px;height:9px;border-radius:50%;vertical-align:middle;margin-left:4px;box-shadow:0 0 8px #ff3030}
+.clan-modal{position:fixed;inset:0;background:#000b;z-index:9999;display:flex;align-items:center;justify-content:center;padding:12px}
+.clan-modal[hidden]{display:none}.clan-modal-box{width:min(480px,100%);max-height:90dvh;overflow:auto;background:#171720;border:1px solid #444;border-radius:18px;padding:18px;box-shadow:0 20px 60px #000}
+.clan-modal-box input,.clan-modal-box textarea{width:100%;box-sizing:border-box;background:#09090d;color:white;border:1px solid #444;border-radius:9px;padding:11px;margin:7px 0}
+@media(max-width:650px){
+ nav{position:fixed!important;bottom:0;top:auto!important;left:0;right:0;z-index:5000!important;display:flex!important;flex-wrap:nowrap!important;justify-content:flex-start!important;overflow-x:auto!important;overflow-y:hidden!important;gap:5px!important;padding:7px 6px calc(7px + env(safe-area-inset-bottom))!important;background:rgba(9,9,13,.96)!important;border-top:1px solid #343442!important;border-bottom:0!important;max-width:none!important;margin:0!important}
+ nav button{flex:0 0 auto!important;min-width:75px!important;padding:8px 9px!important;font-size:10px!important;border-radius:9px!important}
+ body{padding-bottom:calc(78px + env(safe-area-inset-bottom))!important}
+ main{padding-bottom:10px}
+ #garageCars{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+ #garageCars .car{min-width:0!important;width:100%!important;box-sizing:border-box!important}
+ .car .tuning-box{padding:7px!important}
+ .tuning-title{font-size:11px!important}
+ .tuning-row{font-size:10px!important;grid-template-columns:minmax(0,1fr) minmax(78px,45%)!important}
+ .tuning-row button{font-size:9px!important;padding:6px 3px!important}
+}
+</style>
 </head>
 <body>
 
@@ -1205,6 +1240,8 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  <button id="navTasksBtn" onclick="openTab('tasks',this)">📋 Задания</button>
  <button onclick="openTab('collection',this)">📚 Коллекция</button>
  <button onclick="openTab('tops',this)">🏆 Топы</button>
+ <button onclick="openTab('clans',this)" id="clanNavBtn">👥 Кланы <span id="clanNoticeDot" hidden></span></button>
+ <button onclick="openTab('rewards',this)" id="rewardNavBtn">🎁 Награды <span id="rewardNoticeDot" hidden></span></button>
 </nav>
 
 <main>
@@ -1571,6 +1608,15 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  <h2>🏆 Топ игроков</h2>
  <div class="top-container" id="topContainer"></div>
  <div class="top-own-place" id="myTopPlace" style="display:none;"></div>
+</section>
+
+<section id="clans" class="panel" hidden>
+ <h2>👥 Кланы</h2>
+ <div id="clanContent"><div class="clan-card">Загрузка...</div></div>
+</section>
+<section id="rewards" class="panel" hidden>
+ <h2>🎁 Ежедневные и недельные награды</h2>
+ <div id="rewardsContent"><div class="reward-card">Загрузка наград...</div></div>
 </section>
 </main>
 
@@ -2256,6 +2302,9 @@ function updateCaseOdds(){
 function upgradeCarTuning(index,key){
   if(window.__tuningBusy)return; window.__tuningBusy=true;
   const savedScrollY=window.scrollY || document.documentElement.scrollTop || 0;
+  const savedScrolls=[...document.querySelectorAll('main, .panel, #garageCars, .clan-chat')].map(el=>({el,top:el.scrollTop,left:el.scrollLeft}));
+  try{if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();}catch(e){}
+  document.documentElement.style.scrollBehavior='auto';
   const car=cars[index];if(!car){window.__tuningBusy=false;return;}const item=catalog.find(c=>c.id===car.id);if(!item){window.__tuningBusy=false;return;}
   const max={engine:5,turbo:4,suspension:3};if(!Object.prototype.hasOwnProperty.call(max,key)){window.__tuningBusy=false;return;}
   car.tuning=car.tuning&&typeof car.tuning==='object'?car.tuning:{engine:0,turbo:0,suspension:0};
@@ -2263,7 +2312,7 @@ function upgradeCarTuning(index,key){
   const rates={engine:[.08,.07],turbo:[.15,.12],suspension:[.10,.08]};const cost=Math.round(item.price*(rates[key][0]+level*rates[key][1]));
   if(!Number.isFinite(cost)||balance<cost){showToastNotification('💸','Недостаточно денег для улучшения');window.__tuningBusy=false;return;}
   balance-=cost;car.tuning[key]=level+1;triggerBalanceAnimation(cost,false);update();renderGarage();scheduleSave();
-  requestAnimationFrame(()=>{window.scrollTo({top:savedScrollY,left:0,behavior:'auto'});requestAnimationFrame(()=>{window.scrollTo({top:savedScrollY,left:0,behavior:'auto'});window.__tuningBusy=false;});});
+  requestAnimationFrame(()=>{window.scrollTo({top:savedScrollY,left:0,behavior:'auto'});savedScrolls.forEach(s=>{if(s.el&&s.el.isConnected){s.el.scrollTop=s.top;s.el.scrollLeft=s.left;}});requestAnimationFrame(()=>{window.scrollTo({top:savedScrollY,left:0,behavior:'auto'});savedScrolls.forEach(s=>{if(s.el&&s.el.isConnected){s.el.scrollTop=s.top;s.el.scrollLeft=s.left;}});document.documentElement.style.scrollBehavior='';window.__tuningBusy=false;});});
   showToastNotification('🔧 Тюнинг установлен',`${item.name}: ${key==='engine'?'двигатель':key==='turbo'?'турбо':'подвеска'} ${level+1} уровня`);
 }
 
@@ -5171,6 +5220,77 @@ window.addEventListener('load', async () => {
 });
 
 updateCaseOdds();
+</script>
+
+<script>
+(function(){
+const _originalRenderGarage=window.renderGarage;
+if(typeof _originalRenderGarage==='function'){
+ window.renderGarage=function(){
+  const y=window.scrollY||document.documentElement.scrollTop||0;
+  const active=document.activeElement;
+  if(active&&active.tagName==='BUTTON'&&active.blur)active.blur();
+  const scrollNodes=[...document.querySelectorAll('main,.panel,#garageCars')].map(el=>({el,top:el.scrollTop,left:el.scrollLeft}));
+  const result=_originalRenderGarage.apply(this,arguments);
+  window.scrollTo({top:y,left:0,behavior:'auto'});
+  requestAnimationFrame(()=>{window.scrollTo({top:y,left:0,behavior:'auto'});scrollNodes.forEach(s=>{if(s.el.isConnected){s.el.scrollTop=s.top;s.el.scrollLeft=s.left;}});});
+  return result;
+ };
+}
+const fmt=n=>Number(n||0).toLocaleString('ru-RU');
+async function clanReq(path,body,method='POST'){
+ const r=await apiFetch(window.location.origin+path,{method,headers:{'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{})});
+ const data=await r.json().catch(()=>({}));
+ if(!r.ok)throw new Error(data.error||'Ошибка запроса');
+ return data;
+}
+function escapeHtml(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function clanModal(title,html){let m=document.getElementById('clanModal');if(!m){m=document.createElement('div');m.id='clanModal';m.className='clan-modal';m.innerHTML='<div class="clan-modal-box"><div style="display:flex;justify-content:space-between;align-items:center"><h3 id="clanModalTitle"></h3><button class="clan-btn" onclick="closeClanModal()">✕</button></div><div id="clanModalBody"></div></div>';document.body.appendChild(m);}m.querySelector('#clanModalTitle').textContent=title;m.querySelector('#clanModalBody').innerHTML=html;m.hidden=false;}
+window.closeClanModal=()=>{const m=document.getElementById('clanModal');if(m)m.hidden=true;};
+async function refreshClan(){
+ try{
+  const d=await clanReq('/api/clan',null,'GET');
+  const dot=document.getElementById('clanNoticeDot');if(dot)dot.hidden=!(d.invites?.length||d.pending?.length);
+  const host=document.getElementById('clanContent');if(!host)return;
+  if(!d.clan){
+   let html='<div class="clan-card"><h3>Создай свой клан или найди существующий</h3><p>Создание клана: <b>100 000 000 ₽</b></p><div class="clan-actions"><button class="clan-btn primary" onclick="openClanCreate()">✨ Создать клан за 100 млн</button><button class="clan-btn" onclick="openClanSearch()">🔎 Найти клан</button></div>';
+   if(d.invites?.length){html+='<h3>📨 Приглашения <span id="clanNoticeDot"></span></h3>'+d.invites.map(i=>`<div class="clan-invite"><span>${escapeHtml(i.clanName)} — от ${escapeHtml(i.from)}</span><button class="clan-btn primary" onclick="respondClanInvite('${escapeHtml(i.clanId)}',true)">Принять</button><button class="clan-btn" onclick="respondClanInvite('${escapeHtml(i.clanId)}',false)">Отклонить</button></div>`).join('');}
+   host.innerHTML=html+'</div>';return;
+  }
+  const c=d.clan;const leader=d.isLeader;
+  let html=`<div class="clan-card"><div style="display:flex;gap:12px;align-items:center">${c.avatar?`<img class="clan-avatar" src="${c.avatar}">`:'<div class="clan-avatar" style="display:grid;place-items:center;font-size:30px">🛡️</div>'}<div><h2 style="margin:0">${escapeHtml(c.name)}</h2><p>Участников: ${c.memberCount}/30</p><small>Лидер: 👑 ${escapeHtml(c.leaderLogin)}</small></div></div>`;
+  if(leader)html+='<div class="clan-actions"><button class="clan-btn primary" onclick="openClanInvite()">➕ Добавить участника по ID</button></div>';
+  html+='<h3>👥 Участники</h3><div class="clan-list">'+(c.members||[]).map(m=>`<div class="clan-member"><span>${m.role==='leader'?'👑 ':''}${escapeHtml(m.name||m.login)} <small>#${escapeHtml(m.playerId||'')}</small></span><b>${m.role==='leader'?'Лидер':'Участник'}</b></div>`).join('')+'</div>';
+  if(leader&&d.pending?.length)html+='<h3>📨 Заявки в клан</h3>'+d.pending.map(r=>`<div class="clan-request"><span>${escapeHtml(r.name||r.login)} (#${escapeHtml(r.playerId)})</span><button class="clan-btn primary" onclick="respondClanRequest('${escapeHtml(r.login)}',true)">Принять</button><button class="clan-btn" onclick="respondClanRequest('${escapeHtml(r.login)}',false)">Отклонить</button></div>`).join('');
+  html+='<h3>💬 Клановый чат</h3><div class="clan-chat" id="clanChat">'+(d.messages||[]).map(m=>`<div class="clan-message"><b>${m.login===c.leaderLogin?'👑 ':''}${escapeHtml(m.name||m.login)}</b> <small>${new Date(m.createdAt).toLocaleString('ru-RU')}</small><div>${escapeHtml(m.text)}</div></div>`).join('')+'</div><form class="clan-chat-form" onsubmit="sendClanMessage(event)"><input id="clanChatInput" maxlength="500" placeholder="Написать в чат клана..." required><button class="clan-btn primary">Отправить</button></form>';
+  if(!leader)html+='<div class="clan-actions"><button class="clan-btn" onclick="leaveClan()">🚪 Покинуть клан</button></div>';
+  host.innerHTML=html+'</div>';const chat=document.getElementById('clanChat');if(chat)chat.scrollTop=chat.scrollHeight;
+ }catch(e){const host=document.getElementById('clanContent');if(host)host.innerHTML=`<div class="clan-card">${escapeHtml(e.message)}<button class="clan-btn" onclick="refreshClan()">Обновить</button></div>`;}
+}
+window.openClanCreate=()=>clanModal('Создание клана',`<label>Название клана (3–24 символа)</label><input id="newClanName" maxlength="24" placeholder="Например, NIGHT RIDERS"><label>Аватар клана (необязательно)</label><input id="newClanAvatarFile" type="file" accept="image/png,image/jpeg,image/webp"><div id="clanAvatarPreview"></div><button class="clan-btn primary" onclick="createClan()">Создать за 100 000 000 ₽</button>`);
+window.createClan=async()=>{try{let avatar='';const f=document.getElementById('newClanAvatarFile').files[0];if(f){if(f.size>200000)throw new Error('Аватар до 200 КБ');avatar=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f);});}await clanReq('/api/clan/create',{name:document.getElementById('newClanName').value,avatar});closeClanModal();await refreshMe();await refreshClan();}catch(e){alert(e.message)}};
+window.openClanSearch=()=>clanModal('Найти клан',`<label>Название клана</label><input id="clanSearchName" maxlength="24" placeholder="Введи точное название"><button class="clan-btn primary" onclick="applyClan()">Отправить запрос</button>`);
+window.applyClan=async()=>{try{await clanReq('/api/clan/apply',{name:document.getElementById('clanSearchName').value});closeClanModal();alert('Заявка отправлена лидеру клана');}catch(e){alert(e.message)}};
+window.openClanInvite=()=>clanModal('Пригласить игрока',`<label>ID игрока</label><input id="clanInviteId" placeholder="Например, 12-34-56"><button class="clan-btn primary" onclick="inviteClanPlayer()">Отправить приглашение</button>`);
+window.inviteClanPlayer=async()=>{try{await clanReq('/api/clan/invite',{playerId:document.getElementById('clanInviteId').value});closeClanModal();alert('Приглашение отправлено');await refreshClan();}catch(e){alert(e.message)}};
+window.respondClanInvite=async(id,accept)=>{try{await clanReq('/api/clan/invite/respond',{clanId:id,accept});await refreshMe();await refreshClan();}catch(e){alert(e.message)}};
+window.respondClanRequest=async(login,accept)=>{try{await clanReq('/api/clan/request/respond',{login,accept});await refreshClan();}catch(e){alert(e.message)}};
+window.sendClanMessage=async ev=>{ev.preventDefault();const input=document.getElementById('clanChatInput');const text=input.value.trim();if(!text)return;try{await clanReq('/api/clan/chat',{text});input.value='';await refreshClan();}catch(e){alert(e.message)}};
+window.leaveClan=async()=>{if(!confirm('Точно покинуть клан?'))return;try{await clanReq('/api/clan/leave',{});await refreshMe();await refreshClan();}catch(e){alert(e.message)}};
+async function refreshMe(){const r=await apiFetch(API_URL+'/me');if(r.ok){const u=await r.json();applyServerUser(u);}}
+async function refreshRewards(){
+ try{const d=await clanReq('/api/rewards',null,'GET');const dot=document.getElementById('rewardNoticeDot');if(dot)dot.hidden=d.claimedToday;
+ const h=document.getElementById('rewardsContent');if(!h)return;
+ h.innerHTML=`<div class="reward-card"><h3>🎁 Ежедневная награда</h3><p>День серии: <b>${d.streak+1}</b> / 7</p><p>Награды за 7 дней: 500 тыс. → 1 млн → 1,5 млн → 2,5 млн → 4 млн → 6 млн → 15 млн ₽</p><button class="clan-btn primary" ${d.claimedToday?'disabled':''} onclick="claimDailyReward()">${d.claimedToday?'✅ Уже получено сегодня':'Забрать ежедневную награду'}</button><p>Следующий день серии требует захода подряд. Пропустил день — серия начнётся заново.</p></div><div class="reward-card"><h3>🏆 Недельная награда</h3><p>За 7 ежедневных входов: <b>25 000 000 ₽</b></p><button class="clan-btn primary" ${!d.weeklyReady?'disabled':''} onclick="claimWeeklyReward()">${d.weeklyReady?'Забрать недельную награду':'Нужна серия из 7 дней'}</button></div>`;
+ }catch(e){const h=document.getElementById('rewardsContent');if(h)h.textContent=e.message;}
+}
+window.claimDailyReward=async()=>{try{const d=await clanReq('/api/rewards/claim',{});alert(`Получено ${fmt(d.amount)} ₽!`);await refreshMe();await refreshRewards();}catch(e){alert(e.message)}};
+window.claimWeeklyReward=async()=>{try{const d=await clanReq('/api/rewards/weekly',{});alert(`Недельная награда: ${fmt(d.amount)} ₽!`);await refreshMe();await refreshRewards();}catch(e){alert(e.message)}};
+const oldOpenTab=window.openTab;
+window.openTab=function(id,btn){if(oldOpenTab)oldOpenTab(id,btn);if(id==='clans')refreshClan();if(id==='rewards')refreshRewards();};
+document.addEventListener('DOMContentLoaded',()=>{refreshClan();refreshRewards();});
+setInterval(()=>{if(authToken&&document.activeElement?.id!=='clanChatInput')refreshClan();},12000);
+})();
 </script>
 </body>
 </html>
