@@ -955,37 +955,21 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 .tuning-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:7px 0;font-size:12px;color:#ddd;}
 .tuning-row button{border:1px solid #4c4c5a;background:#252530;color:#fff;border-radius:8px;padding:7px 10px;font-weight:800;cursor:pointer;white-space:nowrap;}
 .tuning-row button:disabled{opacity:.4;cursor:not-allowed;}
+.tuning-box,.tuning-row{box-sizing:border-box;min-width:0;width:100%;}
+.tuning-row button{flex:0 0 auto;max-width:48%;white-space:normal;overflow-wrap:anywhere;text-align:center;}
+.tuning-row>div{min-width:0;flex:1;}
 .tuning-progress{height:5px;background:#2a2a34;border-radius:99px;overflow:hidden;margin-top:5px;}
 .tuning-progress span{display:block;height:100%;background:linear-gradient(90deg,#ffb800,#ffe680);}
 .tuning-note{font-size:10px;color:#999;margin-top:7px;line-height:1.4;}
 
-/* MOBILE / TELEGRAM WEBVIEW */
-@media (max-width: 600px) {
-  html { scroll-padding-bottom: 100px; }
-  body { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
-  nav { position: fixed !important; left: 0; right: 0; bottom: 0; top: auto !important; z-index: 9999; width: 100%; max-width: none; margin: 0; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); display: flex; flex-wrap: nowrap; justify-content: flex-start; gap: 7px; overflow-x: auto; overflow-y: hidden; background: rgba(9,9,13,.96); border-top: 1px solid rgba(255,210,26,.25); border-bottom: 0; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); scrollbar-width: none; }
-  nav::-webkit-scrollbar { display:none; }
-  nav button { flex: 0 0 auto; white-space: nowrap; padding: 10px 12px; min-height: 42px; font-size: 11px; }
-  main { padding: 0 8px calc(100px + env(safe-area-inset-bottom)); margin: 10px auto; }
-  .panel { padding: 12px; border-radius: 12px; }
-  .panel h2 { font-size: 18px; }
-  .cars { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px; align-items: start; }
-  .car { min-width: 0; padding: 8px; border-radius: 10px; border-width: 1px; }
-  .car img, .car .car-image { max-width: 100%; }
-  .car-name { font-size: 12px !important; line-height: 1.25; }
-  .car-stats { gap: 4px; margin-top: 7px; }
-  .stat-row { padding: 5px 6px; gap: 4px; font-size: 10px; }
-  .car-sell-inline, .car-put-plate-btn { font-size: 10px; padding: 8px 5px; margin-top: 6px; }
-  .car-income-line { font-size: 11px; }
-  .garage-tools { padding: 9px; gap: 8px; }
-  .garage-tools p { font-size: 11px; }
-  .garage-select-tools { gap: 6px; }
-  .garage-select-tools button { padding: 8px 9px; font-size: 11px; }
-  button, .collect, .slot-buy { touch-action: manipulation; }
-  .modal, .modal-content { max-width: calc(100vw - 16px); }
+@media(max-width:600px){
+ .tuning-box{padding:8px;margin-top:8px;overflow:hidden;}
+ .tuning-row{align-items:stretch;gap:6px;font-size:11px;margin:8px 0;}
+ .tuning-row button{font-size:10px;padding:8px 5px;max-width:42%;min-width:84px;line-height:1.2;border-radius:7px;}
+ .tuning-row b{font-size:11px;}
+ .tuning-note{font-size:9px;}
+ .car-details{box-sizing:border-box;max-width:100%;overflow:hidden;}
 }
-@media (max-width: 360px) { .car { padding: 6px; } .stat-row { font-size: 9px; } nav button { padding: 9px 10px; } }
-
 </style>
 </head>
 <body>
@@ -2166,7 +2150,7 @@ const CASE_RARITY_CHANCES = {
  mythical:    [0,     37.8,  53.9,  7.36,  0.92,  0.02,  0],
  exclusive:   [0,     0,     67,    27.4,  5.47,  0.17,  0],
  secret:      [0,     0,     12.5,  69.4,  17.7,  0.44,  0],
- divine:      [0,     0,     0,     67,    27.4,  5.47,  0.95]
+ divine:      [0,     0,     0,     66.08, 27.02, 5.40,  1.50]
 };
 
 const CASE_TYPES={
@@ -2270,13 +2254,16 @@ function updateCaseOdds(){
 }
 
 function upgradeCarTuning(index,key){
-  const car=cars[index];if(!car)return;const item=catalog.find(c=>c.id===car.id);if(!item)return;
-  const max={engine:5,turbo:4,suspension:3};if(!Object.prototype.hasOwnProperty.call(max,key))return;
+  if(window.__tuningBusy)return; window.__tuningBusy=true;
+  const savedScrollY=window.scrollY || document.documentElement.scrollTop || 0;
+  const car=cars[index];if(!car){window.__tuningBusy=false;return;}const item=catalog.find(c=>c.id===car.id);if(!item){window.__tuningBusy=false;return;}
+  const max={engine:5,turbo:4,suspension:3};if(!Object.prototype.hasOwnProperty.call(max,key)){window.__tuningBusy=false;return;}
   car.tuning=car.tuning&&typeof car.tuning==='object'?car.tuning:{engine:0,turbo:0,suspension:0};
-  const level=Math.max(0,Number(car.tuning[key])||0);if(level>=max[key])return;
+  const level=Math.max(0,Number(car.tuning[key])||0);if(level>=max[key]){window.__tuningBusy=false;return;}
   const rates={engine:[.08,.07],turbo:[.15,.12],suspension:[.10,.08]};const cost=Math.round(item.price*(rates[key][0]+level*rates[key][1]));
-  if(!Number.isFinite(cost)||balance<cost){showToastNotification('💸','Недостаточно денег для улучшения');return;}
+  if(!Number.isFinite(cost)||balance<cost){showToastNotification('💸','Недостаточно денег для улучшения');window.__tuningBusy=false;return;}
   balance-=cost;car.tuning[key]=level+1;triggerBalanceAnimation(cost,false);update();renderGarage();scheduleSave();
+  requestAnimationFrame(()=>{window.scrollTo({top:savedScrollY,left:0,behavior:'auto'});requestAnimationFrame(()=>{window.scrollTo({top:savedScrollY,left:0,behavior:'auto'});window.__tuningBusy=false;});});
   showToastNotification('🔧 Тюнинг установлен',`${item.name}: ${key==='engine'?'двигатель':key==='turbo'?'турбо':'подвеска'} ${level+1} уровня`);
 }
 
@@ -2285,9 +2272,7 @@ function renderGarage(){
   if (!currentUser) return;
   const container=document.getElementById("garageCars");
   if(!container) return;
-  // Сохраняем позицию страницы: мобильный Telegram WebView не должен прыгать при обновлении гаража.
-  const garageScrollY = window.scrollY || window.pageYOffset || 0;
-  const garageScrollX = window.scrollX || window.pageXOffset || 0;
+  // Пересоздаём карточки, чтобы обработчики не ссылались на старые индексы.
   container.innerHTML = "";
 
   expandedCars = new Set([...expandedCars].filter(i=>i>=0&&i<cars.length));
@@ -2351,7 +2336,7 @@ function renderGarage(){
         <div class="car-details">
           <div class="car-stats">
             <div class="stat-row"><span class="stat-label">✨ Редкость</span> <span class="stat-value rarity" style="color:${color}">${item.rarity}</span></div>
-            <div class="stat-row"><span class="stat-label">⚡ Мощность</span> <span class="stat-value">${Math.round(item.power*(1+(Number(car.tuning&&car.tuning.engine)||0)*.04+(Number(car.tuning&&car.tuning.turbo)||0)*.07))} л.с.</span></div>
+            <div class="stat-row"><span class="stat-label">⚡ Мощность</span> <span class="stat-value">${item.power} л.с.</span></div>
             <div class="stat-row"><span class="stat-label">💵 Продажа</span> <span class="stat-value" style="color:var(--green)">${Math.floor(item.price*0.15).toLocaleString("ru-RU")} ₽</span></div>
             <div class="stat-row"><span class="stat-label">📈 Доход</span> <span class="stat-value" style="color:var(--yellow)">${item.income.toLocaleString("ru-RU")} ₽/сек</span></div>
           </div>
@@ -2493,8 +2478,6 @@ function renderGarage(){
   updateGarageSelectionUI();
   update();
   scheduleSave();
-  // Восстанавливаем scroll после перерисовки карточек (продажа/тюнинг/номера).
-  requestAnimationFrame(() => window.scrollTo({left: garageScrollX, top: garageScrollY, behavior: 'instant'}));
 }
 
 function getPlateColor(type) {
