@@ -571,12 +571,151 @@ app.use((err, req, res, next) => {
   });
 });
 
+
+// === КЛАНЫ, НАГРАДЫ (серверные, MongoDB) ===
+const DAY_MS = 24 * 60 * 60 * 1000;
+const DAILY_REWARD_AMOUNTS = [500000, 1000000, 1500000, 2500000, 4000000, 6000000, 15000000];
+function safeClan(c) {
+  if (!c) return null;
+  return { clanId:c.clanId, name:c.name, avatar:c.avatar||'', leaderLogin:c.leaderLogin,
+    leaderPlayerId:c.leaderPlayerId, members:c.members||[], createdAt:c.createdAt,
+    memberCount:(c.members||[]).length };
+}
+async function currentUserDoc(login) { return db.collection('users').findOne({login}); }
+async function clanForUser(user) {
+  if (!user || !user.clanId) return null;
+  return db.collection('clans').findOne({clanId:user.clanId});
+}
+app.get('/api/clan', requireAuth, async (req,res)=>{
+  const u=await currentUserDoc(req.userLogin); if(!u)return res.status(404).json({error:'Игрок не найден'});
+  const clan=await clanForUser(u);
+  const invites=u.clanInvites||[];
+  const pending=clan && clan.leaderLogin===u.login ? (clan.requests||[]) : [];
+  const messages=clan ? await db.collection('clanMessages').find({clanId:clan.clanId}).sort({createdAt:-1}).limit(100).toArray() : [];
+  res.json({clan:safeClan(clan),invites,pending,messages:messages.reverse().map(m=>({login:m.login,playerId:m.playerId,name:m.name,text:m.text,createdAt:m.createdAt})),isLeader:!!clan&&clan.leaderLogin===u.login});
+});
+app.post('/api/clan/create', requireAuth, async(req,res)=>{
+  const u=await currentUserDoc(req.userLogin); if(!u)return res.status(404).json({error:'Игрок не найден'});
+  if(u.clanId)return res.status(400).json({error:'Ты уже состоишь в клане'});
+  const name=String(req.body.name||'').trim();
+  const avatar=String(req.body.avatar||'');
+  if(name.length<3||name.length>24)return res.status(400).json({error:'Название клана: 3–24 символа'});
+  if(avatar && avatar.length>300000)return res.status(400).json({error:'Аватар слишком большой'});
+  if(avatar && !/^data:image\/(png|jpeg|webp|gif);base64,/i.test(avatar))return res.status(400).json({error:'Неверный формат аватара'});
+  if(await db.collection('clans').findOne({nameLower:name.toLowerCase()}))return res.status(409).json({error:'Клан с таким названием уже существует'});
+  const balance=Number(u.gameData?.balance||0);
+  if(balance<100000000)return res.status(400).json({error:'Создание клана стоит 100 000 000 ₽'});
+  const clanId=crypto.randomBytes(12).toString('hex');
+  const member={login:u.login,playerId:u.playerId,name:u.profile?.name||u.login,role:'leader',joinedAt:Date.now()};
+  const clan={clanId,name,nameLower:name.toLowerCase(),avatar,leaderLogin:u.login,leaderPlayerId:u.playerId,members:[member],requests:[],invites:[],createdAt:Date.now()};
+  const session=db.clientSession; // intentionally unused; updates below are atomic by user filter
+  const result=await db.collection('users').updateOne({login:u.login,'gameData.balance':{$gte:100000000},clanId:{$exists:false}},{$inc:{'gameData.balance':-100000000},$set:{clanId}});
+  if(!result.modifiedCount)return res.status(409).json({error:'Баланс или статус клана изменился. Обнови игру.'});
+  try { await db.collection('clans').insertOne(clan); } catch(e) { await db.collection('users').updateOne({login:u.login},{$unset:{clanId:''},$inc:{'gameData.balance':100000000}}); return res.status(409).json({error:'Название уже занято'}); }
+  res.json({success:true,clan:safeClan(clan)});
+});
+app.post('/api/clan/invite',requireAuth,async(req,res)=>{
+  const leader=await currentUserDoc(req.userLogin),clan=await clanForUser(leader);
+  if(!clan||clan.leaderLogin!==req.userLogin)return res.status(403).json({error:'Приглашать может только лидер'});
+  const playerId=String(req.body.playerId||'').trim();
+  const target=await db.collection('users').findOne({playerId});
+  if(!target)return res.status(404).json({error:'Игрок с таким ID не найден'});
+  if(target.clanId)return res.status(400).json({error:'Игрок уже в клане'});
+  if(target.login===leader.login)return res.status(400).json({error:'Нельзя пригласить себя'});
+  if((clan.members||[]).length>=30)return res.status(400).json({error:'В клане максимум 30 участников'});
+  await db.collection('clans').updateOne({clanId:clan.clanId},{$addToSet:{invites:target.login}});
+  await db.collection('users').updateOne({login:target.login},{$addToSet:{clanInvites:{clanId:clan.clanId,clanName:clan.name,from:leader.login,createdAt:Date.now()}}});
+  res.json({success:true});
+});
+app.post('/api/clan/invite/respond',requireAuth,async(req,res)=>{
+  const accept=!!req.body.accept,clanId=String(req.body.clanId||'');
+  const u=await currentUserDoc(req.userLogin);
+  const clan=await db.collection('clans').findOne({clanId});
+  if(!clan)return res.status(404).json({error:'Клан не найден'});
+  if(!(u.clanInvites||[]).some(i=>i.clanId===clanId))return res.status(403).json({error:'Приглашение не найдено'});
+  if(accept){
+    if(u.clanId)return res.status(400).json({error:'Ты уже в клане'});
+    if(clan.members.length>=30)return res.status(400).json({error:'Клан заполнен'});
+    await db.collection('clans').updateOne({clanId},{$push:{members:{login:u.login,playerId:u.playerId,name:u.profile?.name||u.login,role:'member',joinedAt:Date.now()}},$pull:{invites:u.login}});
+    await db.collection('users').updateOne({login:u.login},{$set:{clanId},$pull:{clanInvites:{clanId}}});
+  }else{
+    await db.collection('clans').updateOne({clanId},{$pull:{invites:u.login}});
+    await db.collection('users').updateOne({login:u.login},{$pull:{clanInvites:{clanId}}});
+  }
+  res.json({success:true});
+});
+app.post('/api/clan/apply',requireAuth,async(req,res)=>{
+  const u=await currentUserDoc(req.userLogin);if(u.clanId)return res.status(400).json({error:'Ты уже в клане'});
+  const name=String(req.body.name||'').trim();
+  const clan=await db.collection('clans').findOne({nameLower:name.toLowerCase()});
+  if(!clan)return res.status(404).json({error:'Клан не найден'});
+  if(clan.requests?.some(r=>r.login===u.login))return res.status(409).json({error:'Заявка уже отправлена'});
+  if(clan.members.length>=30)return res.status(400).json({error:'Клан заполнен'});
+  await db.collection('clans').updateOne({clanId:clan.clanId},{$push:{requests:{login:u.login,playerId:u.playerId,name:u.profile?.name||u.login,createdAt:Date.now()}}});
+  res.json({success:true});
+});
+app.post('/api/clan/request/respond',requireAuth,async(req,res)=>{
+  const leader=await currentUserDoc(req.userLogin),clan=await clanForUser(leader);
+  if(!clan||clan.leaderLogin!==leader.login)return res.status(403).json({error:'Только лидер'});
+  const login=String(req.body.login||''),accept=!!req.body.accept;
+  const request=(clan.requests||[]).find(r=>r.login===login);
+  if(!request)return res.status(404).json({error:'Заявка не найдена'});
+  const target=await currentUserDoc(login);
+  if(accept&&target&&!target.clanId&&clan.members.length<30){
+    await db.collection('clans').updateOne({clanId:clan.clanId},{$push:{members:{login:target.login,playerId:target.playerId,name:target.profile?.name||target.login,role:'member',joinedAt:Date.now()}},$pull:{requests:{login}}});
+    await db.collection('users').updateOne({login:target.login},{$set:{clanId:clan.clanId}});
+  }else await db.collection('clans').updateOne({clanId:clan.clanId},{$pull:{requests:{login}}});
+  res.json({success:true});
+});
+app.post('/api/clan/chat',requireAuth,async(req,res)=>{
+  const u=await currentUserDoc(req.userLogin),clan=await clanForUser(u);
+  if(!clan)return res.status(400).json({error:'Ты не в клане'});
+  const text=String(req.body.text||'').trim().slice(0,500);
+  if(!text)return res.status(400).json({error:'Пустое сообщение'});
+  await db.collection('clanMessages').insertOne({clanId:clan.clanId,login:u.login,playerId:u.playerId,name:u.profile?.name||u.login,text,createdAt:Date.now()});
+  await db.collection('clanMessages').deleteMany({clanId:clan.clanId,_id:{$nin:(await db.collection('clanMessages').find({clanId:clan.clanId}).sort({createdAt:-1}).limit(300).toArray()).map(x=>x._id)}});
+  res.json({success:true});
+});
+app.post('/api/clan/leave',requireAuth,async(req,res)=>{
+ const u=await currentUserDoc(req.userLogin),clan=await clanForUser(u);if(!clan)return res.status(400).json({error:'Нет клана'});
+ if(clan.leaderLogin===u.login)return res.status(400).json({error:'Лидер не может выйти; сначала передай лидерство (пока недоступно)'});
+ await db.collection('clans').updateOne({clanId:clan.clanId},{$pull:{members:{login:u.login}}});
+ await db.collection('users').updateOne({login:u.login},{$unset:{clanId:''}});
+ res.json({success:true});
+});
+app.get('/api/rewards',requireAuth,async(req,res)=>{
+ const u=await currentUserDoc(req.userLogin),r=u.rewards||{};
+ const today=new Date().toISOString().slice(0,10);
+ res.json({today,lastClaim:r.lastClaim||'',streak:r.streak||0,claimedToday:r.lastClaim===today,weeklyClaimed:r.weeklyClaimed||false,weeklyReady:Math.floor((r.streak||0)/7)>Number(r.weeklyClaimedWeek||0)});
+});
+app.post('/api/rewards/claim',requireAuth,async(req,res)=>{
+ const u=await currentUserDoc(req.userLogin);let r=u.rewards||{};
+ const today=new Date().toISOString().slice(0,10);
+ if(r.lastClaim===today)return res.status(409).json({error:'Сегодня награда уже получена'});
+ const yesterday=new Date(Date.now()-DAY_MS).toISOString().slice(0,10);
+ const streak=r.lastClaim===yesterday?(r.streak||0)+1:1;
+ const day=((streak-1)%7)+1,amount=DAILY_REWARD_AMOUNTS[day-1];
+ await db.collection('users').updateOne({login:u.login,'rewards.lastClaim':r.lastClaim||{$exists:false}},{$set:{rewards:{...r,lastClaim:today,streak}},$inc:{'gameData.balance':amount}});
+ res.json({success:true,streak,amount,weekly:0});
+});
+
+app.post('/api/rewards/weekly',requireAuth,async(req,res)=>{
+ const u=await currentUserDoc(req.userLogin),r=u.rewards||{},streak=Number(r.streak||0);
+ const week=Math.floor(streak/7);
+ if(week<1)return res.status(400).json({error:'Сначала забери 7 ежедневных наград'});
+ if(Number(r.weeklyClaimedWeek||0)>=week)return res.status(409).json({error:'Недельная награда уже получена'});
+ await db.collection('users').updateOne({login:u.login},{$set:{'rewards.weeklyClaimedWeek':week},$inc:{'gameData.balance':25000000}});
+ res.json({success:true,amount:25000000,week});
+});
+
 // ЗАПУСК СЕРВЕРА
 MongoClient.connect(MONGODB_URI)
   .then(async client => {
     db = client.db(DB_NAME);
     await db.collection('users').createIndex({ login: 1 }, { unique: true });
     await db.collection('users').createIndex({ playerId: 1 }, { unique: true, sparse: true });
+    await db.collection('clans').createIndex({ nameLower: 1 }, { unique: true });
+    await db.collection('clans').createIndex({ clanId: 1 }, { unique: true });
 
     app.listen(PORT, () => {
       console.log(`✅ Сервер запущен на порту ${PORT}`);
