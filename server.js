@@ -9,7 +9,8 @@ const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const DB_NAME = process.env.DB_NAME || 'imperiya_avto';
 const MONGODB_URI = process.env.MONGODB_URI;
-const ADMIN_LOGIN = process.env.ADMIN_LOGIN || 'Q1wesh';
+const ADMIN_LOGIN = String(process.env.ADMIN_LOGIN || '').trim();
+if (!ADMIN_LOGIN) console.warn('⚠️ ADMIN_LOGIN не задан: админ-доступ отключён до настройки переменной окружения.');
 const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 const MAX_FUEL = 10;
 
@@ -46,7 +47,7 @@ function cleanLogin(value) {
 function safeUser(user) {
   if (!user) return null;
   const { password, passwordHash, ...publicData } = user;
-  return publicData;
+  return { ...publicData, isAdmin: Boolean(ADMIN_LOGIN) && String(user.login || '').toLowerCase() === ADMIN_LOGIN.toLowerCase() };
 }
 
 function hashPassword(password, salt = crypto.randomBytes(16).toString('hex')) {
@@ -105,7 +106,7 @@ function requireAuth(req, res, next) {
   }
 
   req.userLogin = session.login;
-  req.isAdmin = session.login === ADMIN_LOGIN;
+  req.isAdmin = Boolean(ADMIN_LOGIN) && session.login.toLowerCase() === ADMIN_LOGIN.toLowerCase();
 
   next();
 }
@@ -185,12 +186,14 @@ app.post('/api/register', rateLimit, async (req, res) => {
     });
   }
 
-  const count = await users.countDocuments();
-  const num = (count + 1) * 10;
-  const str = String(num).padStart(6, '0');
-
-  const playerId =
-    `${str.slice(0, 2)}-${str.slice(2, 4)}-${str.slice(4, 6)}`;
+  // Random player ID prevents collisions after deletion/concurrent registrations.
+  let playerId;
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const digits = String(crypto.randomInt(0, 1000000)).padStart(6, '0');
+    const candidate = `${digits.slice(0, 2)}-${digits.slice(2, 4)}-${digits.slice(4, 6)}`;
+    if (!(await users.findOne({ playerId: candidate }))) { playerId = candidate; break; }
+  }
+  if (!playerId) return res.status(503).json({ error: 'Не удалось создать ID. Повторите регистрацию.' });
 
   const passwordData = hashPassword(password);
 
@@ -363,24 +366,35 @@ app.post('/api/save', requireAuth, async (req, res) => {
   }
 
   if (typeof update['gameData.balance'] !== 'undefined') {
-    update['gameData.balance'] =
-      Math.max(0, Number(update['gameData.balance']) || 0);
+    const value = Number(update['gameData.balance']);
+    if (!Number.isFinite(value) || value < 0 || value > 1e15) return res.status(400).json({ error: 'Некорректный баланс.' });
+    update['gameData.balance'] = Math.floor(value);
   }
 
   if (typeof update['gameData.income'] !== 'undefined') {
-    update['gameData.income'] =
-      Math.max(0, Number(update['gameData.income']) || 0);
+    const value = Number(update['gameData.income']);
+    if (!Number.isFinite(value) || value < 0 || value > 1e12) return res.status(400).json({ error: 'Некорректный доход.' });
+    update['gameData.income'] = value;
+  }
+  for (const key of ['fuel','garageSlots','numbersSlots','xp','playTimeCounter','pityLetters','pityDigits']) {
+    const field = `gameData.${key}`;
+    if (typeof update[field] !== 'undefined') {
+      const value = Number(update[field]);
+      if (!Number.isFinite(value) || value < 0 || value > 1e12) return res.status(400).json({ error: `Некорректное поле ${key}.` });
+      update[field] = Math.floor(value);
+    }
+  }
+  for (const key of ['myNumbers','tasksData','collectionCars']) {
+    const field = `gameData.${key}`;
+    if (typeof update[field] !== 'undefined' && (!Array.isArray(update[field]) || update[field].length > 5000)) return res.status(400).json({ error: `Некорректное поле ${key}.` });
   }
 
-  if (
-    typeof update['gameData.cars'] !== 'undefined' &&
-    (
-      !Array.isArray(update['gameData.cars']) ||
-      update['gameData.cars'].length > 1000
-    )
-  ) {
-    return res.status(400).json({
-      error: 'Некорректный список машин.'
+  if (typeof update['gameData.cars'] !== 'undefined') {
+    const list = update['gameData.cars'];
+    if (!Array.isArray(list) || list.length > 1000 || list.some(c => !c || typeof c !== 'object' || typeof c.id !== 'string' || c.id.length > 100)) return res.status(400).json({ error: 'Некорректный список машин.' });
+    update['gameData.cars'] = list.map(c => {
+      const t = c.tuning && typeof c.tuning === 'object' ? c.tuning : {};
+      return { ...c, tuning: { engine: Math.min(5, Math.max(0, Math.floor(Number(t.engine) || 0))), turbo: Math.min(4, Math.max(0, Math.floor(Number(t.turbo) || 0))), suspension: Math.min(3, Math.max(0, Math.floor(Number(t.suspension) || 0))) } };
     });
   }
 
@@ -559,8 +573,10 @@ app.use((err, req, res, next) => {
 
 // ЗАПУСК СЕРВЕРА
 MongoClient.connect(MONGODB_URI)
-  .then(client => {
+  .then(async client => {
     db = client.db(DB_NAME);
+    await db.collection('users').createIndex({ login: 1 }, { unique: true });
+    await db.collection('users').createIndex({ playerId: 1 }, { unique: true, sparse: true });
 
     app.listen(PORT, () => {
       console.log(`✅ Сервер запущен на порту ${PORT}`);
