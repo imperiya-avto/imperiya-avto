@@ -1558,6 +1558,12 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 // ================= КОНСТАНТЫ И ПЕРЕМЕННЫЕ =================
 const API_URL = window.location.origin + '/api';
 const MAX_FUEL = 10;
+let authToken = localStorage.getItem('autoEmpire_authToken') || '';
+async function apiFetch(url, options = {}) {
+  const headers = { ...(options.headers || {}) };
+  if (authToken) headers.Authorization = `Bearer ${authToken}`;
+  return fetch(url, { ...options, headers });
+}
 let currentUser = null;
 let isRegisterMode = false;
 
@@ -1676,6 +1682,7 @@ async function handleAuth() {
       return;
     }
 
+    if (data.token) { authToken = data.token; localStorage.setItem('autoEmpire_authToken', authToken); }
     localStorage.setItem('autoEmpire_activeUser', login);
     currentUser = login;
     applyServerUser(data.user);
@@ -1689,6 +1696,8 @@ async function handleAuth() {
 // ================= ВЫХОД =================
 function logout() {
   localStorage.removeItem('autoEmpire_activeUser');
+  localStorage.removeItem('autoEmpire_authToken');
+  authToken = '';
   window.location.reload();
 }
 
@@ -1714,6 +1723,7 @@ function applyServerUser(user) {
   garageSlots = user.gameData.garageSlots;
   cars = user.gameData.cars || [];
   collectionCars = user.gameData.collectionCars || [];
+  playTimeCounter = Number(user.gameData.playTimeCounter) || 0;
 
   myNumbers = user.gameData.myNumbers || [];
   numbersSlots = user.gameData.numbersSlots || 10;
@@ -1892,7 +1902,7 @@ function scheduleSave() {
     if (!currentUser) return;
     const fuel = Math.min(window._lastFuel, MAX_FUEL);
     try {
-      await fetch(`${API_URL}/save`, {
+      await apiFetch(`${API_URL}/save`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1910,7 +1920,8 @@ function scheduleSave() {
             pityDigits: pityDigits,
             collectionBonusApplied: collectionBonusApplied,
             collectionCars: collectionCars,
-            xp: myProfileData ? (myProfileData.gameData.xp || 0) : 0 // Сохраняем опыт
+            xp: myProfileData ? (myProfileData.gameData.xp || 0) : 0,
+            playTimeCounter: playTimeCounter // Сохраняем время игры
           }
         })
       });
@@ -2223,6 +2234,8 @@ function renderGarage(){
   if (!currentUser) return;
   const container=document.getElementById("garageCars");
   if(!container) return;
+  // Пересоздаём карточки, чтобы обработчики не ссылались на старые индексы.
+  container.innerHTML = "";
 
   expandedCars = new Set([...expandedCars].filter(i=>i>=0&&i<cars.length));
   selectedCars = selectedCars.filter(i => i >= 0 && i < cars.length && !cars[i].locked);
@@ -2492,6 +2505,7 @@ function buyGarageSlot(){
  triggerBalanceAnimation(price, false);
  garageSlots++;
  renderGarage();
+ scheduleSave();
 }
 
 // ================= МОДАЛКА ВЫБОРА НОМЕРА ДЛЯ МАШИНЫ =================
@@ -2664,6 +2678,7 @@ function collectMoney(){
 
   triggerBalanceAnimation(amount, true);
   update();
+  scheduleSave();
 }
 
 // ================= КЕЙСЫ =================
@@ -2874,11 +2889,12 @@ async function buyCase(){
 
  if(skip){
   winners.forEach((winner,index)=>{
-   cars.push({id:winner.id, plate: null});
+   const droppedCar = { id: winner.id, plate: null, dropToken: `${Date.now()}_${Math.random()}` };
+   cars.push(droppedCar);
    if (!collectionCars.includes(winner.id)) {
      collectionCars.push(winner.id);
    }
-   lastCarsFromCase.push(winner);
+   lastCarsFromCase.push({ ...winner, dropToken: droppedCar.dropToken });
    const row=document.createElement("div");
    row.className="roulette-row";
    const header=document.createElement("div");
@@ -2908,11 +2924,12 @@ async function buyCase(){
 
  const animations = roulettes.map((r, idx) => animateRoulette(r).then(() => {
    const winner = winners[idx];
-   cars.push({ id: winner.id, plate: null });
+   const droppedCar = { id: winner.id, plate: null, dropToken: `${Date.now()}_${Math.random()}` };
+   cars.push(droppedCar);
    if (!collectionCars.includes(winner.id)) {
      collectionCars.push(winner.id);
    }
-   lastCarsFromCase.push(winner);
+   lastCarsFromCase.push({ ...winner, dropToken: droppedCar.dropToken });
    r.result.textContent = "🎉 " + winner.name + " — " + winner.rarity;
    showCaseDrop(winner);
    if(winner.rarity === 'Легендарная') updateTaskProgress('get_legendary_car', 1);
@@ -2946,43 +2963,32 @@ function finishOpening(quantity){
 }
 
 function sellDroppedCars() {
-  if (lastCarsFromCase.length === 0) return;
-  
-  const carsInGarage = lastCarsFromCase.filter(c => 
-    cars.some(garageCar => garageCar.id === c.id)
-  );
-
-  if (carsInGarage.length === 0) {
+  if (!lastCarsFromCase.length) return;
+  const tokens = new Set(lastCarsFromCase.map(c => c.dropToken).filter(Boolean));
+  const owned = cars.filter(c => c.dropToken && tokens.has(c.dropToken));
+  if (!owned.length) {
     lastCarsFromCase = [];
-    document.getElementById('sellDroppedBtn').style.display = 'none';
+    const button = document.getElementById('sellDroppedBtn');
+    if (button) button.style.display = 'none';
     return;
   }
-
-  let total = 0;
-  carsInGarage.forEach(car => {
-    total += Math.floor(car.price * 0.15);
-  });
-
-  for (let i = cars.length - 1; i >= 0; i--) {
-    if (carsInGarage.some(c => c.id === cars[i].id)) {
-      cars.splice(i, 1);
-    }
-  }
-
+  const total = owned.reduce((sum, car) => {
+    const item = catalog.find(c => c.id === car.id);
+    return sum + (item ? Math.floor(item.price * 0.15) : 0);
+  }, 0);
+  const sold = new Set(owned.map(c => c.dropToken));
+  cars = cars.filter(c => !c.dropToken || !sold.has(c.dropToken));
   balance += total;
   triggerBalanceAnimation(total, true);
-  const count = carsInGarage.length;
+  const count = owned.length;
   lastCarsFromCase = [];
-  document.getElementById('sellDroppedBtn').style.display = 'none';
+  const button = document.getElementById('sellDroppedBtn');
+  if (button) button.style.display = 'none';
   document.getElementById('caseMessage').textContent = `✅ Выпавшие машины проданы за ${total.toLocaleString('ru-RU')} ₽!`;
-
-  renderGarage();
-  update();
-  if(count > 0) {
-      updateTaskProgress('sell_car', count);
-      addExperience(count * 5);
-  }
+  renderGarage(); update(); scheduleSave();
+  if (count) { updateTaskProgress('sell_car', count); addExperience(count * 5); }
 }
+
 
 // ================= ПРОФИЛЬ =================
 async function openMyProfile() {
@@ -2990,7 +2996,7 @@ async function openMyProfile() {
   isViewingOtherProfile = false;
 
   try {
-    const res = await fetch(`${API_URL}/user/${currentUser}`);
+    const res = await apiFetch(`${API_URL}/user/${currentUser}`);
     const user = await res.json();
     if (!user) return;
 
@@ -3053,7 +3059,7 @@ async function saveProfile() {
     const newBio = document.getElementById("profileBioInput").value.trim();
     const newAvatar = document.getElementById("profileAvatarPreview").src;
 
-    await fetch(`${API_URL}/profile`, {
+    await apiFetch(`${API_URL}/profile`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -3062,7 +3068,7 @@ async function saveProfile() {
       })
     });
 
-    const res = await fetch(`${API_URL}/user/${currentUser}`);
+    const res = await apiFetch(`${API_URL}/user/${currentUser}`);
     const user = await res.json();
     updateProfileUIFromServer(user);
 
@@ -3084,7 +3090,7 @@ async function viewPlayerProfile(login) {
   }
 
   try {
-    const res = await fetch(`${API_URL}/user/${login}`);
+    const res = await apiFetch(`${API_URL}/user/${login}`);
     const user = await res.json();
     if (!user) return;
 
@@ -3198,7 +3204,7 @@ async function adminAdjust(action) {
   const finalAmount = action === 'give' ? amount : -amount;
 
   try {
-    const res = await fetch(`${API_URL}/admin/adjust`, {
+    const res = await apiFetch(`${API_URL}/admin/adjust`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ adminLogin, targetId, amount: finalAmount })
@@ -3212,7 +3218,7 @@ async function adminAdjust(action) {
     }
 
     if (targetId === document.getElementById('profileIdDisplay').textContent) {
-        const meRes = await fetch(`${API_URL}/user/${currentUser}`);
+        const meRes = await apiFetch(`${API_URL}/user/${currentUser}`);
         const me = await meRes.json();
         balance = me.gameData.balance;
         income = me.gameData.income || 0;
@@ -3242,7 +3248,7 @@ async function adminAdjust(action) {
 async function renderTops() {
   if (!currentUser) return;
   try {
-    const res = await fetch(`${API_URL}/top`);
+    const res = await apiFetch(`${API_URL}/top`);
     const players = await res.json();
     const topContainer = document.getElementById('topContainer');
     topContainer.innerHTML = '';
@@ -4057,7 +4063,6 @@ function openContainer(element, color) {
   balance -= CONTAINER_PRICE;
   triggerBalanceAnimation(CONTAINER_PRICE, false);
   update();
-  addExperience(50); // Опыт за контейнер
 
   element.classList.add('opened');
   const img = element.querySelector('img');
@@ -4068,8 +4073,6 @@ function openContainer(element, color) {
 
   const roll = Math.random();
   let winCar = null;
-
-  updateTaskProgress('open_container', 1); 
 
   if (roll < 0.25) {
     updateTaskProgress('open_empty_container', 1); 
@@ -4091,6 +4094,20 @@ function openContainer(element, color) {
     const mythics = catalog.filter(c => c.rarity === 'Мифическая');
     winCar = mythics[Math.floor(Math.random() * mythics.length)];
   }
+
+  if (!winCar && roll >= 0.25) {
+    balance += CONTAINER_PRICE;
+    triggerBalanceAnimation(CONTAINER_PRICE, true);
+    element.classList.remove('opened');
+    img.src = `images/${color}_con.png`;
+    update(); scheduleSave();
+    showToastNotification('⚠️ Ошибка каталога', 'Не удалось подобрать машину. Деньги возвращены.');
+    return;
+  }
+
+  updateTaskProgress('open_container', 1);
+  addExperience(50); // Опыт начисляется только после корректного результата
+  scheduleSave();
 
   setTimeout(() => {
     if (winCar) {
@@ -5073,9 +5090,11 @@ window.addEventListener('load', async () => {
     return;
   }
   try {
-    const res = await fetch(`${API_URL}/user/${active}`);
+    const res = await apiFetch(`${API_URL}/me`);
     if (!res.ok) {
       localStorage.removeItem('autoEmpire_activeUser');
+      localStorage.removeItem('autoEmpire_authToken');
+      authToken = '';
       document.getElementById('authScreen').style.display = 'flex';
       return;
     }
