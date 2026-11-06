@@ -418,6 +418,7 @@ app.get('/api/top', async (req, res) => {
           login: 1,
           playerId: 1,
           profile: 1,
+          clanId: 1,
           'gameData.balance': 1
         }
       }
@@ -426,12 +427,18 @@ app.get('/api/top', async (req, res) => {
     .limit(200)
     .toArray();
 
+  const clanIds = [...new Set(players.map(p => p.clanId).filter(Boolean))];
+  const clans = clanIds.length
+    ? await db.collection('clans').find({ clanId: { $in: clanIds } }, { projection: { clanId: 1, name: 1 } }).toArray()
+    : [];
+  const clanNames = new Map(clans.map(c => [c.clanId, c.name]));
   res.json(players.map(p => ({
     login: p.login,
     playerId: p.playerId,
     name: p.profile?.name || p.login,
     avatar: p.profile?.avatar || '',
-    balance: p.gameData?.balance || 0
+    balance: p.gameData?.balance || 0,
+    clanName: p.clanId ? (clanNames.get(p.clanId) || '') : ''
   })));
 });
 
