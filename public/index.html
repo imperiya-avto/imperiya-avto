@@ -1006,6 +1006,117 @@ html,body{overflow-x:hidden;overflow-anchor:none;scroll-behavior:auto}
  .tuning-row button{font-size:9px!important;padding:6px 3px!important}
 }
 </style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@500;600;700&display=swap" rel="stylesheet">
+<style id="premium-clan-ui">
+  body { font-family: 'Manrope', 'Segoe UI', sans-serif; }
+  h1,h2,h3,.clan-card h2,.clan-modal-box h3 { font-family: 'Unbounded','Manrope',sans-serif; }
+  .profile-box {
+    max-height: min(82dvh, 760px) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+  }
+  .profile-close {
+    position: sticky !important;
+    float: right;
+    top: 0 !important;
+    right: 0 !important;
+    z-index: 20 !important;
+    width: 38px; height: 38px;
+    margin: -8px -8px 0 8px;
+    display: grid; place-items: center;
+    border-radius: 12px;
+    background: rgba(255,255,255,.08) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 16px #0008;
+  }
+  .profile-close:hover { background: rgba(255,77,94,.2) !important; }
+  .top-clan-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    width: fit-content; max-width: 100%;
+    margin-top: 4px; padding: 3px 9px;
+    border: 1px solid rgba(110,170,255,.35);
+    border-radius: 999px;
+    background: linear-gradient(110deg,rgba(69,123,255,.2),rgba(161,92,255,.16));
+    color: #c8d8ff; font-size: 10px; font-weight: 800;
+    letter-spacing: .35px; overflow-wrap: anywhere;
+  }
+  .clan-card {
+    position: relative; overflow: hidden;
+    background:
+      radial-gradient(ellipse at 8% 0%,rgba(255,196,66,.16),transparent 48%),
+      radial-gradient(ellipse at 100% 100%,rgba(103,91,255,.16),transparent 48%),
+      linear-gradient(145deg,#202033,#101018) !important;
+    border: 1px solid rgba(255,211,105,.28) !important;
+    box-shadow: 0 14px 40px #0007, inset 0 1px rgba(255,255,255,.06);
+    animation: clanCardEnter .45s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .clan-card:before {
+    content:""; position:absolute; inset:0 auto 0 0; width:3px;
+    background:linear-gradient(180deg,#ffe9a1,#ff9d32,#9c7cff);
+    opacity:.9;
+  }
+  .clan-card h2 { color:#ffe4a0; text-shadow:0 0 22px #ffbf4d55; }
+  .clan-avatar {
+    border:1px solid #ffdb8b99 !important;
+    box-shadow:0 0 0 4px #ffca5520,0 8px 24px #0008;
+    animation: clanAvatarGlow 3s ease-in-out infinite;
+  }
+  .clan-member,.clan-request,.clan-invite {
+    background:linear-gradient(110deg,#29293a,#1b1b27) !important;
+    border:1px solid #ffffff10; border-radius:12px !important;
+    transition:transform .2s,border-color .2s,background .2s;
+  }
+  .clan-member:hover,.clan-request:hover,.clan-invite:hover {
+    transform:translateY(-2px); border-color:#ffd36a66;
+  }
+  .clan-btn {
+    cursor:pointer; transition:transform .18s,filter .18s,box-shadow .18s;
+    font-family:'Manrope',sans-serif;
+  }
+  .clan-btn:hover { transform:translateY(-2px); filter:brightness(1.12); box-shadow:0 7px 20px #0005; }
+  .clan-btn.primary { box-shadow:0 6px 20px #ffb52b30; }
+  .clan-modal { z-index:100020 !important; backdrop-filter:blur(9px); animation:clanFade .2s ease both; }
+  .clan-modal-box {
+    position:relative;
+    background:
+      radial-gradient(ellipse at 100% 0%,#6f5cff22,transparent 48%),
+      linear-gradient(145deg,#222234,#111119) !important;
+    border:1px solid #ffe09a55 !important;
+    box-shadow:0 28px 90px #000c,0 0 40px #b58a3820 !important;
+    animation:clanModalIn .28s cubic-bezier(.2,.8,.2,1) both;
+  }
+  .clan-modal-box h3 { color:#ffe4a0; }
+  .clan-success { text-align:center; padding:10px 4px 4px; }
+  .clan-success h3 { margin:8px 0; }
+  .clan-success p { color:#c4c4d2; line-height:1.65; }
+  .clan-success-icon {
+    width:62px;height:62px;margin:0 auto 12px;display:grid;place-items:center;
+    border-radius:20px;font-size:28px;color:#ffe3a0;
+    background:linear-gradient(145deg,#ffca5533,#9874ff33);
+    border:1px solid #ffe09a66;box-shadow:0 0 32px #ffca5522;
+    animation:clanAvatarGlow 2.5s ease-in-out infinite;
+  }
+  .clan-chat { border-color:#66568a66 !important; }
+  .clan-message { border:1px solid #ffffff0b; }
+  @keyframes clanCardEnter { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes clanModalIn { from{opacity:0;transform:translateY(14px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+  @keyframes clanFade { from{opacity:0} to{opacity:1} }
+  @keyframes clanAvatarGlow { 0%,100%{box-shadow:0 0 0 4px #ffca5520,0 8px 24px #0008} 50%{box-shadow:0 0 0 7px #ffca5528,0 8px 30px #ffca5522} }
+  @media(max-width:600px) {
+    .profile-modal { padding:8px !important; align-items:center !important; }
+    .profile-box { width:min(100%,440px) !important; max-height:78dvh !important; padding:15px !important; }
+    .top-row { gap:9px !important; padding:9px 10px !important; }
+  }
+  @media(prefers-reduced-motion:reduce) {
+    .clan-card,.clan-avatar,.clan-modal,.clan-modal-box,.clan-success-icon { animation:none !important; }
+    .clan-btn,.clan-member,.clan-request,.clan-invite { transition:none !important; }
+  }
+</style>
+
 </head>
 <body>
 
@@ -3348,6 +3459,7 @@ async function adminAdjust(action) {
 // ================= ТОПЫ =================
 async function renderTops() {
   if (!currentUser) return;
+  const safeTopText = value => String(value || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   try {
     const res = await apiFetch(`${API_URL}/top`);
     const players = await res.json();
@@ -3379,8 +3491,9 @@ async function renderTops() {
         ${rankHtml}
         <img src="${avatarSrc}" class="top-avatar">
         <div class="top-info">
-          <div class="top-name">${p.name} ${p.login === currentUser ? '(Вы)' : ''}</div>
-          <div class="top-id">ID: ${p.playerId}</div>
+          <div class="top-name">${safeTopText(p.name)} ${p.login === currentUser ? '(Вы)' : ''}</div>
+          ${p.clanName ? `<div class="top-clan-tag">🛡 ${safeTopText(p.clanName)}</div>` : ''}
+          <div class="top-id">ID: ${safeTopText(p.playerId)}</div>
         </div>
         <div class="top-balance">${Math.floor(p.balance).toLocaleString('ru-RU')} ₽</div>
       `;
@@ -4503,6 +4616,7 @@ let playerProgress = 0;
 let botProgress = 0;
 let playerFinished = false;
 let botFinished = false;
+let raceWinner = null; // Победитель определяется в момент пересечения финиша
 let botGoTimeout = null;
 let greenLightTimeout = null;
 let raceStartTime = 0;
@@ -4727,6 +4841,7 @@ function resetRaceUI() {
   botProgress = 0;
   playerFinished = false;
   botFinished = false;
+  raceWinner = null;
   playerGoPressed = false;
   if (botGoTimeout) clearTimeout(botGoTimeout);
   if (greenLightTimeout) clearTimeout(greenLightTimeout);
@@ -4842,6 +4957,7 @@ function startMovement() {
       if (playerProgress >= 100) {
         playerProgress = 100;
         playerFinished = true;
+        if (!raceWinner) raceWinner = 'player';
       }
       document.getElementById("carPlayer").style.left = (8 + (playerProgress / 100) * laneWidth) + "px";
     }
@@ -4851,6 +4967,7 @@ function startMovement() {
       if (botProgress >= 100) {
         botProgress = 100;
         botFinished = true;
+        if (!raceWinner) raceWinner = 'bot';
       }
       document.getElementById("carBot").style.left = (8 + (botProgress / 100) * laneWidth) + "px";
     }
@@ -4879,10 +4996,11 @@ function startMovement() {
       const pLane = document.getElementById("lanePlayer");
       const bLane = document.getElementById("laneBot");
 
-      if (playerFinished && !botFinished) {
+      if (raceWinner === 'player') {
         balance += currentRaceData.reward;
         triggerBalanceAnimation(currentRaceData.reward, true);
         update();
+        if (typeof scheduleSave === 'function') scheduleSave();
 
         pLane.classList.add("win-active");
         bLane.classList.add("lose-active");
@@ -5270,11 +5388,11 @@ async function refreshClan(){
 window.openClanCreate=()=>clanModal('Создание клана',`<label>Название клана (3–24 символа)</label><input id="newClanName" maxlength="24" placeholder="Например, NIGHT RIDERS"><label>Аватар клана (необязательно)</label><input id="newClanAvatarFile" type="file" accept="image/png,image/jpeg,image/webp"><div id="clanAvatarPreview"></div><button class="clan-btn primary" onclick="createClan()">Создать за 100 000 000 ₽</button>`);
 window.createClan=async()=>{try{let avatar='';const f=document.getElementById('newClanAvatarFile').files[0];if(f){if(f.size>200000)throw new Error('Аватар до 200 КБ');avatar=await new Promise((ok,no)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=no;r.readAsDataURL(f);});}await clanReq('/api/clan/create',{name:document.getElementById('newClanName').value,avatar});closeClanModal();await refreshMe();await refreshClan();}catch(e){alert(e.message)}};
 window.openClanSearch=()=>clanModal('Найти клан',`<label>Название клана</label><input id="clanSearchName" maxlength="24" placeholder="Введи точное название"><button class="clan-btn primary" onclick="applyClan()">Отправить запрос</button>`);
-window.applyClan=async()=>{try{await clanReq('/api/clan/apply',{name:document.getElementById('clanSearchName').value});closeClanModal();alert('Заявка отправлена лидеру клана');}catch(e){alert(e.message)}};
+window.applyClan=async()=>{try{await clanReq('/api/clan/apply',{name:document.getElementById('clanSearchName').value});clanModal('Заявка отправлена',`<div class="clan-success"><div class="clan-success-icon">✦</div><h3>Ты сделал первый шаг!</h3><p>Заявка отправлена лидеру клана. Когда её рассмотрят, ты сможешь присоединиться к команде.</p><button class="clan-btn primary" onclick="closeClanModal()">Отлично</button></div>`);}catch(e){clanModal('Не удалось отправить заявку',`<div class="clan-success"><p>${escapeHtml(e.message)}</p><button class="clan-btn primary" onclick="closeClanModal()">Понятно</button></div>`);}};
 window.openClanInvite=()=>clanModal('Пригласить игрока',`<label>ID игрока</label><input id="clanInviteId" placeholder="Например, 12-34-56"><button class="clan-btn primary" onclick="inviteClanPlayer()">Отправить приглашение</button>`);
 window.inviteClanPlayer=async()=>{try{await clanReq('/api/clan/invite',{playerId:document.getElementById('clanInviteId').value});closeClanModal();alert('Приглашение отправлено');await refreshClan();}catch(e){alert(e.message)}};
-window.respondClanInvite=async(id,accept)=>{try{await clanReq('/api/clan/invite/respond',{clanId:id,accept});await refreshMe();await refreshClan();}catch(e){alert(e.message)}};
-window.respondClanRequest=async(login,accept)=>{try{await clanReq('/api/clan/request/respond',{login,accept});await refreshClan();}catch(e){alert(e.message)}};
+window.respondClanInvite=async(id,accept)=>{try{await clanReq('/api/clan/invite/respond',{clanId:id,accept});await refreshMe();await refreshClan();if(accept)clanModal('Добро пожаловать!',`<div class="clan-success"><div class="clan-success-icon">🛡</div><h3>Ты теперь в клане!</h3><p>Твоя команда стала сильнее. Общайся с участниками и вместе поднимайтесь в рейтинге.</p><button class="clan-btn primary" onclick="closeClanModal()">Вперёд!</button></div>`);}catch(e){clanModal('Ошибка',`<div class="clan-success"><p>${escapeHtml(e.message)}</p><button class="clan-btn primary" onclick="closeClanModal()">Закрыть</button></div>`);}};
+window.respondClanRequest=async(login,accept)=>{try{await clanReq('/api/clan/request/respond',{login,accept});await refreshClan();if(accept)clanModal('Новый участник',`<div class="clan-success"><div class="clan-success-icon">⚔</div><h3>Игрок принят в клан</h3><p>Отличное пополнение команды. Поздоровайтесь с новым участником в клановом чате!</p><button class="clan-btn primary" onclick="closeClanModal()">Продолжить</button></div>`);}catch(e){clanModal('Ошибка',`<div class="clan-success"><p>${escapeHtml(e.message)}</p><button class="clan-btn primary" onclick="closeClanModal()">Закрыть</button></div>`);}};
 window.sendClanMessage=async ev=>{ev.preventDefault();const input=document.getElementById('clanChatInput');const text=input.value.trim();if(!text)return;try{await clanReq('/api/clan/chat',{text});input.value='';await refreshClan();}catch(e){alert(e.message)}};
 window.leaveClan=async()=>{if(!confirm('Точно покинуть клан?'))return;try{await clanReq('/api/clan/leave',{});await refreshMe();await refreshClan();}catch(e){alert(e.message)}};
 async function refreshMe(){const r=await apiFetch(API_URL+'/me');if(r.ok){const u=await r.json();applyServerUser(u);}}
