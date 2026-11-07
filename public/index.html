@@ -991,11 +991,69 @@ header .header-widgets{margin:0;display:flex;align-items:center;gap:8px}
 .balance-container{position:absolute;top:15px;left:calc(50% + 56px);width:auto;max-width:none;margin:0;z-index:5}
 .balance{padding:8px 13px!important;background:#1c1c1e!important;border:0!important;border-radius:30px!important;color:#f5f5f7!important;font-size:13px!important;box-shadow:none!important;white-space:nowrap}
 .balance #balance{color:#fff!important;text-shadow:none!important}
-nav#bottomNav{position:fixed!important;left:50%;bottom:10px;transform:translateX(-50%);z-index:9999;width:max-content;max-width:calc(100vw - 28px);display:flex;gap:2px;padding:4px;background:rgba(35,35,39,.94);border:1px solid #66666d;border-radius:28px;box-shadow:0 8px 28px rgba(0,0,0,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
-nav#bottomNav button{display:flex;align-items:center;justify-content:center;gap:6px;min-width:82px;padding:10px 15px;border:0;border-radius:22px;background:transparent;color:#a4a4ac;font-size:12px;font-weight:800;letter-spacing:0;box-shadow:none}
-nav#bottomNav button span{display:none}
-nav#bottomNav button.active{background:#505056;color:#fff;box-shadow:none}
-nav#bottomNav button:hover:not(:disabled){transform:none;color:#fff;box-shadow:none;border:0}
+nav#bottomNav {
+    position: fixed !important;
+    left: 50% !important;
+    bottom: 10px !important;
+    top: auto !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: max-content !important;
+    height: auto !important;
+    max-width: calc(100vw - 24px) !important;
+
+    padding: 4px !important;
+    gap: 3px !important;
+    margin: 0 !important;
+
+    background: #252529 !important;
+    border: 1px solid #666 !important;
+    border-radius: 30px !important;
+    z-index: 99999 !important;
+}
+
+nav#bottomNav button {
+    display: flex !important;
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: 75px !important;
+    height: auto !important;
+    min-height: 0 !important;
+
+    padding: 10px 12px !important;
+    margin: 0 !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    border-radius: 24px !important;
+}
+
+nav#bottomNav button.active {
+    background: #505056 !important;
+    color: white !important;
+}
+
+nav#bottomNav button span {
+    display: none !important;
+}
+
+@media (max-width: 420px) {
+    nav#bottomNav button {
+        min-width: 65px !important;
+        padding: 9px 10px !important;
+    }
+}
 main{width:min(568px,calc(100% - 24px));max-width:568px;margin:12px auto 0;padding:0 0 100px}
 .panel{background:#1c1c1e!important;border:0!important;border-radius:16px!important;padding:16px!important;box-shadow:none!important;backdrop-filter:none!important}
 .panel:before{display:none!important}
