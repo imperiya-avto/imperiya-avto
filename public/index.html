@@ -981,7 +981,34 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
 }
 html,body{background:#000!important;color:#f5f5f7;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
 .bg-lights-container{display:none!important}
-header{max-width:568px;margin:0 auto 4px;padding:14px 8px 0;min-height:54px;display:flex;flex-direction:row;align-items:center;justify-content:flex-end}
+header {
+    max-width: 568px;
+    margin: 0 auto 4px;
+    padding: 14px 8px 0;
+  header .header-widgets {
+    position: relative !important;
+    z-index: 21 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    overflow: visible !important;
+}
+
+header .fuel-widget,
+header .user-profile-widget {
+    position: relative !important;
+    z-index: 22 !important;
+}
+    min-height: 54px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative !important;
+    z-index: 20 !important;
+    background: transparent !important;
+    overflow: visible !important;
+}
 header .header-content{display:none}
 header .header-widgets{margin:0;display:flex;align-items:center;gap:8px}
 .user-profile-widget{background:#1c1c1e!important;border:0!important;border-radius:50px!important;padding:4px!important;min-width:36px}
