@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Империя Авто</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IMPERIYA AVTO</title>
 <link rel="icon" type="image/png" href="images/logo_image.png">
 
 <style>
@@ -970,6 +970,140 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  .tuning-note{font-size:9px;}
  .car-details{box-sizing:border-box;max-width:100%;overflow:hidden;}
 }
+
+/* =========================================================
+   IMPERIYA AVTO — DROPEZONE-INSPIRED VISUAL REDESIGN
+   Visual layer only: existing IDs, handlers and API remain intact.
+   ========================================================= */
+:root{
+  --bg:#080808; --bg-2:#101010; --panel:#1c1c1e; --panel-2:#242426; --panel-3:#303034;
+  --stroke:#2b2b2f; --stroke-2:#3a3a40; --text:#f5f5f7; --muted:#929299;
+  --yellow:#168bff; --yellow-2:#0878ed; --yellow-soft:#75bdff; --yellow-glow:rgba(22,139,255,.32);
+  --green:#35d07f; --red:#ff5364; --blue:#168bff; --radius:17px; --radius-sm:12px;
+  --shadow:0 12px 34px rgba(0,0,0,.38);
+}
+html{background:#000;scroll-behavior:smooth}
+body{background:#000!important;color:#f5f5f7;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif!important;padding-bottom:94px;overflow-x:hidden}
+.bg-lights-container{display:none!important}
+header{
+  width:min(100% - 24px,568px);margin:14px auto 8px;padding:8px 12px!important;min-height:58px!important;
+  border:0!important;border-bottom:1px solid #222!important;border-radius:0!important;
+  background:#080808!important;box-shadow:none!important;overflow:visible!important;
+}
+header:before{display:none!important}
+.header-content{gap:10px!important}
+.header-logo{max-width:42px!important;max-height:42px;object-fit:contain;filter:none!important;animation:none!important}
+.header-content p{display:none!important}
+.header-fallback-text{font-size:18px!important;letter-spacing:0!important;background:none!important;-webkit-text-fill-color:#fff!important;animation:none!important}
+.header-widgets{gap:8px!important}
+.user-profile-widget{position:relative!important;top:auto!important;right:auto!important;padding:5px 10px 5px 5px!important;background:#1c1c1e!important;border:1px solid #303034!important}
+.user-avatar-mini{width:32px!important;height:32px!important;border:1px solid #777!important}
+.user-name-mini{font-size:12px!important}
+.fuel-widget{background:#1c1c1e!important;border:1px solid #303034!important;border-radius:999px!important;padding:7px 10px!important}
+.balance-container{max-width:568px!important;width:calc(100% - 24px)!important;margin:8px auto!important}
+.balance{padding:10px 14px!important;background:#1c1c1e!important;border:1px solid #303034!important;border-radius:13px!important;color:#fff!important;box-shadow:none!important;font-size:15px!important}
+.balance #balance{color:#fff!important;text-shadow:none!important}
+nav{
+  position:fixed!important;left:50%!important;right:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;top:auto!important;
+  transform:translateX(-50%)!important;width:min(calc(100% - 24px),568px)!important;max-width:568px!important;
+  display:flex!important;flex-wrap:nowrap!important;justify-content:flex-start!important;gap:5px!important;
+  overflow-x:auto!important;overflow-y:hidden!important;padding:6px!important;margin:0!important;
+  border:1px solid #48484d!important;border-radius:18px!important;background:rgba(32,32,35,.96)!important;
+  backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;z-index:5000!important;
+  scrollbar-width:none!important;box-shadow:0 12px 35px #0009!important;
+}
+nav::-webkit-scrollbar{display:none!important}
+nav button{
+  flex:1 0 auto!important;min-width:74px!important;padding:10px 11px!important;border:0!important;border-radius:12px!important;
+  background:transparent!important;color:#a7a7ad!important;font-size:11px!important;font-weight:750!important;
+  letter-spacing:0!important;box-shadow:none!important;white-space:nowrap!important;transition:background .18s,color .18s!important;
+}
+nav button:hover:not(:disabled){transform:none!important;background:#2c2c30!important;color:#fff!important;box-shadow:none!important}
+nav button.active{background:#55555a!important;color:#fff!important;border:0!important;box-shadow:none!important}
+nav button:active{transform:scale(.97)!important;box-shadow:none!important}
+main{width:min(100% - 24px,568px)!important;max-width:568px!important;margin:12px auto 0!important;padding:0 0 24px!important}
+.panel{
+  padding:16px!important;background:#080808!important;border:0!important;border-radius:0!important;
+  box-shadow:none!important;backdrop-filter:none!important;overflow:visible!important;
+}
+.panel:before{display:none!important}
+.panel h2{font-size:22px!important;font-weight:800!important;letter-spacing:-.45px!important;margin:0 0 14px!important;color:#f7f7f8!important}
+.panel h2:after{display:none!important}
+.income{
+  padding:16px!important;background:#1c1c1e!important;border:0!important;border-radius:16px!important;
+  margin:10px 0 16px!important;box-shadow:none!important;
+}
+.income p{color:#929299!important;font-size:12px!important}
+.income h3{font-size:15px!important}
+.green{color:#fff!important;font-size:28px!important;text-shadow:none!important}
+.collect,.slot-buy,.case-select-button,.case-button,.buy-slot-btn,.auth-btn{
+  background:#168bff!important;color:#fff!important;border:0!important;border-radius:12px!important;
+  box-shadow:none!important;text-transform:none!important;letter-spacing:0!important;font-weight:800!important;
+}
+.collect{width:100%!important;padding:14px!important;font-size:15px!important}
+.collect:hover,.slot-buy:hover,.case-button:hover,.auth-btn:hover{filter:brightness(1.08)!important;transform:none!important}
+.garage-tools,.garage-select-tools{
+  background:#1c1c1e!important;border:0!important;border-radius:13px!important;padding:12px!important;
+}
+.garage-tools p,.selection-count{color:#929299!important}
+.slot-price{color:#75bdff!important}
+.cars{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+.car{
+  background:#1c1c1e!important;border:1px solid #303034!important;border-radius:16px!important;
+  padding:10px!important;box-shadow:none!important;
+}
+.car:before{display:none!important}
+.car:hover{transform:translateY(-2px)!important;filter:none!important}
+.car img{height:112px!important;background:transparent!important;border-radius:10px!important}
+.car h3{font-size:14px!important;font-weight:750!important;letter-spacing:0!important}
+.car p{font-size:12px!important;color:#a3a3aa!important}
+.case-area{padding:8px 0 16px!important}
+.case-selected{background:#1c1c1e!important;border:1px solid #34343a!important;box-shadow:none!important}
+.case-selected .name{background:none!important;-webkit-text-fill-color:#fff!important;text-shadow:none!important}
+.case-subtitle{color:#a0a0a6!important}
+.case-visual{filter:none!important}
+.quantity-button{background:#29292d!important;border:1px solid #3a3a40!important;border-radius:10px!important;color:#fff!important}
+.quantity-button.active{background:#168bff!important;border-color:#168bff!important}
+.case-button{width:100%!important;padding:15px!important;font-size:15px!important}
+.case-price,.number-controls,.number-inventory,.income .reward-card{
+  background:#1c1c1e!important;border:1px solid #303034!important;border-radius:14px!important;box-shadow:none!important;
+}
+.empty{background:#1c1c1e!important;border:1px dashed #3a3a40!important}
+.reward-card,.clan-member,.clan-request,.clan-invite,.clan-chat{
+  background:#1c1c1e!important;border-color:#34343a!important;border-radius:13px!important;
+}
+.clan-btn.primary{background:#168bff!important;color:#fff!important}
+.modal,.tutorial,.profile-modal{background:rgba(0,0,0,.82)!important;backdrop-filter:blur(12px)!important}
+.modal-box,.tutorial-box,.profile-box,.auth-box{
+  background:#1c1c1e!important;border:1px solid #3a3a40!important;border-radius:18px!important;
+  box-shadow:0 24px 80px #000b!important;
+}
+.modal-box h2,.tutorial-box h2,.auth-box h2{color:#fff!important;text-shadow:none!important}
+.auth-box{padding:26px!important}
+.auth-input{background:#101012!important;border:1px solid #3a3a40!important;border-radius:11px!important}
+.auth-input:focus{border-color:#168bff!important;box-shadow:0 0 0 3px #168bff22!important}
+footer{max-width:568px!important;margin:12px auto!important;border:0!important;color:#666!important}
+button{font-family:inherit}
+button:focus-visible{outline:2px solid #168bff!important;outline-offset:2px!important}
+@media(min-width:700px){
+  body{padding-bottom:105px}
+  header{margin-top:18px}
+  .panel{padding:18px!important}
+}
+@media(max-width:420px){
+  header{width:calc(100% - 18px)!important;padding:7px 5px!important}
+  main{width:calc(100% - 12px)!important}
+  .panel{padding:12px!important}
+  .cars{gap:8px!important}
+  .car{padding:8px!important}
+  .car img{height:96px!important}
+  nav{width:calc(100% - 16px)!important;bottom:calc(7px + env(safe-area-inset-bottom))!important}
+  nav button{min-width:68px!important;padding:9px 8px!important;font-size:10px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+
 </style>
 
 <style>
