@@ -2,8 +2,8 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>IMPERIYA AVTO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Империя Авто</title>
 <link rel="icon" type="image/png" href="images/logo_image.png">
 
 <style>
@@ -971,137 +971,76 @@ footer{ text-align:center;color:#5f5f6e;padding:20px;font-size:12px;letter-spaci
  .car-details{box-sizing:border-box;max-width:100%;overflow:hidden;}
 }
 
-/* =========================================================
-   IMPERIYA AVTO — DROPEZONE-INSPIRED VISUAL REDESIGN
-   Visual layer only: existing IDs, handlers and API remain intact.
-   ========================================================= */
+/* ===== DROPEZONE-inspired compact mobile UI ===== */
 :root{
-  --bg:#080808; --bg-2:#101010; --panel:#1c1c1e; --panel-2:#242426; --panel-3:#303034;
-  --stroke:#2b2b2f; --stroke-2:#3a3a40; --text:#f5f5f7; --muted:#929299;
-  --yellow:#168bff; --yellow-2:#0878ed; --yellow-soft:#75bdff; --yellow-glow:rgba(22,139,255,.32);
-  --green:#35d07f; --red:#ff5364; --blue:#168bff; --radius:17px; --radius-sm:12px;
-  --shadow:0 12px 34px rgba(0,0,0,.38);
+ --bg:#000;--bg-2:#09090b;--panel:#1c1c1e;--panel-2:#242428;--panel-3:#303034;
+ --stroke:#303034;--stroke-2:#414146;--text:#f5f5f7;--muted:#96969e;
+ --yellow:#168bff;--yellow-2:#0878ed;--yellow-soft:#79bdff;--yellow-glow:rgba(22,139,255,.24);
+ --green:#35d66f;--red:#ff4d67;--blue:#168bff;--radius:16px;--radius-sm:10px;
+ --shadow:0 8px 24px rgba(0,0,0,.28);
 }
-html{background:#000;scroll-behavior:smooth}
-body{background:#000!important;color:#f5f5f7;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif!important;padding-bottom:94px;overflow-x:hidden}
+html,body{background:#000!important;color:#f5f5f7;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
 .bg-lights-container{display:none!important}
-header{
-  width:min(100% - 24px,568px);margin:14px auto 8px;padding:8px 12px!important;min-height:58px!important;
-  border:0!important;border-bottom:1px solid #222!important;border-radius:0!important;
-  background:#080808!important;box-shadow:none!important;overflow:visible!important;
-}
-header:before{display:none!important}
-.header-content{gap:10px!important}
-.header-logo{max-width:42px!important;max-height:42px;object-fit:contain;filter:none!important;animation:none!important}
-.header-content p{display:none!important}
-.header-fallback-text{font-size:18px!important;letter-spacing:0!important;background:none!important;-webkit-text-fill-color:#fff!important;animation:none!important}
-.header-widgets{gap:8px!important}
-.user-profile-widget{position:relative!important;top:auto!important;right:auto!important;padding:5px 10px 5px 5px!important;background:#1c1c1e!important;border:1px solid #303034!important}
-.user-avatar-mini{width:32px!important;height:32px!important;border:1px solid #777!important}
-.user-name-mini{font-size:12px!important}
-.fuel-widget{background:#1c1c1e!important;border:1px solid #303034!important;border-radius:999px!important;padding:7px 10px!important}
-.balance-container{max-width:568px!important;width:calc(100% - 24px)!important;margin:8px auto!important}
-.balance{padding:10px 14px!important;background:#1c1c1e!important;border:1px solid #303034!important;border-radius:13px!important;color:#fff!important;box-shadow:none!important;font-size:15px!important}
+header{max-width:568px;margin:0 auto 4px;padding:14px 8px 0;min-height:54px;display:flex;flex-direction:row;align-items:center;justify-content:flex-end}
+header .header-content{display:none}
+header .header-widgets{margin:0;display:flex;align-items:center;gap:8px}
+.user-profile-widget{background:#1c1c1e!important;border:0!important;border-radius:50px!important;padding:4px!important;min-width:36px}
+.user-name-mini{display:none!important}
+.user-avatar-mini{width:30px!important;height:30px!important}
+.user-level-badge{font-size:10px!important}
+.balance-container{position:absolute;top:15px;left:calc(50% + 56px);width:auto;max-width:none;margin:0;z-index:5}
+.balance{padding:8px 13px!important;background:#1c1c1e!important;border:0!important;border-radius:30px!important;color:#f5f5f7!important;font-size:13px!important;box-shadow:none!important;white-space:nowrap}
 .balance #balance{color:#fff!important;text-shadow:none!important}
-nav{
-  position:fixed!important;left:50%!important;right:auto!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;top:auto!important;
-  transform:translateX(-50%)!important;width:min(calc(100% - 24px),568px)!important;max-width:568px!important;
-  display:flex!important;flex-wrap:nowrap!important;justify-content:flex-start!important;gap:5px!important;
-  overflow-x:auto!important;overflow-y:hidden!important;padding:6px!important;margin:0!important;
-  border:1px solid #48484d!important;border-radius:18px!important;background:rgba(32,32,35,.96)!important;
-  backdrop-filter:blur(18px)!important;-webkit-backdrop-filter:blur(18px)!important;z-index:5000!important;
-  scrollbar-width:none!important;box-shadow:0 12px 35px #0009!important;
-}
-nav::-webkit-scrollbar{display:none!important}
-nav button{
-  flex:1 0 auto!important;min-width:74px!important;padding:10px 11px!important;border:0!important;border-radius:12px!important;
-  background:transparent!important;color:#a7a7ad!important;font-size:11px!important;font-weight:750!important;
-  letter-spacing:0!important;box-shadow:none!important;white-space:nowrap!important;transition:background .18s,color .18s!important;
-}
-nav button:hover:not(:disabled){transform:none!important;background:#2c2c30!important;color:#fff!important;box-shadow:none!important}
-nav button.active{background:#55555a!important;color:#fff!important;border:0!important;box-shadow:none!important}
-nav button:active{transform:scale(.97)!important;box-shadow:none!important}
-main{width:min(100% - 24px,568px)!important;max-width:568px!important;margin:12px auto 0!important;padding:0 0 24px!important}
-.panel{
-  padding:16px!important;background:#080808!important;border:0!important;border-radius:0!important;
-  box-shadow:none!important;backdrop-filter:none!important;overflow:visible!important;
-}
+nav#bottomNav{position:fixed!important;left:50%;bottom:10px;transform:translateX(-50%);z-index:9999;width:max-content;max-width:calc(100vw - 28px);display:flex;gap:2px;padding:4px;background:rgba(35,35,39,.94);border:1px solid #66666d;border-radius:28px;box-shadow:0 8px 28px rgba(0,0,0,.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px)}
+nav#bottomNav button{display:flex;align-items:center;justify-content:center;gap:6px;min-width:82px;padding:10px 15px;border:0;border-radius:22px;background:transparent;color:#a4a4ac;font-size:12px;font-weight:800;letter-spacing:0;box-shadow:none}
+nav#bottomNav button span{display:none}
+nav#bottomNav button.active{background:#505056;color:#fff;box-shadow:none}
+nav#bottomNav button:hover:not(:disabled){transform:none;color:#fff;box-shadow:none;border:0}
+main{width:min(568px,calc(100% - 24px));max-width:568px;margin:12px auto 0;padding:0 0 100px}
+.panel{background:#1c1c1e!important;border:0!important;border-radius:16px!important;padding:16px!important;box-shadow:none!important;backdrop-filter:none!important}
 .panel:before{display:none!important}
-.panel h2{font-size:22px!important;font-weight:800!important;letter-spacing:-.45px!important;margin:0 0 14px!important;color:#f7f7f8!important}
+.panel h2{font-size:26px!important;margin:0 0 16px!important;letter-spacing:-.5px!important}
 .panel h2:after{display:none!important}
-.income{
-  padding:16px!important;background:#1c1c1e!important;border:0!important;border-radius:16px!important;
-  margin:10px 0 16px!important;box-shadow:none!important;
-}
-.income p{color:#929299!important;font-size:12px!important}
-.income h3{font-size:15px!important}
-.green{color:#fff!important;font-size:28px!important;text-shadow:none!important}
-.collect,.slot-buy,.case-select-button,.case-button,.buy-slot-btn,.auth-btn{
-  background:#168bff!important;color:#fff!important;border:0!important;border-radius:12px!important;
-  box-shadow:none!important;text-transform:none!important;letter-spacing:0!important;font-weight:800!important;
-}
-.collect{width:100%!important;padding:14px!important;font-size:15px!important}
-.collect:hover,.slot-buy:hover,.case-button:hover,.auth-btn:hover{filter:brightness(1.08)!important;transform:none!important}
-.garage-tools,.garage-select-tools{
-  background:#1c1c1e!important;border:0!important;border-radius:13px!important;padding:12px!important;
-}
-.garage-tools p,.selection-count{color:#929299!important}
-.slot-price{color:#75bdff!important}
-.cars{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
-.car{
-  background:#1c1c1e!important;border:1px solid #303034!important;border-radius:16px!important;
-  padding:10px!important;box-shadow:none!important;
-}
-.car:before{display:none!important}
-.car:hover{transform:translateY(-2px)!important;filter:none!important}
-.car img{height:112px!important;background:transparent!important;border-radius:10px!important}
-.car h3{font-size:14px!important;font-weight:750!important;letter-spacing:0!important}
-.car p{font-size:12px!important;color:#a3a3aa!important}
-.case-area{padding:8px 0 16px!important}
-.case-selected{background:#1c1c1e!important;border:1px solid #34343a!important;box-shadow:none!important}
-.case-selected .name{background:none!important;-webkit-text-fill-color:#fff!important;text-shadow:none!important}
-.case-subtitle{color:#a0a0a6!important}
-.case-visual{filter:none!important}
-.quantity-button{background:#29292d!important;border:1px solid #3a3a40!important;border-radius:10px!important;color:#fff!important}
-.quantity-button.active{background:#168bff!important;border-color:#168bff!important}
-.case-button{width:100%!important;padding:15px!important;font-size:15px!important}
-.case-price,.number-controls,.number-inventory,.income .reward-card{
-  background:#1c1c1e!important;border:1px solid #303034!important;border-radius:14px!important;box-shadow:none!important;
-}
-.empty{background:#1c1c1e!important;border:1px dashed #3a3a40!important}
-.reward-card,.clan-member,.clan-request,.clan-invite,.clan-chat{
-  background:#1c1c1e!important;border-color:#34343a!important;border-radius:13px!important;
-}
-.clan-btn.primary{background:#168bff!important;color:#fff!important}
-.modal,.tutorial,.profile-modal{background:rgba(0,0,0,.82)!important;backdrop-filter:blur(12px)!important}
-.modal-box,.tutorial-box,.profile-box,.auth-box{
-  background:#1c1c1e!important;border:1px solid #3a3a40!important;border-radius:18px!important;
-  box-shadow:0 24px 80px #000b!important;
-}
-.modal-box h2,.tutorial-box h2,.auth-box h2{color:#fff!important;text-shadow:none!important}
-.auth-box{padding:26px!important}
-.auth-input{background:#101012!important;border:1px solid #3a3a40!important;border-radius:11px!important}
-.auth-input:focus{border-color:#168bff!important;box-shadow:0 0 0 3px #168bff22!important}
-footer{max-width:568px!important;margin:12px auto!important;border:0!important;color:#666!important}
+.income{background:#1c1c1e!important;border:0!important;box-shadow:none!important}
+.collect{background:#168bff!important;color:#fff!important}
 button{font-family:inherit}
-button:focus-visible{outline:2px solid #168bff!important;outline-offset:2px!important}
-@media(min-width:700px){
-  body{padding-bottom:105px}
-  header{margin-top:18px}
-  .panel{padding:18px!important}
-}
-@media(max-width:420px){
-  header{width:calc(100% - 18px)!important;padding:7px 5px!important}
-  main{width:calc(100% - 12px)!important}
-  .panel{padding:12px!important}
-  .cars{gap:8px!important}
-  .car{padding:8px!important}
-  .car img{height:96px!important}
-  nav{width:calc(100% - 16px)!important;bottom:calc(7px + env(safe-area-inset-bottom))!important}
-  nav button{min-width:68px!important;padding:9px 8px!important;font-size:10px!important}
-}
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+.menu-panel{padding:0!important;background:transparent!important;overflow:visible!important}
+.menu-panel h2{font-size:34px!important;margin:0 0 10px!important}
+.menu-group-title{font-size:11px;color:#a1a1a8;margin:19px 0 9px;padding-left:15px;font-weight:700}
+.season-pass-card{padding:14px 15px;border-radius:21px;background:linear-gradient(110deg,#6156e8,#bd4fe9);box-shadow:0 5px 24px rgba(151,74,238,.26);color:white}
+.season-pass-head,.season-pass-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px}
+.season-pass-head strong{padding:3px 9px;border-radius:15px;background:rgba(255,255,255,.2)}
+.season-pass-progress{height:6px;background:rgba(255,255,255,.32);border-radius:8px;margin:12px 0 8px;overflow:hidden}
+.season-pass-progress span{display:block;height:100%;background:#fff;border-radius:8px}
+.season-pass-foot{font-size:11px;opacity:.95}
+.menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.menu-grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.menu-tile{position:relative;min-height:62px;padding:12px 12px 11px 48px;border-radius:18px;text-align:left;border:1px solid var(--tile-border,#3d3d42);background:linear-gradient(120deg,var(--tile-bg,#242428),#1c1c1e 75%);color:#fff;box-shadow:0 0 15px var(--tile-glow,transparent);display:flex;flex-direction:column;justify-content:center;gap:2px;cursor:pointer}
+.menu-tile>span{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:22px}
+.menu-tile b{font-size:14px;line-height:1.15}
+.menu-tile small{font-size:11px;color:#a6a6ad;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.menu-tile.wide{grid-column:1/-1}
+.menu-tile.gold{--tile-border:#8d7220;--tile-bg:#332c18;--tile-glow:rgba(231,183,38,.18)}
+.menu-tile.green{--tile-border:#3c9b62;--tile-bg:#193323;--tile-glow:rgba(47,201,105,.18)}
+.menu-tile.amber{--tile-border:#a66c23;--tile-bg:#382817;--tile-glow:rgba(231,145,36,.18)}
+.menu-tile.cyan{--tile-border:#368aa8;--tile-bg:#19303b;--tile-glow:rgba(52,178,220,.18)}
+.menu-tile.purple{--tile-border:#86509d;--tile-bg:#302039;--tile-glow:rgba(171,90,205,.18)}
+.menu-tile.red{--tile-border:#a83d52;--tile-bg:#381c25;--tile-glow:rgba(225,61,94,.18)}
+.menu-tile.blue{--tile-border:#277fc7;--tile-bg:#192b3e;--tile-glow:rgba(30,137,236,.18)}
+.menu-tile:active{transform:scale(.985)}
+/* Compact car cards and clean graphite surfaces */
+.car,.case-area,.fuel-card,.race-slot,.task-card,.reward-card{background:#1c1c1e!important;border-color:#303034!important;box-shadow:none!important}
+.car{border-radius:16px!important}
+.car.expanded{border-color:#168bff!important;box-shadow:0 0 0 1px #168bff!important}
+button:disabled{opacity:.45}
+@media(max-width:600px){
+ header{width:calc(100% - 24px)}
+ main{width:calc(100% - 20px);margin-top:10px}
+ .panel{padding:13px!important}
+ .menu-panel{padding:0!important}
+ .menu-panel h2{font-size:30px!important}
+ .menu-tile{padding-left:44px}
+ nav#bottomNav{bottom:max(8px,env(safe-area-inset-bottom))}
 }
 
 </style>
@@ -1475,18 +1414,10 @@ html,body{overflow-x:hidden;overflow-anchor:none;scroll-behavior:auto}
   <div class="balance" id="balanceBox">Баланс: <span id="balance">0</span> ₽</div>
 </div>
 
-<nav>
- <button class="active" onclick="openTab('garage',this)">🏎️ Мой гараж</button>
- <button onclick="openTab('cars',this)">🎁 Кейс машин</button>
- <button onclick="openTab('numbers',this)">🔢 Номера</button>
- <button onclick="openTab('containers',this)">📦 Контейнеры</button>
- <button onclick="openTab('casino',this)">🎰 Казино</button>
- <button onclick="openTab('races',this)">🏁 Гонки</button>
- <button id="navTasksBtn" onclick="openTab('tasks',this)">📋 Задания</button>
- <button onclick="openTab('collection',this)">📚 Коллекция</button>
- <button onclick="openTab('tops',this)">🏆 Топы</button>
- <button onclick="openTab('clans',this)" id="clanNavBtn">👥 Кланы <span id="clanNoticeDot" hidden></span></button>
- <button onclick="openTab('rewards',this)" id="rewardNavBtn">🎁 Награды <span id="rewardNoticeDot" hidden></span></button>
+<nav id="bottomNav" aria-label="Основная навигация">
+ <button class="active" data-tab="garage" onclick="openTab('garage',this)"><span>🚘</span>Гараж</button>
+ <button data-tab="cars" onclick="openTab('cars',this)"><span>🎁</span>Кейсы</button>
+ <button data-tab="menu" onclick="openTab('menu',this)"><span>☰</span>Меню</button>
 </nav>
 
 <main>
@@ -1862,6 +1793,39 @@ html,body{overflow-x:hidden;overflow-anchor:none;scroll-behavior:auto}
 <section id="rewards" class="panel" hidden>
  <h2>🎁 Ежедневные и недельные награды</h2>
  <div id="rewardsContent"><div class="reward-card">Загрузка наград...</div></div>
+</section>
+
+
+<section id="menu" class="panel menu-panel" hidden>
+ <h2>Меню</h2>
+ <div class="season-pass-card">
+  <div class="season-pass-head"><b>🎟️ Пропуск · Сезон 2</b><strong>3/60</strong></div>
+  <div class="season-pass-progress"><span style="width:83%"></span></div>
+  <div class="season-pass-foot"><span>Уровень 4 · 💰 18 000 ₽</span><span>👑 Премиум</span></div>
+ </div>
+ <div class="menu-group-title">СЕЗОН</div>
+ <div class="menu-grid">
+  <button class="menu-tile gold wide" onclick="openTab('tops')"><span>🏆</span><b>Рейтинг</b><small>Сезон 2 · таблица лидеров</small></button>
+ </div>
+ <div class="menu-group-title">МИНИ-ИГРЫ</div>
+ <div class="menu-grid">
+  <button class="menu-tile green wide" onclick="openTab('casino')"><span>🎯</span><b>Апгрейд</b><small>Испытай удачу в мини-игре</small></button>
+  <button class="menu-tile blue wide" onclick="openTab('races')"><span>🏁</span><b>Гонки</b><small>Соревнуйся с другими игроками</small></button>
+ </div>
+ <div class="menu-group-title">ТОРГОВЛЯ</div>
+ <div class="menu-grid two">
+  <button class="menu-tile amber" onclick="openTab('containers')"><span>🏪</span><b>Площадка</b><small>Контейнеры и торговля</small></button>
+  <button class="menu-tile cyan" onclick="openTab('numbers')"><span>🚘</span><b>Номера</b><small>Номера для машин</small></button>
+  <button class="menu-tile green wide" onclick="openTab('collection')"><span>🛒</span><b>Коллекция</b><small>Собирай редкие автомобили</small></button>
+ </div>
+ <div class="menu-group-title">ЕЩЁ</div>
+ <div class="menu-grid two">
+  <button class="menu-tile purple" onclick="openTab('collection')"><span>📚</span><b>Коллекция</b><small>Автомобили и предметы</small></button>
+  <button class="menu-tile red" onclick="openTab('clans')"><span>👥</span><b>Кланы</b><small>Играй вместе с друзьями</small></button>
+  <button class="menu-tile blue wide" id="menuTasksBtn" onclick="openTab('tasks')"><span>📋</span><b>Задания</b><small>Выполняй задания и получай награды</small></button>
+  <button class="menu-tile gold wide" onclick="openTab('rewards')"><span>🎁</span><b>Награды</b><small>Ежедневные и недельные бонусы</small></button>
+  <button class="menu-tile cyan wide" onclick="openTab('cars')"><span>🎁</span><b>Кейсы автомобилей</b><small>Открывай новые машины</small></button>
+ </div>
 </section>
 </main>
 
@@ -2486,6 +2450,14 @@ function buildPools() {
 const CASE_POOLS = buildPools();
 
 // ================= ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ =================
+function getTunedCarPower(car, baseItem){
+ const base = Number(baseItem && baseItem.power) || 0;
+ const tuning = car && car.tuning && typeof car.tuning === 'object' ? car.tuning : {};
+ const engine = Math.max(0, Number(tuning.engine) || 0);
+ const turbo = Math.max(0, Number(tuning.turbo) || 0);
+ return Math.round(base * (1 + engine * 0.04 + turbo * 0.07));
+}
+
 function getRate(){
  const carIncome = cars.reduce((sum,car)=>{
   const item=catalog.find(c=>c.id===car.id);
@@ -2556,7 +2528,7 @@ function upgradeCarTuning(index,key){
   const level=Math.max(0,Number(car.tuning[key])||0);if(level>=max[key]){window.__tuningBusy=false;return;}
   const rates={engine:[.08,.07],turbo:[.15,.12],suspension:[.10,.08]};const cost=Math.round(item.price*(rates[key][0]+level*rates[key][1]));
   if(!Number.isFinite(cost)||balance<cost){showToastNotification('💸','Недостаточно денег для улучшения');window.__tuningBusy=false;return;}
-  balance-=cost;car.tuning[key]=level+1;triggerBalanceAnimation(cost,false);update();renderGarage();scheduleSave();
+  balance-=cost;car.tuning[key]=level+1;triggerBalanceAnimation(cost,false);update();renderGarage();if(!document.getElementById('races').hidden){renderRaceCarsGrid();}scheduleSave();
   requestAnimationFrame(()=>{window.scrollTo({top:savedScrollY,left:0,behavior:'auto'});savedScrolls.forEach(s=>{if(s.el&&s.el.isConnected){s.el.scrollTop=s.top;s.el.scrollLeft=s.left;}});requestAnimationFrame(()=>{window.scrollTo({top:savedScrollY,left:0,behavior:'auto'});savedScrolls.forEach(s=>{if(s.el&&s.el.isConnected){s.el.scrollTop=s.top;s.el.scrollLeft=s.left;}});document.documentElement.style.scrollBehavior='';window.__tuningBusy=false;});});
   showToastNotification('🔧 Тюнинг установлен',`${item.name}: ${key==='engine'?'двигатель':key==='turbo'?'турбо':'подвеска'} ${level+1} уровня`);
 }
@@ -2630,7 +2602,7 @@ function renderGarage(){
         <div class="car-details">
           <div class="car-stats">
             <div class="stat-row"><span class="stat-label">✨ Редкость</span> <span class="stat-value rarity" style="color:${color}">${item.rarity}</span></div>
-            <div class="stat-row"><span class="stat-label">⚡ Мощность</span> <span class="stat-value">${item.power} л.с.</span></div>
+            <div class="stat-row"><span class="stat-label">⚡ Мощность</span> <span class="stat-value">${getTunedCarPower(car,item)} л.с.</span></div>
             <div class="stat-row"><span class="stat-label">💵 Продажа</span> <span class="stat-value" style="color:var(--green)">${Math.floor(item.price*0.15).toLocaleString("ru-RU")} ₽</span></div>
             <div class="stat-row"><span class="stat-label">📈 Доход</span> <span class="stat-value" style="color:var(--yellow)">${item.income.toLocaleString("ru-RU")} ₽/сек</span></div>
           </div>
@@ -3489,7 +3461,7 @@ async function viewPlayerProfile(login) {
                     <div style="font-size:24px; display:none;">🚘</div>
                     <div class="view-car-info">
                         <div class="view-car-name">${item.name}</div>
-                        <div class="view-car-stat">⚡ ${item.power} л.с.</div>
+                        <div class="view-car-stat">⚡ ${getTunedCarPower(c,item)} л.с.</div>
                     </div>
                 `;
                 carsList.appendChild(el);
@@ -3659,8 +3631,10 @@ function openTab(tab,button){
  document.querySelectorAll("main section").forEach(s=>{ s.hidden=true; });
  const section = document.getElementById(tab);
  if (section) section.hidden = false;
- document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
- if (button) button.classList.add("active");
+ document.querySelectorAll("#bottomNav button").forEach(b=>b.classList.remove("active"));
+ const activeBottomTab = tab === "garage" ? "garage" : (tab === "cars" ? "cars" : "menu");
+ const bottomButton = document.querySelector(`#bottomNav button[data-tab="${activeBottomTab}"]`);
+ if (bottomButton) bottomButton.classList.add("active");
 
  if (tab === "tops") {
    renderTops();
@@ -4771,7 +4745,7 @@ function renderRaceCarsGrid() {
   const uniqueCars = [];
   cars.forEach((owned, ownedIndex) => {
     const base = catalog.find(x => x.id === owned.id);
-    if (base) { const t=owned.tuning||{}; const power=Math.round(base.power*(1+Math.max(0,Number(t.engine)||0)*.04+Math.max(0,Number(t.turbo)||0)*.07)); uniqueCars.push({...base,power,ownedIndex,ownedCar:owned}); }
+    if (base) { const power=getTunedCarPower(owned,base); uniqueCars.push({...base,power,ownedIndex,ownedCar:owned}); }
   });
   uniqueCars.sort((a, b) => b.power - a.power);
   const topCars = uniqueCars.slice(0, 4);
@@ -4899,7 +4873,7 @@ function openCarSelect() {
       const el = document.createElement("div");
       el.className = "car-select-item";
       el.onclick = () => {
-        const t=c.tuning||{}; selectedPlayerCar={...item,ownedIndex:cars.indexOf(c),power:Math.round(item.power*(1+(Number(t.engine)||0)*.04+(Number(t.turbo)||0)*.07)),ownedCar:c};
+        const t=c.tuning||{}; selectedPlayerCar={...item,ownedIndex:cars.indexOf(c),power:getTunedCarPower(c,item),ownedCar:c};
         closeCarSelect();
         updateRaceUI();
         renderRaceCarsGrid();
@@ -4908,7 +4882,7 @@ function openCarSelect() {
         <img src="images/${item.id}.png" onerror="this.style.display='none'">
         <div class="car-select-item-info">
           <div class="car-select-item-name">${item.name}</div>
-          <div class="car-select-item-power">⚡ ${item.power} л.с.</div>
+          <div class="car-select-item-power">⚡ ${getTunedCarPower(c,item)} л.с.</div>
         </div>
       `;
       list.appendChild(el);
